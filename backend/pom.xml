@@ -9,10 +9,10 @@
 		<version>4.0.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>itu.p17.s5.cloud</groupId>
-	<artifactId>roadworks-tracker</artifactId>
+	<groupId>itu.cloud</groupId>
+	<artifactId>roadworks</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>roadworks-tracker</name>
+	<name>roadworks</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>

@@ -1,10 +1,10 @@
-package itu.p17.s5.cloud.roadworks_tracker;
+package itu.cloud.roadworks;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RoadworksTrackerApplicationTests {
+class RoadworksApplicationTests {
 
 	@Test
 	void contextLoads() {

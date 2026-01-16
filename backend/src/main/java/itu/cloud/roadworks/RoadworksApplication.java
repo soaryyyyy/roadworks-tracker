@@ -1,13 +1,13 @@
-package itu.p17.s5.cloud.roadworks_tracker;
+package itu.cloud.roadworks;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RoadworksTrackerApplication {
+public class RoadworksApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RoadworksTrackerApplication.class, args);
+		SpringApplication.run(RoadworksApplication.class, args);
 	}
 
 }
