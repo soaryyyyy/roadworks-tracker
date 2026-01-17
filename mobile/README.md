@@ -6,7 +6,6 @@
 npm install firebase
 npm install ionicons
 npm install @capacitor/push-notifications
-npm install pinia
 ```
 
 ## Lancer l'image docker

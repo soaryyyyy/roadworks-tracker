@@ -88,13 +88,12 @@ import {
   IonSpinner, 
   IonCard, IonCardTitle, IonCardContent, IonCardHeader
 } from '@ionic/vue';
-import { logInOutline, alertCircleOutline } from 'ionicons/icons';
+import { logInOutline, alertCircleOutline, cloudOfflineOutline } from 'ionicons/icons';
 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 
-import { auth } from '@/services/firebase';
-import { setupPush } from '@/services/notifications';
+import { auth } from '@/services/firebase/routeworks.tracker';
 import { showToast } from '@/services/utils/ui';
 import router from '@/router';
 
@@ -134,7 +133,6 @@ const handleSignIn = async () => {
   awaitSignIn.value = true;
   try {
     await signInWithEmailAndPassword(auth, email.value, password.value);
-    await setupPush();
     email.value = '';
     password.value = '';
     router.push('/');
@@ -142,7 +140,7 @@ const handleSignIn = async () => {
     if (error instanceof FirebaseError) {
       switch (error.code) {
         case 'auth/network-request-failed':
-          showToast('Erreur de connexion. Vérifiez votre accès internet.', 5000, alertCircleOutline, 'danger', 'bottom')
+          showToast('Vérifiez votre accès internet.', 5000, cloudOfflineOutline, 'danger', 'bottom')
           break;
 
         case 'auth/user-disabled':
@@ -161,7 +159,7 @@ const handleSignIn = async () => {
         case 'auth/wrong-password':
         case 'auth/invalid-email':
           errors.value.simpleErrorMessage = 
-          "Identifiants invalides.<br>Veuillez vérifier votre e-mail et votre mot de passe.";
+          "Veuillez vérifier votre e-mail et votre mot de passe.";
           break;
       }
     } else {
