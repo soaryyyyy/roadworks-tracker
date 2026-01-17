@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import TabsPage from '../views/TabsPage.vue'
-import { auth } from '@/services/firebase/routeworks.tracker';
-import { onAuthStateChanged } from 'firebase/auth';
+import routeWorksTracker from '@/services/firebase/routeworks.tracker';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 const routes: Array<RouteRecordRaw> = [
   { path: '/', redirect: '/tabs/tab1' },
@@ -19,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
 
-  { path: '/auth/login', component: () => import('@/views/auth/LoginPage.vue') },
+  { path: '/auth/signIn', component: () => import('@/views/auth/SignInPage.vue') },
 ]
 
 const router = createRouter({
@@ -27,15 +27,17 @@ const router = createRouter({
   routes
 })
 
-const getCurrentUser = () => {
+const getCurrentUser = (): Promise<User | null> => {
   return new Promise((resolve, reject) => {
-    const removeListener = onAuthStateChanged(
-      auth,
+    const unsubscribe = onAuthStateChanged(
+      routeWorksTracker.auth,
       (user) => {
-        removeListener();
+        unsubscribe();
         resolve(user);
       },
-      reject
+      (error) => {
+        reject(error);
+      }
     );
   });
 };
@@ -48,7 +50,7 @@ router.beforeEach(async (to, from, next) => {
     if (user) {
       next();
     } else {
-      next('/auth/login');
+      next('/login');
     }
   } else {
     next();

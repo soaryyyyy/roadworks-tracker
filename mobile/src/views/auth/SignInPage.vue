@@ -93,7 +93,7 @@ import { logInOutline, alertCircleOutline, cloudOfflineOutline } from 'ionicons/
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 
-import { auth } from '@/services/firebase/routeworks.tracker';
+import routeWorksTracker from '@/services/firebase/routeworks.tracker';
 import { showToast } from '@/services/utils/ui';
 import router from '@/router';
 
@@ -132,7 +132,7 @@ const handleSignIn = async () => {
   clearErrors();
   awaitSignIn.value = true;
   try {
-    await signInWithEmailAndPassword(auth, email.value, password.value);
+    await signInWithEmailAndPassword(routeWorksTracker.auth, email.value, password.value);
     email.value = '';
     password.value = '';
     router.push('/');

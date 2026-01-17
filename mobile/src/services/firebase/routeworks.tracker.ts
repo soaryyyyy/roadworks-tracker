@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
+import { getRemoteConfig } from 'firebase/remote-config'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDehq2R623KKuuEpxX0Ubt-IokwP2hqINY',
@@ -14,5 +15,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const remoteConfig = getRemoteConfig(app);
 
-export { auth, db }
+remoteConfig.settings = {
+  minimumFetchIntervalMillis: 3_600_000,
+  fetchTimeoutMillis: 60_000,
+};
+
+remoteConfig.defaultConfig = {
+  session_duration: 3600
+};
+
+export default { auth, db, remoteConfig }
