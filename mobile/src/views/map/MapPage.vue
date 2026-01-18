@@ -3,7 +3,7 @@
 
     <ion-header>
       <ion-toolbar>
-        <ion-title>Tab 1</ion-title>
+        <ion-title>Carte</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -14,14 +14,15 @@
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, isPlatform } from '@ionic/vue';
-
 import { onMounted } from 'vue';
+
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, isPlatform } from '@ionic/vue';
 import { Geolocation } from '@capacitor/geolocation';
 import L from 'leaflet';
 
 let map: L.Map | null = null;
 
+// TODO Change the location of this method to be in a specific folder
 const checkGeoLocationPermissions = async () => {
   if (isPlatform('hybrid')) {
     const permission = await Geolocation.checkPermissions();
