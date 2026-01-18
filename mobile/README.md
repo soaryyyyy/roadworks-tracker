@@ -23,3 +23,14 @@ npm install --save-dev @types/leaflet
 ```bash
 docker compose up --build
 ```
+
+## Android permission
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"
+    tools:ignore="ManifestOrder" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
