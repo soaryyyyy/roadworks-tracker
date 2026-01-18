@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import TabsPage from '../views/TabsPage.vue'
-import routeWorksTracker from '@/services/firebase/routeworks.tracker';
+import { auth } from '@/services/firebase/routeworks.tracker';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import { isSessionExpired } from '@/services/session/preference';
 
 const routes: Array<RouteRecordRaw> = [
   { path: '/', redirect: '/tabs/tab1' },
@@ -30,7 +31,7 @@ const router = createRouter({
 const getCurrentUser = (): Promise<User | null> => {
   return new Promise((resolve, reject) => {
     const unsubscribe = onAuthStateChanged(
-      routeWorksTracker.auth,
+      auth,
       (user) => {
         unsubscribe();
         resolve(user);
@@ -47,14 +48,17 @@ router.beforeEach(async (to, from, next) => {
 
   if (requiresAuth) {
     const user = await getCurrentUser();
-    if (user) {
+    const sessionExpired = await isSessionExpired();
+
+    if (user && !sessionExpired) {
       next();
     } else {
-      next('/login');
+      next('/auth/signIn');
     }
   } else {
     next();
   }
 });
 
-export default router
+
+export default router;

@@ -4,7 +4,7 @@ import router from './router';
 
 import { IonicVue } from '@ionic/vue';
 import { createPinia } from 'pinia';
-import routeWorksTrackerConfigStore from './stores/routeworks.tracker';
+import { useConfigStore } from './stores/routeworks.tracker';
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
 
@@ -43,7 +43,7 @@ app.use(pinia);
 app.use(router);
 
 const initApp = async () => {
-  const configStore = routeWorksTrackerConfigStore.useConfigStore();
+  const configStore = useConfigStore();
   await configStore.loadRemoteConfig();
   await router.isReady();
   app.mount('#app');

@@ -23,7 +23,7 @@ remoteConfig.settings = {
 };
 
 remoteConfig.defaultConfig = {
-  session_duration: 3600
+  session_duration_millis: 3_600_000
 };
 
-export default { auth, db, remoteConfig }
+export { auth, db, remoteConfig }

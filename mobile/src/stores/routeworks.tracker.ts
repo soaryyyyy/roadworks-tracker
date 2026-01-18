@@ -1,19 +1,19 @@
 import { defineStore } from 'pinia';
-import routeWorksTracker from '@/services/firebase/routeworks.tracker';
+import { remoteConfig } from '@/services/firebase/routeworks.tracker';
 import { fetchAndActivate, getNumber } from "firebase/remote-config";
 
 const useConfigStore = defineStore('routeworks.tracker.config', {
   state: () => ({
-    sessionDuration: 3600,
+    sessionDurationMillis: 3_600_000,
     isConfigLoaded: false
   }),
   actions: {
     async loadRemoteConfig() {
-      await fetchAndActivate(routeWorksTracker.remoteConfig);
-      this.sessionDuration = getNumber(routeWorksTracker.remoteConfig, 'session_duration');
+      await fetchAndActivate(remoteConfig);
+      this.sessionDurationMillis = getNumber(remoteConfig, 'session_duration_millis');
       this.isConfigLoaded = true;
     }
   }
 });
 
-export default { useConfigStore };
+export { useConfigStore };

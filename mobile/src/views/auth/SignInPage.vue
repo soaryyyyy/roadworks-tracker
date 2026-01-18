@@ -66,9 +66,7 @@
       :disabled="isSignInButtonDisabled">
 
       <ion-text v-if="!awaitSignIn">Se Connecter</ion-text>
-  
-      <ion-spinner v-else name="lines"></ion-spinner>
-  
+      <ion-spinner v-else name="lines"></ion-spinner>  
       <ion-icon v-if="!awaitSignIn" :icon="logInOutline" slot="end"></ion-icon>
 
     </ion-button>
@@ -90,12 +88,15 @@ import {
 } from '@ionic/vue';
 import { logInOutline, alertCircleOutline, cloudOfflineOutline } from 'ionicons/icons';
 
+import router from '@/router';
+
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 
-import routeWorksTracker from '@/services/firebase/routeworks.tracker';
+import { auth } from '@/services/firebase/routeworks.tracker';
 import { showToast } from '@/services/utils/ui';
-import router from '@/router';
+import { useConfigStore } from '@/stores/routeworks.tracker';
+import { setSessionExpirationDate } from '@/services/session/preference';
 
 // Input
 const email = ref<string>('');
@@ -104,12 +105,8 @@ const password = ref<string>('');
 // Disable button or not
 const awaitSignIn = ref<boolean>(false);
 
-const isAllCredentialInputNotEmpty = computed<boolean>(() => {
-  return email.value.length > 0 && password.value.length > 0;
-});
-
 const isSignInButtonDisabled = computed<boolean>(() => {
-  return awaitSignIn.value || !isAllCredentialInputNotEmpty.value;
+  return awaitSignIn.value || !email.value || !password.value;
 })
 
 // Error management
@@ -132,7 +129,13 @@ const handleSignIn = async () => {
   clearErrors();
   awaitSignIn.value = true;
   try {
-    await signInWithEmailAndPassword(routeWorksTracker.auth, email.value, password.value);
+    await signInWithEmailAndPassword(auth, email.value, password.value);
+    
+    const configStore = useConfigStore();
+    const sessionExpiresAt = Date.now() + configStore.sessionDurationMillis;
+
+    await setSessionExpirationDate(sessionExpiresAt);
+    
     email.value = '';
     password.value = '';
     router.push('/');
