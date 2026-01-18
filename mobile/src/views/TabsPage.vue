@@ -4,8 +4,8 @@
       <ion-router-outlet></ion-router-outlet>
       <ion-tab-bar slot="bottom">
         <ion-tab-button tab="map" href="/tabs/map">
-          <ion-icon aria-hidden="true" :icon="mapOutline" />
-          <ion-label>Carte</ion-label>
+          <ion-icon aria-hidden="true" :icon="locationOutline" />
+          <ion-label>Explorer</ion-label>
         </ion-tab-button>
 
         <ion-tab-button tab="tab2" href="/tabs/tab2">
@@ -24,5 +24,5 @@
 
 <script setup lang="ts">
 import { IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon, IonPage, IonRouterOutlet } from '@ionic/vue';
-import { ellipse, square, mapOutline } from 'ionicons/icons';
+import { ellipse, square, locationOutline } from 'ionicons/icons';
 </script>

@@ -3,33 +3,74 @@
 
     <ion-header>
       <ion-toolbar>
-        <ion-title>Carte</ion-title>
+        <ion-title>Explorer</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
+      <!-- <ion-fab slot="fixed" vertical="top" horizontal="end">
+        <ion-fab-button>
+          <ion-icon :icon="mapOutline"></ion-icon>
+        </ion-fab-button>
+      </ion-fab> -->
+
       <div id="map" style="height: 100%; width: 100%;"></div>
+
+      <ion-modal 
+        :is-open="isLocationModalOpen" 
+        @didDismiss="isLocationModalOpen = false"
+        :initial-breakpoint="0.25" 
+        :breakpoints="[0, 0.25, 0.8]"
+        :backdrop-breakpoint="0.5">
+
+        <location-detail :data="selectedLocationData"></location-detail>
+      </ion-modal>
+
     </ion-content>
+
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 
 import { 
   IonPage, IonHeader, IonToolbar, 
-  IonTitle, IonContent, actionSheetController
+  IonTitle, IonContent, IonFab, 
+  IonFabButton, IonIcon, loadingController,
+  IonModal
 } from '@ionic/vue';
 
-import { arrowBackOutline, shareOutline, trashBinOutline } from 'ionicons/icons';
+import { mapOutline } from 'ionicons/icons';
 
 import { Geolocation } from '@capacitor/geolocation';
 import { setupGeoLocationPermissions } from '@/services/geolocation/permission';
 import L from 'leaflet';
+import LocationDetail from '@/components/LocationDetail.vue';
 
 let map: L.Map | null = null;
 
-const initMap = async () => {
+const isLocationModalOpen = ref<boolean>(false);
+
+export interface LocationData {
+  latitude: number,
+  longitude: number,
+}
+
+const selectedLocationData = ref<LocationData>({
+  latitude: 0,
+  longitude: 0
+});
+
+const setupMap = async () => {
+  const mapLoading = await loadingController.create({
+    message: 'Chargement de la carte...',
+    spinner: 'crescent',
+    backdropDismiss: false,
+  });
+
+  await mapLoading.present();
+
   try {
     // Current coordinates
     await setupGeoLocationPermissions();
@@ -50,39 +91,29 @@ const initMap = async () => {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Current position marker
-    const currentPosition = L.marker([latitude, longitude])
+    // Mark current position
+    const location = L.marker([latitude, longitude])
       .addTo(map)
       .bindPopup(`${latitude},${longitude}`, {
         closeButton: false, 
         closeOnClick: false,
-      }).openPopup();
+      });
 
-    currentPosition.on('click', () => {
-      // Ca fait un effet des glitch mais au moins maintenant le pop up ne se ferme plus
-      currentPosition.openPopup() 
-      presentMarkerActionSheet(currentPosition);
+    location.on('click', () => {
+      location.openPopup();
+
+      selectedLocationData.value.latitude = latitude;
+      selectedLocationData.value.longitude = longitude;
+      isLocationModalOpen.value = true;
     });
-    
   } catch (error) {
     console.error(error);
+  } finally {
+    await mapLoading.dismiss();
   }
 };
 
-const presentMarkerActionSheet = async (marker: L.Marker) => {
-  const actionSheet = await actionSheetController.create({
-    header: `${marker.getLatLng().lat}, ${marker.getLatLng().lng}`,
-    buttons: [
-      { text: 'Signaler', icon: shareOutline },
-      { text: 'Supprimer', role: 'destructive', icon: trashBinOutline },
-      { text: 'Annuler', role: 'cancel', icon: arrowBackOutline },
-    ],
-  });
-
-  await actionSheet.present();
-}
-
 onMounted(() => {
-  initMap();
+  setupMap();
 });
 </script>
