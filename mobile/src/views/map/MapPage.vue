@@ -13,8 +13,8 @@
       <div id="map" style="height: 100%; width: 100%;"></div>
 
       <ion-modal 
-        :is-open="isLocationModalOpen" 
-        @didDismiss="isLocationModalOpen = false"
+        :is-open="isGeoLocationModalOpen" 
+        @didDismiss="isGeoLocationModalOpen = false"
         :initial-breakpoint="0.25" 
         :breakpoints="[0, 0.25, 0.8]"
         :backdrop-breakpoint="0.5">
@@ -40,7 +40,7 @@ import MapFab from '@/components/map/MapFab.vue';
 import L from 'leaflet';
 import { useCurrentLocationStore } from '@/pinia/geolocation';
 
-const isLocationModalOpen = ref<boolean>(false);
+const isGeoLocationModalOpen = ref<boolean>(false);
 
 let map: L.Map | null = null;
 let userLocation: L.Marker | null = null;
@@ -83,7 +83,7 @@ watch(
 
     if (!userLocation && map) {
       userLocation = L.marker([lat, lng]).addTo(map);
-      map.flyTo([lat, lng], 16);
+
     } else if (userLocation && map){
       userLocation.setLatLng([lat, lng]);
     }
