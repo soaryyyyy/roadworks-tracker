@@ -22,6 +22,7 @@ remoteConfig.settings = {
   fetchTimeoutMillis: 60_000,
 };
 
+// Default value to use if we cannot reach the remote one
 remoteConfig.defaultConfig = {
   session_duration_millis: 3_600_000
 };

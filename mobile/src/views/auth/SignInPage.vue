@@ -95,7 +95,7 @@ import { FirebaseError } from 'firebase/app';
 
 import { auth } from '@/services/firebase/routeworks.tracker';
 import { showToast } from '@/services/ui';
-import { useConfigStore } from '@/stores/routeworks.tracker';
+import { useConfigStore } from '@/pinia/firebase/routeworks.tracker';
 import { setSessionExpirationDate } from '@/services/session/preference';
 
 // Input

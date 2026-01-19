@@ -8,11 +8,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <!-- <ion-fab slot="fixed" vertical="top" horizontal="end">
-        <ion-fab-button>
-          <ion-icon :icon="mapOutline"></ion-icon>
-        </ion-fab-button>
-      </ion-fab> -->
+      <map-fab></map-fab>
 
       <div id="map" style="height: 100%; width: 100%;"></div>
 
@@ -23,7 +19,6 @@
         :breakpoints="[0, 0.25, 0.8]"
         :backdrop-breakpoint="0.5">
 
-        <location-detail :data="selectedLocationData"></location-detail>
       </ion-modal>
 
     </ion-content>
@@ -32,37 +27,25 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 import { 
   IonPage, IonHeader, IonToolbar, 
-  IonTitle, IonContent, IonFab, 
-  IonFabButton, IonIcon, loadingController,
+  IonTitle, IonContent, loadingController,
   IonModal
 } from '@ionic/vue';
 
-import { mapOutline } from 'ionicons/icons';
+import MapFab from '@/components/map/MapFab.vue';
 
-import { Geolocation } from '@capacitor/geolocation';
-import { setupGeoLocationPermissions } from '@/services/geolocation/permission';
 import L from 'leaflet';
-import LocationDetail from '@/components/LocationDetail.vue';
-
-let map: L.Map | null = null;
+import { useCurrentLocationStore } from '@/pinia/geolocation';
 
 const isLocationModalOpen = ref<boolean>(false);
 
-export interface LocationData {
-  latitude: number,
-  longitude: number,
-}
+let map: L.Map | null = null;
+let userLocation: L.Marker | null = null;
 
-const selectedLocationData = ref<LocationData>({
-  latitude: 0,
-  longitude: 0
-});
-
-const setupMap = async () => {
+const mountMap = async () => {
   const mapLoading = await loadingController.create({
     message: 'Chargement de la carte...',
     spinner: 'crescent',
@@ -72,40 +55,13 @@ const setupMap = async () => {
   await mapLoading.present();
 
   try {
-    // Current coordinates
-    await setupGeoLocationPermissions();
-
-    const coordinates = await Geolocation.getCurrentPosition({
-      enableHighAccuracy: true,
-      maximumAge: 0
-    });
-
-    const { latitude, longitude } = coordinates.coords;
-
-    // Map
     map = L.map('map', {
       zoomControl: false
-    }).setView([latitude, longitude], 15);
+    }).setView([-18.9184607, 47.5211293], 11); // Antananarivo
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-
-    // Mark current position
-    const location = L.marker([latitude, longitude])
-      .addTo(map)
-      .bindPopup(`${latitude},${longitude}`, {
-        closeButton: false, 
-        closeOnClick: false,
-      });
-
-    location.on('click', () => {
-      location.openPopup();
-
-      selectedLocationData.value.latitude = latitude;
-      selectedLocationData.value.longitude = longitude;
-      isLocationModalOpen.value = true;
-    });
   } catch (error) {
     console.error(error);
   } finally {
@@ -113,7 +69,30 @@ const setupMap = async () => {
   }
 };
 
+const currentLocationStore = useCurrentLocationStore();
+
+watch(
+  () => currentLocationStore.coords,
+
+  (coords) => { 
+    if (!coords) {
+      return;
+    }
+
+    const { lat, lng } = coords; 
+
+    if (!userLocation && map) {
+      userLocation = L.marker([lat, lng]).addTo(map);
+      map.flyTo([lat, lng], 16);
+    } else if (userLocation && map){
+      userLocation.setLatLng([lat, lng]);
+    }
+  },
+
+  { deep: true }
+)
+
 onMounted(() => {
-  setupMap();
+  mountMap();
 });
 </script>
