@@ -1,10 +1,9 @@
 import { defineStore } from "pinia";
 import { Geolocation } from "@capacitor/geolocation";
 import { PermissionState } from "@capacitor/core";
-import { isPlatform } from "@ionic/vue";
 
 interface PermissionStoreState {
-  geoLocationStatus: PermissionState;
+  status: PermissionState;
 }
 
 /**
@@ -12,30 +11,30 @@ interface PermissionStoreState {
  * Geolocation.checkPermissions and Geolocation.requestPermissions in it
  * Don't forget to check if isPlatform('hybrid')
  */
-const usePermissionStore = defineStore('permission', {
+const useGeoLocationPermissionStore = defineStore('geo-location-permission', {
   state: (): PermissionStoreState =>  ({
-    geoLocationStatus: 'prompt',
+    status: 'prompt',
   }),
 
   getters: {
-    isGeoLocationGranted: (state) => state.geoLocationStatus === 'granted',
+    isGranted: (state) => state.status === 'granted',
   },
 
   actions: {
-    async loadGeoLocationStatus() {
+    async loadStatus() {
       try {
         const status = await Geolocation.checkPermissions();
-        this.geoLocationStatus = status.location;
+        this.status = status.location;
       } catch (error) {
         console.log(error);
       }
     },
 
-    async requestGeoLocationPermission() {
-      if (!this.isGeoLocationGranted) {
+    async requestPermission() {
+      if (!this.isGranted) {
         try {
           const status = await Geolocation.requestPermissions();
-          this.geoLocationStatus = status.location;
+          this.status = status.location;
         } catch (error) {
           console.log(error);
         }
@@ -44,4 +43,4 @@ const usePermissionStore = defineStore('permission', {
   }
 });
 
-export { usePermissionStore };
+export { useGeoLocationPermissionStore };

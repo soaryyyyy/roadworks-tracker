@@ -14,7 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const firestore = getFirestore(app);
 const remoteConfig = getRemoteConfig(app);
 
 remoteConfig.settings = {
@@ -27,4 +27,4 @@ remoteConfig.defaultConfig = {
   session_duration_millis: 3_600_000
 };
 
-export { auth, db, remoteConfig }
+export { auth, firestore, remoteConfig }

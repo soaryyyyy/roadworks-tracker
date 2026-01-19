@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { auth } from '@/services/firebase/routeworks.tracker';
+import { auth } from '@/services/firebase/routeworks-tracker';
 import { IonButton, IonIcon } from '@ionic/vue';
 import { logInOutline } from 'ionicons/icons';
 

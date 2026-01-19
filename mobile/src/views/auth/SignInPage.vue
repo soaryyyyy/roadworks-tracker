@@ -93,9 +93,9 @@ import router from '@/router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 
-import { auth } from '@/services/firebase/routeworks.tracker';
+import { auth } from '@/services/firebase/routeworks-tracker';
 import { showToast } from '@/utils/ui';
-import { useConfigStore } from '@/pinia/firebase/routeworks.tracker';
+import { useConfigStore } from '@/pinia/firebase/routeworks-tracker';
 import { setSessionExpirationDate } from '@/preference/session';
 
 // Input

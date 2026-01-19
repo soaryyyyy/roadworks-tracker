@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { remoteConfig } from '@/services/firebase/routeworks.tracker';
+import { remoteConfig } from '@/services/firebase/routeworks-tracker';
 import { activate, fetchAndActivate, getNumber } from "firebase/remote-config";
 
 const useConfigStore = defineStore('firebase.routeworks-tracker.config', {

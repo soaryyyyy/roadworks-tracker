@@ -5,8 +5,8 @@ import router from './router';
 import { IonicVue } from '@ionic/vue';
 import { createPinia } from 'pinia';
 
-import { useConfigStore } from './pinia/firebase/routeworks.tracker';
-import { usePermissionStore } from './pinia/permission';
+import { useConfigStore } from './pinia/firebase/routeworks-tracker';
+import { useGeoLocationPermissionStore } from './pinia/geo-location/permission';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
@@ -45,16 +45,12 @@ app.use(IonicVue);
 app.use(pinia);
 app.use(router);
 
-const initApp = async () => {
-  // Get remote firebase config / Use cached firebase config // Use default local firebase config
-  const configStore = useConfigStore();
-  await configStore.loadRemoteConfig();
 
-  const permissionStore = usePermissionStore();
-  await permissionStore.loadGeoLocationStatus();
+const configStore = useConfigStore();
+await configStore.loadRemoteConfig();
 
-  await router.isReady();
-  app.mount('#app');
-};
+const geoLocationPermissionStore = useGeoLocationPermissionStore();
+await geoLocationPermissionStore.loadStatus();
 
-initApp();
+await router.isReady();
+app.mount('#app');

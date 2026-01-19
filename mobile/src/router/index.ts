@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import TabsPage from '../views/TabsPage.vue'
-import { auth } from '@/services/firebase/routeworks.tracker';
+import { auth } from '@/services/firebase/routeworks-tracker';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { isSessionExpired } from '@/preference/session';
 
@@ -14,7 +14,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
     children: [
       { path: '', redirect: '/tabs/map' },
-      { path: 'map', component: () => import('@/views/map/MapPage.vue') },
+      { path: 'map', component: () => import('@/views/geo-location/MapPage.vue') },
       { path: 'tab2', component: () => import('@/views/Tab2Page.vue') },
       { path: 'tab3', component: () => import('@/views/Tab3Page.vue') },
     ]

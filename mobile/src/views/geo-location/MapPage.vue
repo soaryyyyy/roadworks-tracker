@@ -8,7 +8,17 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <map-fab></map-fab>
+      <ion-fab slot="fixed" horizontal="start" vertical="top">
+        
+        <ion-fab-button 
+          size="small" 
+          @click="handleLocate"
+          :color="locateFabColor ? 'success' : 'warning'">
+          
+          <ion-icon :icon="locateOutline"></ion-icon>
+        </ion-fab-button>
+      
+      </ion-fab>
 
       <div id="map" style="height: 100%; width: 100%;"></div>
 
@@ -18,7 +28,6 @@
         :initial-breakpoint="0.25" 
         :breakpoints="[0, 0.25, 0.8]"
         :backdrop-breakpoint="0.5">
-
       </ion-modal>
 
     </ion-content>
@@ -27,18 +36,20 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 import { 
   IonPage, IonHeader, IonToolbar, 
   IonTitle, IonContent, loadingController,
-  IonModal
+  IonModal, IonFab, IonFabButton,
+  IonIcon
 } from '@ionic/vue';
 
-import MapFab from '@/components/map/MapFab.vue';
+import { locateOutline } from 'ionicons/icons';
 
 import L from 'leaflet';
-import { useCurrentLocationStore } from '@/pinia/geolocation';
+import { useCurrentLocationStore } from '@/pinia/geo-location/current-location';
+import { defaultMarker } from '@/components/geo-location/icon';
 
 const isGeoLocationModalOpen = ref<boolean>(false);
 
@@ -71,6 +82,12 @@ const mountMap = async () => {
 
 const currentLocationStore = useCurrentLocationStore();
 
+const handleLocate = async () => {
+  if (!currentLocationStore.isTracked) {
+    await currentLocationStore.startTracking();
+  }
+}
+
 watch(
   () => currentLocationStore.coords,
 
@@ -83,11 +100,10 @@ watch(
 
     if (!userLocation && map) {
       userLocation = L.marker([lat, lng]).addTo(map);
-      
-      userLocation.bindPopup('<div style="text-align: center;font-weight: bold;">Vous</div>', {
-        closeButton: false
-      });
-
+      userLocation.bindPopup(
+        '<div style="text-align: center;font-weight: bold;">Vous</div>', 
+        { closeButton: false }
+      );
       userLocation.openPopup();
     } else if (userLocation && map){
       userLocation.setLatLng([lat, lng]);
@@ -97,25 +113,13 @@ watch(
   { deep: true }
 )
 
-// Default marker used by leaflet
-import iconUrl from 'leaflet/dist/images/marker-icon.png';
-import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
-import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+const locateFabColor = computed<string>(() => {
+  return currentLocationStore.isTracked ? 'success' : 'warning';
+});
 
 onMounted(() => {
-  const DefaultIcon = L.icon({
-    iconUrl,
-    iconRetinaUrl,
-    shadowUrl,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    tooltipAnchor: [16, -28],
-    shadowSize: [41, 41]
-  });
-
-  L.Marker.prototype.options.icon = DefaultIcon;
-
+  // Make leaflet use the default icon for marker
+  L.Marker.prototype.options.icon = defaultMarker;
   mountMap();
 });
 </script>
