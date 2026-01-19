@@ -10,7 +10,7 @@ import { IonButton, IonIcon } from '@ionic/vue';
 import { logInOutline } from 'ionicons/icons';
 
 import { signOut } from 'firebase/auth';
-import { expireSession } from '@/services/session/preference';
+import { expireSession } from '@/preference/session';
 import router from '@/router';
 
 const handleSignOut = async () => {

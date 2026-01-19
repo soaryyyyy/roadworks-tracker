@@ -96,7 +96,7 @@ import { FirebaseError } from 'firebase/app';
 import { auth } from '@/services/firebase/routeworks.tracker';
 import { showToast } from '@/utils/ui';
 import { useConfigStore } from '@/pinia/firebase/routeworks.tracker';
-import { setSessionExpirationDate } from '@/services/session/preference';
+import { setSessionExpirationDate } from '@/preference/session';
 
 // Input
 const email = ref<string>('');

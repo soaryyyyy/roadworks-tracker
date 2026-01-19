@@ -3,7 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 import TabsPage from '../views/TabsPage.vue'
 import { auth } from '@/services/firebase/routeworks.tracker';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { isSessionExpired } from '@/services/session/preference';
+import { isSessionExpired } from '@/preference/session';
 
 const routes: Array<RouteRecordRaw> = [
   { path: '/', redirect: '/tabs/map' },
