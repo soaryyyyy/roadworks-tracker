@@ -10,12 +10,12 @@
     <ion-content :fullscreen="true">
       <ion-fab slot="fixed" horizontal="start" vertical="top">
         
-        <ion-fab-button 
-          size="small" 
+        <ion-fab-button
           @click="handleLocate"
-          :color="locateFabColor ? 'success' : 'warning'">
+          :color="currentLocationStore.isTracked ? 'success' : 'warning'">
           
-          <ion-icon :icon="locateOutline"></ion-icon>
+          <ion-spinner v-if="currentLocationStore.isEnablingWatch" name="crescent"></ion-spinner>
+          <ion-icon v-else :icon="locateOutline"></ion-icon>
         </ion-fab-button>
       
       </ion-fab>
@@ -36,13 +36,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 import { 
   IonPage, IonHeader, IonToolbar, 
   IonTitle, IonContent, loadingController,
   IonModal, IonFab, IonFabButton,
-  IonIcon
+  IonIcon, IonSpinner
 } from '@ionic/vue';
 
 import { locateOutline } from 'ionicons/icons';
@@ -83,7 +83,7 @@ const mountMap = async () => {
 const currentLocationStore = useCurrentLocationStore();
 
 const handleLocate = async () => {
-  if (!currentLocationStore.isTracked) {
+  if (!currentLocationStore.isTracked && !currentLocationStore.coords) {
     await currentLocationStore.startTracking();
   }
 }
@@ -94,6 +94,7 @@ watch(
     if (!coords) {
       return;
     }
+
     const { lat, lng } = coords; 
     if (!userLocation && map) {
       userLocation = L.marker([lat, lng]).addTo(map);
@@ -108,10 +109,6 @@ watch(
   },
   { deep: true }
 )
-
-const locateFabColor = computed<string>(() => {
-  return currentLocationStore.isTracked ? 'success' : 'warning';
-});
 
 onMounted(() => {
   // Make leaflet use the default icon for marker
