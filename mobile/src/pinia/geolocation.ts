@@ -21,11 +21,12 @@ const useCurrentLocationStore = defineStore('current-location', {
 
       const permissionStore = usePermissionStore();
 
-      if (isPlatform('hybrid')) {
+      if (isPlatform('hybrid')) { // Only there for debugging while using web platform
         await permissionStore.requestGeoLocationPermission();
       }
       
-      if (permissionStore.isGeoLocationGranted || !isPlatform('hybrid')) {
+      if (permissionStore.isGeoLocationGranted || 
+          !isPlatform('hybrid')) { // Only there for debugging while using web platform
         this.watchId = await Geolocation.watchPosition(
           { enableHighAccuracy: true },
           (position) => {

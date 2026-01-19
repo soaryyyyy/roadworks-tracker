@@ -5,11 +5,9 @@
     </ion-fab-button>
 
     <ion-fab-list side="bottom">
-
       <ion-fab-button @click="handleLocateClick">
         <ion-icon :icon="locateOutline"></ion-icon>
       </ion-fab-button>
-
     </ion-fab-list>
   </ion-fab>
 </template>
