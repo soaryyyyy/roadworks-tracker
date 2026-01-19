@@ -90,14 +90,11 @@ const handleLocate = async () => {
 
 watch(
   () => currentLocationStore.coords,
-
   (coords) => { 
     if (!coords) {
       return;
     }
-
     const { lat, lng } = coords; 
-
     if (!userLocation && map) {
       userLocation = L.marker([lat, lng]).addTo(map);
       userLocation.bindPopup(
@@ -109,7 +106,6 @@ watch(
       userLocation.setLatLng([lat, lng]);
     }
   },
-
   { deep: true }
 )
 

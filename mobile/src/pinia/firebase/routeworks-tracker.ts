@@ -5,7 +5,6 @@ import { activate, fetchAndActivate, getNumber } from "firebase/remote-config";
 const useConfigStore = defineStore('firebase.routeworks-tracker.config', {
   state: () => ({
     sessionDurationMillis: 3_600_000,
-    isConfigLoaded: false
   }),
 
   actions: {
@@ -20,8 +19,6 @@ const useConfigStore = defineStore('firebase.routeworks-tracker.config', {
         if (remoteValue > 0) {
           this.sessionDurationMillis = remoteValue;
         }
-        
-        this.isConfigLoaded = true;
       }
     }
   }

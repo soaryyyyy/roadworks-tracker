@@ -37,6 +37,7 @@ import '@ionic/vue/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import { useAuthSessionStore } from './pinia/auth/session';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -45,12 +46,22 @@ app.use(IonicVue);
 app.use(pinia);
 app.use(router);
 
+const initApp = async () => {
+  try {
+    const configStore = useConfigStore();
+    await configStore.loadRemoteConfig();
 
-const configStore = useConfigStore();
-await configStore.loadRemoteConfig();
+    const authSessionStore = useAuthSessionStore();
+    await authSessionStore.loadSession();
 
-const geoLocationPermissionStore = useGeoLocationPermissionStore();
-await geoLocationPermissionStore.loadStatus();
+    const geoLocationPermissionStore = useGeoLocationPermissionStore();
+    await geoLocationPermissionStore.loadStatus();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    await router.isReady();
+    app.mount('#app');
+  }
+};
 
-await router.isReady();
-app.mount('#app');
+initApp();

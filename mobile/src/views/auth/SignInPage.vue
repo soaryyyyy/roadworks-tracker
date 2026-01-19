@@ -96,7 +96,7 @@ import { FirebaseError } from 'firebase/app';
 import { auth } from '@/services/firebase/routeworks-tracker';
 import { showToast } from '@/utils/ui';
 import { useConfigStore } from '@/pinia/firebase/routeworks-tracker';
-import { setSessionExpirationDate } from '@/preference/session';
+import { useAuthSessionStore } from '@/pinia/auth/session';
 
 // Input
 const email = ref<string>('');
@@ -133,7 +133,8 @@ const handleSignIn = async () => {
     const configStore = useConfigStore();
     const sessionExpiresAt = Date.now() + configStore.sessionDurationMillis;
 
-    await setSessionExpirationDate(sessionExpiresAt);
+    const authSessionStore = useAuthSessionStore();
+    await authSessionStore.setSession(sessionExpiresAt);
     
     email.value = '';
     password.value = '';

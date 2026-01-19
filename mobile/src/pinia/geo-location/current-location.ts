@@ -9,7 +9,7 @@ const useCurrentLocationStore = defineStore('current-geo-location', {
   state: () => ({
     coords: null as { lat: number, lng: number } | null,
     watchId: null as string | null,
-    isLoading: false,
+    isWatchLoading: false,
   }),
 
   getters: {
@@ -18,9 +18,9 @@ const useCurrentLocationStore = defineStore('current-geo-location', {
 
   actions: {
     async startTracking() {
-      if (this.isTracked || this.isLoading) return;
+      if (this.isTracked || this.isWatchLoading) return;
       
-      this.isLoading = true;
+      this.isWatchLoading = true;
 
       const permissionStore = useGeoLocationPermissionStore();
 
@@ -38,7 +38,7 @@ const useCurrentLocationStore = defineStore('current-geo-location', {
           },
 
           (position, error: any) => {
-            this.isLoading = false;
+            this.isWatchLoading = false;
 
             if (error) {
               this.startTracking();

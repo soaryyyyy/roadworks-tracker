@@ -3,7 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 import TabsPage from '../views/TabsPage.vue'
 import { auth } from '@/services/firebase/routeworks-tracker';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { isSessionExpired } from '@/preference/session';
+import { useAuthSessionStore } from '@/pinia/auth/session';
 
 const routes: Array<RouteRecordRaw> = [
   { path: '/', redirect: '/tabs/map' },
@@ -43,12 +43,14 @@ const getCurrentUser = (): Promise<User | null> => {
   });
 };
 
+
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-
+  
   if (requiresAuth) {
     const user = await getCurrentUser();
-    const sessionExpired = await isSessionExpired();
+    const authSessionStore = useAuthSessionStore();
+    const sessionExpired = authSessionStore.isExpired;
 
     if (user && !sessionExpired) {
       next();
