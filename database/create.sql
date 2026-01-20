@@ -121,8 +121,9 @@ ADD COLUMN firebase_uid VARCHAR(128);
 -- Données par défaut
 
 -- Rôles
-INSERT INTO role (libelle) VALUES ('visiteur') ON CONFLICT (libelle) DO NOTHING;
+INSERT INTO role (libelle) VALUES ('utilisateur') ON CONFLICT (libelle) DO NOTHING;
 INSERT INTO role (libelle) VALUES ('manager') ON CONFLICT (libelle) DO NOTHING;
+
 
 -- Statuts de compte
 INSERT INTO status_account (libelle) VALUES ('actif') ON CONFLICT (libelle) DO NOTHING;

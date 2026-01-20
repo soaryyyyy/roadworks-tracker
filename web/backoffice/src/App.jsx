@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
+import UsersPage from './pages/UsersPage'
 import './App.css'
 
 function ProtectedRoute({ children }) {
@@ -21,6 +22,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <UsersPage />
             </ProtectedRoute>
           }
         />

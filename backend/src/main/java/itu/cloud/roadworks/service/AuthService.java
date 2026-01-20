@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -92,13 +93,14 @@ public class AuthService {
                     .build();
         }
 
-        Role managerRole = roleRepository.findByLibelle(ROLE_MANAGER)
-                .orElseThrow(() -> new RuntimeException("Role manager non trouvé"));
+        String roleLibelle = request.getRole() != null ? request.getRole() : ROLE_MANAGER;
+        Role role = roleRepository.findByLibelle(roleLibelle)
+                .orElseThrow(() -> new RuntimeException("Role " + roleLibelle + " non trouvé"));
 
         Account account = Account.builder()
                 .username(request.getUsername())
                 .pwd(hashPassword(request.getPassword()))
-                .role(managerRole)
+                .role(role)
                 .createdAt(Instant.now())
                 .isActive(true)
                 .isLocked(false)
@@ -179,5 +181,15 @@ public class AuthService {
                 .findFirst()
                 .map(Config::getMaxAttempts)
                 .orElse(DEFAULT_MAX_ATTEMPTS);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Role> getAllRoles() {
+        return roleRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Account> getAllUsers() {
+        return accountRepository.findAllWithRole();
     }
 }

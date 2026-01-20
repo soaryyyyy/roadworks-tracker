@@ -1,4 +1,5 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { useNavigate } from 'react-router-dom'
 import { iconByType } from '../mapIcons'
 import './DashboardPage.css'
 
@@ -11,18 +12,30 @@ const events = [
 ]
 
 export default function DashboardPage() {
+  const navigate = useNavigate()
+  const role = localStorage.getItem('role')
+
   const handleLogout = () => {
     localStorage.removeItem('token')
-    window.location.href = '/login'
+    localStorage.removeItem('username')
+    localStorage.removeItem('role')
+    navigate('/login')
   }
 
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>Backoffice - Suivi des travaux routiers</h1>
-        <button onClick={handleLogout} className="logout-button">
-          Déconnexion
-        </button>
+        <div className="header-actions">
+          {role === 'manager' && (
+            <button onClick={() => navigate('/users')} className="logout-button">
+              Gestion Utilisateurs
+            </button>
+          )}
+          <button onClick={handleLogout} className="logout-button">
+            Déconnexion
+          </button>
+        </div>
       </header>
       <div className="map-root">
         <MapContainer center={[-18.91, 47.52]} zoom={13} className="map-inner" scrollWheelZoom>
