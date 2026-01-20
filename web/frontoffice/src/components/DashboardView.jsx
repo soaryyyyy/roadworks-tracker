@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import './DashboardView.css'
 
 export function DashboardView({ events }) {
@@ -13,7 +14,7 @@ export function DashboardView({ events }) {
   return (
     <div className="dashboard-panel">
       <section className="dashboard-summary">
-        <h2>Vue d'ensemble</h2>
+        <h2>Vue d ensemble</h2>
         <div className="summary-grid">
           {Object.entries(statusCounts).map(([status, count]) => (
             <div className="summary-card" key={status}>
@@ -49,4 +50,25 @@ export function DashboardView({ events }) {
       </section>
     </div>
   )
+}
+
+DashboardView.propTypes = {
+  events: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      type_problem: PropTypes.string.isRequired,
+      illustration_problem: PropTypes.string.isRequired,
+      detail_problem: PropTypes.shape({
+        etat: PropTypes.string.isRequired,
+        date_problem: PropTypes.string.isRequired,
+        surface_m2: PropTypes.number.isRequired,
+        budget: PropTypes.number.isRequired,
+        entreprise_assign: PropTypes.shape({
+          id: PropTypes.number.isRequired,
+          name: PropTypes.string.isRequired,
+        }),
+        description: PropTypes.string.isRequired,
+      }).isRequired,
+    })
+  ).isRequired,
 }

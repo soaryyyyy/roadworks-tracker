@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import { iconByType } from './mapIcons'
 import './App.css'
+import { MapView } from './components/MapView'
+import { DashboardView } from './components/DashboardView'
 
 const events = [
   {
@@ -45,7 +46,7 @@ const events = [
       date_problem: '2026-01-18T09:00:00Z',
       surface_m2: 150,
       budget: 180000,
-      entreprise_assign: { id: 3, name: 'Réseau Fluvial' },
+      entreprise_assign: { id: 3, name: 'Reseau Fluvial' },
       description: 'Monte d\'eau suite aux fortes pluies, quartier Analakely.',
     },
   },
@@ -61,7 +62,7 @@ const events = [
       surface_m2: 200,
       budget: 215000,
       entreprise_assign: { id: 2, name: 'Reseaux Urbains' },
-      description: 'Route ferme pour reseau de gaz, detour mis en place.',
+      description: 'Route fermee pour reseau de gaz, detour mis en place.',
     },
   },
   {
@@ -90,36 +91,68 @@ const events = [
       date_problem: '2026-01-21T15:00:00Z',
       surface_m2: 30,
       budget: 40000,
-      entreprise_assign: { id: 3, name: 'Réseau Fluvial' },
+      entreprise_assign: { id: 3, name: 'Reseau Fluvial' },
       description: 'Warning sur la signalisation au carrefour Bellonte.',
     },
   },
 ]
 
-export default function App() {
-  return (
-    <div className="map-root">
-      <MapContainer center={[-18.91, 47.52]} zoom={13} className="map-inner" scrollWheelZoom>
-        <TileLayer url="http://localhost:8081/styles/basic-preview/512/{z}/{x}/{y}.png" attribution="© OpenStreetMap contributors" />
+const views = [
+  { key: 'map', label: 'Carte' },
+  { key: 'dashboard', label: 'Tableau de bord' },
+  { key: 'list', label: 'Liste' },
+]
 
-        {events.map((event) => (
-          <Marker key={event.id} position={[event.lat, event.lon]} icon={iconByType[event.type_problem]}>
-            <Popup>
-              <strong>
-                {event.illustration_problem} {event.type_problem.replace(/_/g, ' ')}
-              </strong>
+export default function App() {
+  const [activeView, setActiveView] = useState('map')
+
+  const renderView = () => {
+    if (activeView === 'map') {
+      return <MapView events={events} />
+    }
+
+    if (activeView === 'dashboard') {
+      return <DashboardView events={events} />
+    }
+
+    return (
+      <section className="list-view">
+        <h2>Liste detaillee</h2>
+        <ul>
+          {events.map((event) => (
+            <li key={event.id}>
+              <strong>{event.illustration_problem} {event.type_problem.replace(/_/g, ' ')}</strong>
               <p>{event.detail_problem.description}</p>
-              <ul>
-                <li>Status : {event.detail_problem.etat}</li>
-                <li>Date : {new Date(event.detail_problem.date_problem).toLocaleString()}</li>
-                <li>Surface : {event.detail_problem.surface_m2} m²</li>
-                <li>Budget : {event.detail_problem.budget.toLocaleString()} Ar</li>
-                <li>Entreprise : {event.detail_problem.entreprise_assign.name}</li>
-              </ul>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+              <small>
+                Etat: {event.detail_problem.etat} · Budget: {event.detail_problem.budget} Ar
+              </small>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  return (
+    <div className="app-shell">
+      <header className="app-header">
+        <div>
+          <p className="eyebrow">Roadworks Tracker</p>
+          <h1>Suivi des incidents et travaux</h1>
+        </div>
+        <nav className="view-nav">
+          {views.map((view) => (
+            <button
+              key={view.key}
+              className={activeView === view.key ? 'active' : ''}
+              onClick={() => setActiveView(view.key)}
+            >
+              {view.label}
+            </button>
+          ))}
+        </nav>
+      </header>
+      <main className="app-main">{renderView()}</main>
     </div>
   )
 }

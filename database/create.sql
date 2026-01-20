@@ -115,3 +115,39 @@ CREATE TABLE session (
   CONSTRAINT fk_session_account
     FOREIGN KEY (id_account) REFERENCES account(id) ON DELETE CASCADE
 );
+
+CREATE VIEW signalement_problem_view AS
+SELECT
+  s.id,
+  tp.libelle AS type_problem,
+  tp.icone AS illustration_problem,
+  s.descriptions,
+  s.created_at AS date_problem,
+  s.location,
+  s.surface AS surface_m2,
+  ss.status_label AS etat,
+  ss.updated_at AS status_date,
+  sw.price AS budget,
+  sw.start_date,
+  sw.end_date_estimation,
+  sw.real_end_date,
+  sw.id_company,
+  c.name AS company_name
+FROM signalement s
+JOIN type_problem tp ON s.id_type_problem = tp.id
+LEFT JOIN LATERAL (
+  SELECT ss.*, st.libelle AS status_label
+  FROM signalement_status ss
+  JOIN status_signalement st ON ss.id_status_signalement = st.id
+  WHERE ss.id_signalement = s.id
+  ORDER BY ss.updated_at DESC
+  LIMIT 1
+) ss ON true
+LEFT JOIN LATERAL (
+  SELECT sw.*
+  FROM signalement_work sw
+  WHERE sw.id_signalement = s.id
+  ORDER BY sw.start_date DESC NULLS LAST
+  LIMIT 1
+) sw ON true
+LEFT JOIN company c ON sw.id_company = c.id;

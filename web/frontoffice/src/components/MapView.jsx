@@ -1,4 +1,5 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import PropTypes from 'prop-types'
 import { iconByType } from '../mapIcons'
 
 export function MapView({ events }) {
@@ -29,4 +30,27 @@ export function MapView({ events }) {
       ))}
     </MapContainer>
   )
+}
+
+MapView.propTypes = {
+  events: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      type_problem: PropTypes.string.isRequired,
+      illustration_problem: PropTypes.string.isRequired,
+      lat: PropTypes.number.isRequired,
+      lon: PropTypes.number.isRequired,
+      detail_problem: PropTypes.shape({
+        etat: PropTypes.string.isRequired,
+        date_problem: PropTypes.string.isRequired,
+        surface_m2: PropTypes.number.isRequired,
+        budget: PropTypes.number.isRequired,
+        entreprise_assign: PropTypes.shape({
+          id: PropTypes.number.isRequired,
+          name: PropTypes.string.isRequired,
+        }),
+        description: PropTypes.string.isRequired,
+      }).isRequired,
+    })
+  ).isRequired,
 }
