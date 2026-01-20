@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import itu.cloud.roadworks.dto.SignalementDto;
+import itu.cloud.roadworks.dto.SignalementProblemDto;
 import itu.cloud.roadworks.service.SignalementService;
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ public class SignalementApi {
     private final SignalementService service;
 
     @GetMapping
-    public List<SignalementDto> findAll() {
-        return service.findAll();
+    public List<SignalementProblemDto> findAll() {
+        return service.findAllProblems();
     }
 }
