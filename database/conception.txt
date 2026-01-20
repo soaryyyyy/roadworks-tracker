@@ -2,10 +2,11 @@ role : id, libelle (visiteur(sans compte), utilisateur, manager)
 account : id, username, pwd, id_role, created_at, last_login, is_active, is_locked, attempts, last_failed_login
 status_account : id, libelle (actif, inactif, bloque)
 account_status : id, id_account, id_status_account, updated_at
-status_road : id, libelle (nouveau, en cours, termine)
-society_btp : id, name, siret, address, phone, email, created_at
-signalement : id, id_account, descriptions, created_at, location, picture, surface
-signalement_work : id, id_signalement, id_society_btp, start_date, end_date_estimation, price, real_end_date
-signalement_status : id, id_signalement, id_status_road, updated_at
+id_status_signalement : id, libelle (nouveau, en cours, termine) 
+company : id, name, siret, address, phone, email, created_at
+type_problem : id, icone, libelle
+signalement : id, id_account, descriptions, created_at, location, picture, surface, id_type_problem
+signalement_work : id, id_signalement, id_company, start_date, end_date_estimation, price, real_end_date
+signalement_status : id, id_signalement, id_status_signalement, updated_at
 session : id, id_account, token, created_at, expires_at, ip_address, user_agent
 config : id, max_attempts, session_duration

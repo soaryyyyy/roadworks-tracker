@@ -11,7 +11,7 @@ CREATE TABLE status_account (
   libelle VARCHAR(50) NOT NULL UNIQUE
 );
 
-CREATE TABLE status_road (
+CREATE TABLE status_signalement (
   id BIGSERIAL PRIMARY KEY,
   libelle VARCHAR(50) NOT NULL UNIQUE
 );
@@ -48,7 +48,7 @@ CREATE TABLE account_status (
     FOREIGN KEY (id_status_account) REFERENCES status_account(id)
 );
 
-CREATE TABLE society_btp (
+CREATE TABLE company (
   id BIGSERIAL PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
   siret VARCHAR(30) NOT NULL UNIQUE,
@@ -56,6 +56,12 @@ CREATE TABLE society_btp (
   phone VARCHAR(30),
   email VARCHAR(150),
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE type_problem (
+  id BIGSERIAL PRIMARY KEY,
+  icone TEXT,
+  libelle VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE signalement (
@@ -66,33 +72,36 @@ CREATE TABLE signalement (
   location VARCHAR(255) NOT NULL,
   picture TEXT,
   surface NUMERIC(12,2),
+  id_type_problem BIGINT NOT NULL,
   CONSTRAINT fk_signalement_account
-    FOREIGN KEY (id_account) REFERENCES account(id) ON DELETE CASCADE
+    FOREIGN KEY (id_account) REFERENCES account(id) ON DELETE CASCADE,
+  CONSTRAINT fk_signalement_type
+    FOREIGN KEY (id_type_problem) REFERENCES type_problem(id)
 );
 
 CREATE TABLE signalement_work (
   id BIGSERIAL PRIMARY KEY,
   id_signalement BIGINT NOT NULL,
-  id_society_btp BIGINT NOT NULL,
+  id_company BIGINT NOT NULL,
   start_date DATE,
   end_date_estimation DATE,
   price NUMERIC(14,2),
   real_end_date DATE,
   CONSTRAINT fk_work_signalement
     FOREIGN KEY (id_signalement) REFERENCES signalement(id) ON DELETE CASCADE,
-  CONSTRAINT fk_work_society
-    FOREIGN KEY (id_society_btp) REFERENCES society_btp(id)
+  CONSTRAINT fk_work_company
+    FOREIGN KEY (id_company) REFERENCES company(id)
 );
 
 CREATE TABLE signalement_status (
   id BIGSERIAL PRIMARY KEY,
   id_signalement BIGINT NOT NULL,
-  id_status_road BIGINT NOT NULL,
+  id_status_signalement BIGINT NOT NULL,
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
   CONSTRAINT fk_sig_status_signalement
     FOREIGN KEY (id_signalement) REFERENCES signalement(id) ON DELETE CASCADE,
   CONSTRAINT fk_sig_status_status
-    FOREIGN KEY (id_status_road) REFERENCES status_road(id)
+    FOREIGN KEY (id_status_signalement) REFERENCES status_signalement(id)
 );
 
 CREATE TABLE session (
