@@ -2,21 +2,57 @@ import PropTypes from 'prop-types'
 import './DashboardView.css'
 
 export function DashboardView({ events }) {
-  const statusCounts = events.reduce(
+  const summary = events.reduce(
     (acc, event) => {
       const state = event.detail_problem.etat
-      acc[state] = (acc[state] || 0) + 1
+      acc.states[state] = (acc.states[state] || 0) + 1
+      acc.nbPoints += 1
+      acc.totalSurface += event.detail_problem.surface_m2
+      acc.totalBudget += event.detail_problem.budget
+      if (state === 'termine') {
+        acc.completed += 1
+      }
       return acc
     },
-    {}
+    {
+      states: {},
+      nbPoints: 0,
+      totalSurface: 0,
+      totalBudget: 0,
+      completed: 0,
+    }
   )
+
+  const progressPercent = summary.nbPoints ? Math.round((summary.completed / summary.nbPoints) * 100) : 0
 
   return (
     <div className="dashboard-panel">
       <section className="dashboard-summary">
-        <h2>Vue d ensemble</h2>
+        <h2>Tableau de recap</h2>
+        <div className="summary-grid summary-grid--highlight">
+          <article>
+            <p>Nb de points</p>
+            <strong>{summary.nbPoints}</strong>
+          </article>
+          <article>
+            <p>Total surface</p>
+            <strong>{Math.round(summary.totalSurface)} m²</strong>
+          </article>
+          <article>
+            <p>Total budget</p>
+            <strong>{summary.totalBudget.toLocaleString()} Ar</strong>
+          </article>
+          <article>
+            <p>Avancement</p>
+            <strong>{progressPercent}%</strong>
+          </article>
+        </div>
+      </section>
+
+      <section className="dashboard-summary">
+        <h2>Vue d'ensemble</h2>
         <div className="summary-grid">
-          {Object.entries(statusCounts).map(([status, count]) => (
+          {Object.entries(summary.states).map(([status, count]) => (
             <div className="summary-card" key={status}>
               <strong>{status.replace('_', ' ')}</strong>
               <span>{count}</span>
