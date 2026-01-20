@@ -1,8 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-create database roadworks_tracker;
-\c roadworks_tracker;
-
 CREATE TABLE role (
   id BIGSERIAL PRIMARY KEY,
   libelle VARCHAR(50) NOT NULL UNIQUE
