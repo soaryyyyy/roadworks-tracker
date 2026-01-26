@@ -46,3 +46,13 @@ INSERT INTO signalement_status (id, id_signalement, id_status_signalement) VALUE
   (1, 1, 2),
   (2, 1, 3),
   (3, 2, 1);
+
+-- Configuration par défaut (5 tentatives max, session de 60 minutes)
+INSERT INTO config (max_attempts, session_duration) VALUES (5, 60);
+
+-- Compte manager par défaut (mot de passe: manager123 hashé en SHA-256 Base64)
+-- Hash de "manager123" en UTF-8 SHA-256 Base64
+INSERT INTO account (username, pwd, id_role, is_active, is_locked, attempts)
+SELECT 'admin', 'hmSFeWz6jXwM9xEWQCBbgwdkM1R1d1EdgfgDCumezqU=', r.id, true, false, 0
+FROM role r WHERE r.libelle = 'manager'
+ON CONFLICT (username) DO NOTHING;

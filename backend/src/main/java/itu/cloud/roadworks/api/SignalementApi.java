@@ -12,7 +12,6 @@ import itu.cloud.roadworks.service.SignalementService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api/signalements")
 @RequiredArgsConstructor
 public class SignalementApi {
