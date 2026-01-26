@@ -10,11 +10,12 @@ import { IonButton, IonIcon } from '@ionic/vue';
 import { logInOutline } from 'ionicons/icons';
 
 import { signOut } from 'firebase/auth';
-import { expireSession } from '@/preference/session';
+import { useAuthSessionStore } from '@/pinia/auth/session';
 import router from '@/router';
 
 const handleSignOut = async () => {
-  await expireSession();
+  const authStore = useAuthSessionStore();
+  await authStore.clearSession();
   await signOut(auth);
   router.push('/auth/signIn');
 }

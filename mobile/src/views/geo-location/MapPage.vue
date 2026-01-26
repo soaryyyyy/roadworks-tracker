@@ -4,10 +4,15 @@
     <ion-header>
       <ion-toolbar>
         <ion-title>Explorer</ion-title>
+        <ion-buttons slot="end">
+          <ion-button @click="handleSignOut" color="danger">
+            <ion-icon slot="icon-only" :icon="logOutOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" id="map-content">
       <ion-fab slot="fixed" horizontal="start" vertical="top">
         
         <ion-fab-button @click="handleLocate">
@@ -17,15 +22,20 @@
       
       </ion-fab>
 
+      <ion-fab slot="fixed" horizontal="end" vertical="top">
+        <ion-fab-button @click="toggleFilter" :color="showOnlyMyReports ? 'primary' : 'medium'" title="Filtrer les signalements">
+          <ion-icon :icon="filterOutline"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+
       <div id="map" style="height: 100%; width: 100%;"></div>
 
-      <ion-modal 
-        :is-open="isGeoLocationModalOpen" 
-        @didDismiss="isGeoLocationModalOpen = false"
-        :initial-breakpoint="0.25" 
-        :breakpoints="[0, 0.25, 0.8]"
-        :backdrop-breakpoint="0.5">
-      </ion-modal>
+      <roadworks-report-modal
+        :is-open="isReportModalOpen"
+        :coords="selectedCoords"
+        @close="isReportModalOpen = false"
+        @submitted="handleReportSubmitted"
+      />
 
     </ion-content>
 
@@ -38,20 +48,33 @@ import { onMounted, ref, watch } from 'vue';
 import { 
   IonPage, IonHeader, IonToolbar, 
   IonTitle, IonContent, loadingController,
-  IonModal, IonFab, IonFabButton,
-  IonIcon, IonSpinner
+  IonFab, IonFabButton,
+  IonIcon, IonSpinner, IonButtons, IonButton
 } from '@ionic/vue';
 
-import { locateOutline } from 'ionicons/icons';
+import { locateOutline, filterOutline, logOutOutline } from 'ionicons/icons';
 
 import L from 'leaflet';
 import { useCurrentLocationStore } from '@/pinia/geo-location/current-location';
+import { useRoadworksReportStore } from '@/pinia/geo-location/roadworks-report';
+import { useAuthSessionStore } from '@/pinia/auth/session';
+import { auth } from '@/services/firebase/routeworks-tracker';
 import { defaultMarker } from '@/components/geo-location/icon';
+import RoadworksReportModal from '@/components/geo-location/RoadworksReportModal.vue';
+import { signOut } from 'firebase/auth';
+import router from '@/router';
 
 const isGeoLocationModalOpen = ref<boolean>(false);
-
 let map: L.Map | null = null;
 let userLocation: L.Marker | null = null;
+
+const isReportModalOpen = ref<boolean>(false);
+const selectedCoords = ref<{ lat: number; lng: number } | null>(null);
+
+const currentLocationStore = useCurrentLocationStore();
+const reportStore = useRoadworksReportStore();
+
+const showOnlyMyReports = ref<boolean>(false);
 
 const mountMap = async () => {
   const mapLoading = await loadingController.create({
@@ -63,6 +86,11 @@ const mountMap = async () => {
   await mapLoading.present();
 
   try {
+    const mapElement = document.getElementById('map');
+    if (!mapElement) {
+      throw new Error('Élément map non trouvé');
+    }
+
     map = L.map('map', {
       zoomControl: false
     }).setView([-18.9184607, 47.5211293], 11); // Antananarivo
@@ -70,18 +98,151 @@ const mountMap = async () => {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
+
+    // Utiliser l'événement 'click' de Leaflet correctement
+    map.on('click', function(e: L.LeafletMouseEvent) {
+      // Vérifier que le clic n'est pas sur un marqueur
+      if ((e.target as any).options && (e.target as any).options.icon) {
+        return;
+      }
+
+      console.log('🗺️ Clic sur la carte');
+      console.log('📍 Coordonnées:', e.latlng);
+      
+      selectedCoords.value = {
+        lat: e.latlng.lat,
+        lng: e.latlng.lng,
+      };
+      
+      isReportModalOpen.value = true;
+    });
+
   } catch (error) {
-    console.error(error);
+    console.error('❌ Erreur mountMap:', error);
   } finally {
     await mapLoading.dismiss();
   }
 };
 
-const currentLocationStore = useCurrentLocationStore();
-
 const handleLocate = async () => {
   await currentLocationStore.refreshCoords();
 }
+
+const handleReportSubmitted = async () => {
+  // Charger tous les signalements et les afficher sur la carte
+  console.log('📍 Signalement soumis, chargement des données...');
+  await reportStore.loadAllReports();
+  displayReportsOnMap();
+}
+
+const toggleFilter = () => {
+  showOnlyMyReports.value = !showOnlyMyReports.value;
+  console.log('🔄 Filtre toggled:', showOnlyMyReports.value);
+  displayReportsOnMap();
+}
+
+const handleSignOut = async () => {
+  const authStore = useAuthSessionStore();
+  await authStore.clearSession();
+  await signOut(auth);
+  router.push('/auth/signIn');
+}
+
+const getStatusColor = (status: string): string => {
+  switch (status) {
+    case 'pothole': return '#FF6B6B'; // Rouge
+    case 'blocked_road': return '#FF8C00'; // Orange foncé
+    case 'accident': return '#DC143C'; // Cramoisé
+    case 'construction': return '#FFD700'; // Or
+    case 'flooding': return '#1E90FF'; // Bleu
+    case 'debris': return '#A9A9A9'; // Gris
+    case 'poor_surface': return '#FFA500'; // Orange
+    case 'other': return '#808080'; // Gris foncé
+    default: return '#808080';
+  }
+};
+
+const getStatusLabel = (status: string): string => {
+  switch (status) {
+    case 'pothole': return '🕳️ Nid-de-poule';
+    case 'blocked_road': return '🚧 Route barrée';
+    case 'accident': return '🚨 Accident';
+    case 'construction': return '🏗️ Travaux';
+    case 'flooding': return '💧 Inondation';
+    case 'debris': return '🪨 Débris';
+    case 'poor_surface': return '⚠️ Mauvaise surface';
+    case 'other': return '❓ Autre';
+    default: return status;
+  }
+};
+
+const getStatusEmoji = (status: string): string => {
+  switch (status) {
+    case 'pothole': return '🕳️';
+    case 'blocked_road': return '🚧';
+    case 'accident': return '🚨';
+    case 'construction': return '🏗️';
+    case 'flooding': return '💧';
+    case 'debris': return '🪨';
+    case 'poor_surface': return '⚠️';
+    case 'other': return '❓';
+    default: return '📍';
+  }
+};
+
+const displayReportsOnMap = () => {
+  if (!map) return;
+
+  // Supprimer TOUS les marqueurs (sauf la position utilisateur)
+  map.eachLayer((layer: any) => {
+    if (layer instanceof L.Marker && layer !== userLocation) {
+      map?.removeLayer(layer);
+    }
+  });
+
+  // Déterminer quels signalements afficher
+  let reportsToDisplay = reportStore.reports;
+  
+  if (showOnlyMyReports.value) {
+    reportsToDisplay = reportStore.reports.filter(r => r.userId === reportStore.currentUserId);
+    console.log(`🔒 Filtre activé - Affichage mes signalements seulement`);
+    console.log(`👤 Mon ID: ${reportStore.currentUserId}`);
+    console.log(`📊 Mes signalements: ${reportsToDisplay.length}`);
+  } else {
+    console.log(`🌍 Tous les signalements`);
+    console.log(`📊 Total: ${reportsToDisplay.length}`);
+  }
+
+  // Ajouter les marqueurs
+  reportsToDisplay.forEach((report) => {
+    const emoji = getStatusEmoji(report.status);
+    
+    const emojiIcon = L.divIcon({
+      html: `<div style="font-size: 28px; line-height: 28px;">${emoji}</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+      className: 'emoji-marker',
+    });
+
+    const marker = L.marker([report.lat, report.lng], {
+      icon: emojiIcon,
+    }).addTo(map!);
+
+    const popupContent = `
+      <div style="text-align: center; padding: 8px; width: 150px;">
+        <strong>${getStatusLabel(report.status)}</strong>
+        ${report.description ? `<p style="margin: 4px 0; font-size: 12px;">${report.description}</p>` : ''}
+        <small style="color: #999;">
+          ${report.lat.toFixed(5)}, ${report.lng.toFixed(5)}
+        </small>
+      </div>
+    `;
+
+    marker.bindPopup(popupContent);
+  });
+
+  console.log(`✅ ${reportsToDisplay.length} marqueurs affichés`);
+};
 
 watch(
   () => currentLocationStore.coords,
@@ -105,9 +266,14 @@ watch(
   { deep: true }
 )
 
-onMounted(() => {
+onMounted(async () => {
   // Make leaflet use the default icon for marker
   L.Marker.prototype.options.icon = defaultMarker;
-  mountMap();
+  await mountMap();
+  
+  // Charger les signalements depuis Firebase
+  console.log('📍 Chargement des signalements...');
+  await reportStore.loadAllReports();
+  displayReportsOnMap();
 });
 </script>
