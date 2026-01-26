@@ -10,11 +10,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import itu.cloud.roadworks.dto.SignalementDto;
 import itu.cloud.roadworks.service.SignalementService;
 import lombok.RequiredArgsConstructor;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import itu.cloud.roadworks.dto.SignalementProblemDto;
+import itu.cloud.roadworks.service.SignalementService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/signalements")
@@ -39,7 +44,7 @@ public class SignalementApi {
             )
     })
     @GetMapping
-    public List<SignalementDto> findAll() {
-        return service.findAll();
+    public List<SignalementProblemDto> findAll() {
+        return service.findAllProblems();
     }
 }

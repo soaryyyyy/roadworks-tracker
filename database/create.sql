@@ -1,4 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
+\c roadworks;
 
 CREATE TABLE role (
   id BIGSERIAL PRIMARY KEY,
@@ -115,32 +116,38 @@ CREATE TABLE session (
     FOREIGN KEY (id_account) REFERENCES account(id) ON DELETE CASCADE
 );
 
-ALTER TABLE account
-ADD COLUMN firebase_uid VARCHAR(128);
-
--- Données par défaut
-
--- Rôles
-INSERT INTO role (libelle) VALUES ('utilisateur') ON CONFLICT (libelle) DO NOTHING;
-INSERT INTO role (libelle) VALUES ('manager') ON CONFLICT (libelle) DO NOTHING;
-
-
--- Statuts de compte
-INSERT INTO status_account (libelle) VALUES ('actif') ON CONFLICT (libelle) DO NOTHING;
-INSERT INTO status_account (libelle) VALUES ('inactif') ON CONFLICT (libelle) DO NOTHING;
-INSERT INTO status_account (libelle) VALUES ('bloqué') ON CONFLICT (libelle) DO NOTHING;
-
--- Statuts de signalement
-INSERT INTO status_signalement (libelle) VALUES ('nouveau') ON CONFLICT (libelle) DO NOTHING;
-INSERT INTO status_signalement (libelle) VALUES ('en cours') ON CONFLICT (libelle) DO NOTHING;
-INSERT INTO status_signalement (libelle) VALUES ('terminé') ON CONFLICT (libelle) DO NOTHING;
-
--- Configuration par défaut (5 tentatives max, session de 60 minutes)
-INSERT INTO config (max_attempts, session_duration) VALUES (5, 60);
-
--- Compte manager par défaut (mot de passe: manager123 hashé en SHA-256 Base64)
--- Hash de "manager123" en UTF-8 SHA-256 Base64
-INSERT INTO account (username, pwd, id_role, is_active, is_locked, attempts)
-SELECT 'admin', 'hmSFeWz6jXwM9xEWQCBbgwdkM1R1d1EdgfgDCumezqU=', r.id, true, false, 0
-FROM role r WHERE r.libelle = 'manager'
-ON CONFLICT (username) DO NOTHING;
+CREATE VIEW signalement_problem_view AS
+SELECT
+  s.id,
+  tp.libelle AS type_problem,
+  tp.icone AS illustration_problem,
+  s.descriptions,
+  s.created_at AS date_problem,
+  s.location,
+  s.surface AS surface_m2,
+  ss.status_label AS etat,
+  ss.updated_at AS status_date,
+  sw.price AS budget,
+  sw.start_date,
+  sw.end_date_estimation,
+  sw.real_end_date,
+  sw.id_company,
+  c.name AS company_name
+FROM signalement s
+JOIN type_problem tp ON s.id_type_problem = tp.id
+LEFT JOIN LATERAL (
+  SELECT ss.*, st.libelle AS status_label
+  FROM signalement_status ss
+  JOIN status_signalement st ON ss.id_status_signalement = st.id
+  WHERE ss.id_signalement = s.id
+  ORDER BY ss.updated_at DESC
+  LIMIT 1
+) ss ON true
+LEFT JOIN LATERAL (
+  SELECT sw.*
+  FROM signalement_work sw
+  WHERE sw.id_signalement = s.id
+  ORDER BY sw.start_date DESC NULLS LAST
+  LIMIT 1
+) sw ON true
+LEFT JOIN company c ON sw.id_company = c.id;

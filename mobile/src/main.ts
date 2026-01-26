@@ -3,6 +3,10 @@ import App from './App.vue'
 import router from './router';
 
 import { IonicVue } from '@ionic/vue';
+import { createPinia } from 'pinia';
+
+import { useConfigStore } from './pinia/firebase/routeworks-tracker';
+import { useGeoLocationPermissionStore } from './pinia/geo-location/permission';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
@@ -33,11 +37,31 @@ import '@ionic/vue/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import { useAuthSessionStore } from './pinia/auth/session';
 
-const app = createApp(App)
-  .use(IonicVue)
-  .use(router);
+const app = createApp(App);
+const pinia = createPinia();
 
-router.isReady().then(() => {
-  app.mount('#app');
-});
+app.use(IonicVue);
+app.use(pinia);
+app.use(router);
+
+const initApp = async () => {
+  try {
+    const configStore = useConfigStore();
+    await configStore.loadRemoteConfig();
+
+    const authSessionStore = useAuthSessionStore();
+    await authSessionStore.loadSession();
+
+    const geoLocationPermissionStore = useGeoLocationPermissionStore();
+    await geoLocationPermissionStore.loadStatus();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    await router.isReady();
+    app.mount('#app');
+  }
+};
+
+initApp();

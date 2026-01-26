@@ -1,10 +1,8 @@
 FROM maven:3.9.5-eclipse-temurin-17-alpine AS build
 WORKDIR /workspace
-COPY mvnw .
-COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
-RUN ./mvnw -B -DskipTests package
+RUN mvn -B -DskipTests package
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app

@@ -1,69 +1,71 @@
-version: '3.9'
-
 services:
   postgres:
-    image: postgres:14
+    build:
+      context: .
+      dockerfile: docker/postgres/Dockerfile
     container_name: monprojet-postgres14
     environment:
-      POSTGRES_DB: roadworks_tracker
-      POSTGRES_USER: monprojet
-      POSTGRES_PASSWORD: monprojet
+      POSTGRES_DB: roadworks
+      POSTGRES_USER: roadworks
+      POSTGRES_PASSWORD: roadworks
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./database/create.sql:/docker-entrypoint-initdb.d/create.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U monprojet -d roadworks_tracker"]
+      test: ["CMD-SHELL", "pg_isready -U roadworks -d roadworks"]
       interval: 5s
       timeout: 3s
       retries: 20
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    image: roadworks-backend
+    image: maven:3.9.5-eclipse-temurin-17
     container_name: monprojet-backend
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/roadworks_tracker
-      SPRING_DATASOURCE_USERNAME: monprojet
-      SPRING_DATASOURCE_PASSWORD: monprojet
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SERVER_PORT: "8080"
-      FIREBASE_CREDENTIALS_PATH: /app/firebase-key.json
-    ports:
-      - "8084:8080"
+    working_dir: /app
     volumes:
-      - ./roadworks-tracker-firebase-adminsdk-fbsvc-f052231349.json:/app/firebase-key.json:ro
+      - ./backend:/app
+      - ~/.m2:/root/.m2
+    ports:
+      - "8080:8080"
+    command: sh -c "mvn spring-boot:run"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/roadworks
+      SPRING_DATASOURCE_USERNAME: roadworks
+      SPRING_DATASOURCE_PASSWORD: roadworks
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
+      - postgres
 
   frontoffice:
-    build:
-      context: ./web/frontoffice
-      dockerfile: Dockerfile
-    image: roadworks-frontoffice
+    image: node:22.19.0-alpine
     container_name: monprojet-frontoffice
+    working_dir: /app
+    volumes:
+      - ./web/frontoffice:/app
+      - ./web/frontoffice/node_modules:/app/node_modules
     ports:
-      - "3002:80"
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
     depends_on:
       - backend
-    restart: unless-stopped
 
   backoffice:
-    build:
-      context: ./web/backoffice
-      dockerfile: Dockerfile
-    image: roadworks-backoffice
+    image: node:22.19.0-alpine
     container_name: monprojet-backoffice
+    working_dir: /app
+    volumes:
+      - ./web/backoffice:/app
+      - ./web/backoffice/node_modules:/app/node_modules
     ports:
-      - "3001:80"
+      - "5174:5173"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
     depends_on:
       - backend
-    restart: unless-stopped
 
   map:
     image: maptiler/tileserver-gl:latest
@@ -73,7 +75,6 @@ services:
     volumes:
       - ./maps/data:/data
     command: ["--mbtiles", "/data/antananarivo.mbtiles"]
-    restart: unless-stopped
 
 volumes:
   pgdata:

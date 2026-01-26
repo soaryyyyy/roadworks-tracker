@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "signalement")
@@ -38,4 +42,18 @@ public class Signalement {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_type_problem", nullable = false)
     private TypeProblem typeProblem;
+
+    @OneToMany(mappedBy = "signalement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("updatedAt DESC")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    private List<SignalementStatus> statuses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "signalement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("startDate DESC")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    private List<SignalementWork> works = new ArrayList<>();
 }
