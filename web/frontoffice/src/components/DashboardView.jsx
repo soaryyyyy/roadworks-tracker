@@ -100,8 +100,8 @@ DashboardView.propTypes = {
         surface_m2: PropTypes.number.isRequired,
         budget: PropTypes.number.isRequired,
         entreprise_assign: PropTypes.shape({
-          id: PropTypes.number.isRequired,
-          name: PropTypes.string.isRequired,
+          id: PropTypes.number,
+          name: PropTypes.string,
         }),
         description: PropTypes.string.isRequired,
       }).isRequired,
