@@ -31,8 +31,11 @@ services:
       SPRING_DATASOURCE_PASSWORD: monprojet
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SERVER_PORT: "8080"
+      FIREBASE_CREDENTIALS_PATH: /app/firebase-key.json
     ports:
       - "8084:8080"
+    volumes:
+      - ./roadworks-tracker-firebase-adminsdk-fbsvc-f052231349.json:/app/firebase-key.json:ro
     depends_on:
       postgres:
         condition: service_healthy

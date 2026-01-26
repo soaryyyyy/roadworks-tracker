@@ -12,6 +12,7 @@ import itu.cloud.roadworks.repository.ConfigRepository;
 import itu.cloud.roadworks.repository.RoleRepository;
 import itu.cloud.roadworks.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,12 +27,14 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
     private final SessionRepository sessionRepository;
     private final ConfigRepository configRepository;
+    private final FirebaseService firebaseService;
 
     private static final String ROLE_MANAGER = "manager";
     private static final int DEFAULT_SESSION_DURATION_MINUTES = 60;
@@ -96,6 +99,23 @@ public class AuthService {
         String roleLibelle = request.getRole() != null ? request.getRole() : ROLE_MANAGER;
         Role role = roleRepository.findByLibelle(roleLibelle)
                 .orElseThrow(() -> new RuntimeException("Role " + roleLibelle + " non trouvé"));
+
+        // Créer l'utilisateur dans Firebase
+        String firebaseUid;
+        try {
+            String email = request.getUsername() + "@roadworks.app"; // Utiliser un email par défaut
+            firebaseUid = firebaseService.createFirebaseUser(
+                    email, 
+                    request.getPassword(), 
+                    request.getUsername()
+            );
+            log.info("Utilisateur créé dans Firebase avec UID: {}", firebaseUid);
+        } catch (Exception e) {
+            log.error("Erreur lors de la création de l'utilisateur dans Firebase: {}", e.getMessage());
+            return AuthResponse.builder()
+                    .message("Erreur lors de la création de l'utilisateur: " + e.getMessage())
+                    .build();
+        }
 
         Account account = Account.builder()
                 .username(request.getUsername())
