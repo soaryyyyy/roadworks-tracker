@@ -11,6 +11,7 @@ import itu.cloud.roadworks.dto.SignalementDto;
 import itu.cloud.roadworks.service.SignalementService;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import itu.cloud.roadworks.dto.SignalementProblemDto;
 import itu.cloud.roadworks.service.SignalementService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/signalements")
@@ -46,5 +50,33 @@ public class SignalementApi {
     @GetMapping
     public List<SignalementProblemDto> findAll() {
         return service.findAllProblems();
+    }
+
+    @Operation(
+            summary = "Mettre à jour le statut d'un signalement",
+            description = "Met à jour le statut d'un signalement (nouveau, en_cours, resolu, rejete)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Statut mis à jour avec succès"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Signalement non trouvé"
+            )
+    })
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
+        try {
+            String status = request.get("status");
+            service.updateStatus(id, status);
+            return ResponseEntity.ok().body(Map.of("message", "Statut mis à jour avec succès"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 }

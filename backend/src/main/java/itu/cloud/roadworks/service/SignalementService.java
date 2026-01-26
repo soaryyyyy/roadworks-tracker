@@ -5,9 +5,12 @@ import itu.cloud.roadworks.model.Signalement;
 import itu.cloud.roadworks.model.SignalementStatus;
 import itu.cloud.roadworks.model.SignalementWork;
 import itu.cloud.roadworks.repository.SignalementRepository;
+import itu.cloud.roadworks.repository.SignalementStatusRepository;
+import itu.cloud.roadworks.repository.StatusSignalementRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +19,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SignalementService {
     private final SignalementRepository repository;
+    private final SignalementStatusRepository statusRepository;
+    private final StatusSignalementRepository statusSignalementRepository;
 
     public List<SignalementProblemDto> findAllProblems() {
         return repository.findAll()
@@ -49,5 +54,21 @@ public class SignalementService {
                 .location(signalement.getLocation())
                 .detail(detail)
                 .build();
+    }
+
+    public void updateStatus(Long signalementId, String statusName) throws Exception {
+        Signalement signalement = repository.findById(signalementId)
+                .orElseThrow(() -> new Exception("Signalement non trouvé"));
+
+        var statusSignalement = statusSignalementRepository.findByLibelle(statusName)
+                .orElseThrow(() -> new Exception("Statut invalide: " + statusName));
+
+        SignalementStatus newStatus = SignalementStatus.builder()
+                .signalement(signalement)
+                .statusSignalement(statusSignalement)
+                .updatedAt(Instant.now())
+                .build();
+
+        statusRepository.save(newStatus);
     }
 }

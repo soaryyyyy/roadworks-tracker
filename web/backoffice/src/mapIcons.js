@@ -22,9 +22,10 @@ const buildSvgIcon = (color, emoji) => {
 
 export const iconByType = {
   danger: buildSvgIcon('#d63031', '⚠️'),
-  warning: buildSvgIcon('#fdcb6e', '‼️'),
-  travaux_routier: buildSvgIcon('#e17055', '🚧'),
-  accident_routier: buildSvgIcon('#6c5ce7', '⛔'),
-  montee_d_eau: buildSvgIcon('#0984e3', '💧'),
-  route_fermee: buildSvgIcon('#2d3436', '🚫'),
+  works: buildSvgIcon('#e17055', '🚧'),
+  warning: buildSvgIcon('#fdcb6e', '⚡'),
+  water: buildSvgIcon('#0984e3', '💧'),
+  ok: buildSvgIcon('#27ae60', '✅'),
+  accident: buildSvgIcon('#6c5ce7', '⛔'),
 }
+

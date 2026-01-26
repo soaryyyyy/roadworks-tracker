@@ -1,5 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
-\c roadworks;
+\c roadworks_tracker;
 
 CREATE TABLE role (
   id BIGSERIAL PRIMARY KEY,
@@ -151,3 +151,25 @@ LEFT JOIN LATERAL (
   LIMIT 1
 ) sw ON true
 LEFT JOIN company c ON sw.id_company = c.id;
+
+-- Insertion des données initiales
+INSERT INTO role (libelle) VALUES 
+  ('manager'),
+  ('utilisateur'),
+  ('visiteur');
+
+INSERT INTO status_account (libelle) VALUES 
+  ('actif'),
+  ('inactif'),
+  ('suspendu');
+
+INSERT INTO status_signalement (libelle) VALUES 
+  ('nouveau'),
+  ('en_cours'),
+  ('resolu'),
+  ('rejete');
+
+-- Création d'un compte manager par défaut
+-- Mot de passe: admin123 (hashé en SHA-256 puis encodé en Base64)
+INSERT INTO account (username, pwd, id_role, created_at, is_active, is_locked, attempts)
+VALUES ('admin', 'JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=', 1, NOW(), true, false, 0);
