@@ -15,7 +15,7 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       { path: '', redirect: '/tabs/map' },
       { path: 'map', component: () => import('@/views/geo-location/MapPage.vue') },
-      { path: 'tab2', component: () => import('@/views/Tab2Page.vue') },
+      { path: 'tab2', component: () => import('@/views/recap/RecapPage.vue') },
       { path: 'tab3', component: () => import('@/views/Tab3Page.vue') },
     ]
   },

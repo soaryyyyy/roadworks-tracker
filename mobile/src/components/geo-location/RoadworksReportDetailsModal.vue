@@ -52,32 +52,40 @@
       </ion-card>
 
       <!-- Surface -->
-      <ion-card v-if="report.surface">
+      <ion-card>
         <ion-card-header>
           <ion-card-title>📐 Surface affectée</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <p><strong>{{ report.surface }} m²</strong></p>
+          <p>
+            <strong>
+              {{ report.surface != null ? `${report.surface} m²` : '—' }}
+            </strong>
+          </p>
         </ion-card-content>
       </ion-card>
 
       <!-- Budget -->
-      <ion-card v-if="report.budget">
+      <ion-card>
         <ion-card-header>
           <ion-card-title>💰 Budget estimé</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <p><strong>{{ report.budget.toLocaleString() }} €</strong></p>
+          <p>
+            <strong>
+              {{ report.budget != null ? `${report.budget.toLocaleString()} Ar` : '—' }}
+            </strong>
+          </p>
         </ion-card-content>
       </ion-card>
 
       <!-- Entreprise -->
-      <ion-card v-if="report.company">
+      <ion-card>
         <ion-card-header>
           <ion-card-title>🏢 Entreprise concernée</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <p><strong>{{ report.company }}</strong></p>
+          <p><strong>{{ report.company || '—' }}</strong></p>
         </ion-card-content>
       </ion-card>
 
@@ -87,11 +95,11 @@
           <ion-card-title>📅 Dates</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <p v-if="report.createdAt">
-            <strong>Créé:</strong> {{ formatDate(report.createdAt) }}
+          <p>
+            <strong>Date:</strong> {{ report.createdAt ? formatDate(report.createdAt) : '—' }}
           </p>
-          <p v-if="report.updatedAt">
-            <strong>Mis à jour:</strong> {{ formatDate(report.updatedAt) }}
+          <p>
+            <strong>Mis à jour:</strong> {{ report.updatedAt ? formatDate(report.updatedAt) : '—' }}
           </p>
         </ion-card-content>
       </ion-card>
@@ -124,10 +132,6 @@ interface Props {
 }
 
 defineProps<Props>();
-
-const emit = defineEmits<{
-  close: [];
-}>();
 
 const getStatusLabel = (status: string): string => {
   switch (status) {

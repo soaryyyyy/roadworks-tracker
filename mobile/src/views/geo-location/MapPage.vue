@@ -200,6 +200,36 @@ const getStatusEmoji = (status: string): string => {
   }
 };
 
+const getReportStatusLabel = (status: string): string => {
+  switch (status) {
+    case 'new': return 'Nouveau';
+    case 'in_progress': return 'En cours';
+    case 'completed': return 'Terminé';
+    default: return status;
+  }
+};
+
+const formatDateForPopup = (date: any): string => {
+  if (!date) return '—';
+
+  let dateObj: Date;
+  if (date.toDate) {
+    dateObj = date.toDate();
+  } else if (date instanceof Date) {
+    dateObj = date;
+  } else if (typeof date === 'number') {
+    dateObj = new Date(date);
+  } else {
+    return '—';
+  }
+
+  return new Intl.DateTimeFormat('fr-FR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(dateObj);
+};
+
 const displayReportsOnMap = () => {
   if (!map) return;
 
@@ -242,6 +272,13 @@ const displayReportsOnMap = () => {
       <div style="text-align: center; padding: 8px; width: 150px;">
         <strong>${getStatusLabel(report.status)}</strong>
         ${report.description ? `<p style="margin: 4px 0; font-size: 12px;">${report.description}</p>` : ''}
+        <div style="margin-top: 6px; font-size: 12px; text-align: left;">
+          <div><strong>Date:</strong> ${formatDateForPopup((report as any).createdAt)}</div>
+          <div><strong>Statut:</strong> ${getReportStatusLabel((report as any).reportStatus || 'new')}</div>
+          <div><strong>Surface:</strong> ${(report as any).surface != null ? `${(report as any).surface} m²` : '—'}</div>
+          <div><strong>Budget:</strong> ${(report as any).budget != null ? `${Number((report as any).budget).toLocaleString()} Ar` : '—'}</div>
+          <div><strong>Entreprise:</strong> ${(report as any).company || '—'}</div>
+        </div>
         <small style="color: #999;">
           ${report.lat.toFixed(5)}, ${report.lng.toFixed(5)}
         </small>
