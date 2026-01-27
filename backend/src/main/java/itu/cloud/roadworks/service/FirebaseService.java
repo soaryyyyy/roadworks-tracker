@@ -3,6 +3,8 @@ package itu.cloud.roadworks.service;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import com.google.cloud.firestore.Firestore;
+import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -100,6 +102,19 @@ public class FirebaseService {
         } catch (FirebaseAuthException e) {
             log.error("Erreur lors de l'activation de l'utilisateur Firebase: {}", e.getMessage());
             throw new RuntimeException("Impossible d'activer l'utilisateur Firebase: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Récupère l'instance Firestore
+     * @return L'instance Firestore
+     */
+    public Firestore getFirestore() {
+        try {
+            return FirestoreClient.getFirestore();
+        } catch (Exception e) {
+            log.error("Erreur lors de l'accès à Firestore: {}", e.getMessage());
+            return null;
         }
     }
 }

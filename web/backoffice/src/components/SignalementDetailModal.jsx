@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './SignalementDetailModal.css'
 
 export default function SignalementDetailModal({ signalement, onClose, onStatusChange, isManager, token }) {
@@ -6,6 +6,51 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
   const [selectedStatus, setSelectedStatus] = useState(signalement.status)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showWorkForm, setShowWorkForm] = useState(false)
+  const [companies, setCompanies] = useState([])
+  const [loadingCompanies, setLoadingCompanies] = useState(false)
+  const [syncLoading, setSyncLoading] = useState(false)
+  const [syncSuccess, setSyncSuccess] = useState('')
+  
+  // Form fields for work
+  const [formData, setFormData] = useState({
+    surface: '',
+    companyId: '',
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: '',
+    price: '',
+  })
+
+  // Charger les companies au montage du composant
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        setLoadingCompanies(true)
+        const response = await fetch('/api/companies', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Erreur lors du chargement des entreprises')
+        }
+
+        const data = await response.json()
+        setCompanies(data)
+      } catch (err) {
+        console.error('Erreur:', err)
+      } finally {
+        setLoadingCompanies(false)
+      }
+    }
+
+    if (showWorkForm) {
+      fetchCompanies()
+    }
+  }, [showWorkForm, token])
 
   const statusOptions = [
     { id: 1, label: 'Nouveau', value: 'nouveau' },
@@ -48,6 +93,83 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
       setError(err.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSubmitWork = async () => {
+    try {
+      setLoading(true)
+      setError('')
+
+      // Validation
+      if (!formData.surface || !formData.companyId || !formData.price) {
+        throw new Error('Veuillez remplir tous les champs obligatoires')
+      }
+
+      const response = await fetch(`/api/signalements/${signalement.id}/work`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          surface: parseFloat(formData.surface),
+          companyId: formData.companyId,
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          price: parseFloat(formData.price),
+          status: 'en_cours', // Changer le statut à en_cours
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'ajout de la réparation')
+      }
+
+      // Mettre à jour le statut et fermer le formulaire
+      onStatusChange('en_cours')
+      setShowWorkForm(false)
+      setShowStatusEdit(false)
+    } catch (err) {
+      console.error('Erreur:', err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleFormChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const handleSyncToFirebase = async () => {
+    try {
+      setSyncLoading(true)
+      setSyncSuccess('')
+      setError('')
+
+      const response = await fetch(`/api/signalements/${signalement.id}/sync/firebase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la synchronisation vers Firebase')
+      }
+
+      setSyncSuccess('✓ Synchronisé vers Firebase avec succès')
+      setTimeout(() => setSyncSuccess(''), 3000)
+    } catch (err) {
+      console.error('Erreur:', err)
+      setError(err.message)
+    } finally {
+      setSyncLoading(false)
     }
   }
 
@@ -94,6 +216,10 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
               <hr />
               <h3>📋 Réparation</h3>
               <div className="detail-row">
+                <label>Surface (m²):</label>
+                <p>{signalement.work.surface || 'N/A'}</p>
+              </div>
+              <div className="detail-row">
                 <label>Entreprise:</label>
                 <p>{signalement.work.company || 'N/A'}</p>
               </div>
@@ -115,9 +241,121 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
               </div>
             </>
           )}
+
+          {/* Formulaire de réparation pour les signalements "nouveau" */}
+          {isManager && signalement.status === 'nouveau' && !signalement.work && (
+            <>
+              <hr />
+              <h3>➕ Ajouter une réparation</h3>
+              {showWorkForm ? (
+                <div className="work-form">
+                  <div className="form-group">
+                    <label htmlFor="surface">Surface (m²):</label>
+                    <input
+                      id="surface"
+                      type="number"
+                      step="0.01"
+                      value={formData.surface}
+                      onChange={(e) => handleFormChange('surface', e.target.value)}
+                      placeholder="Ex: 25.50"
+                      className="form-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="company">Entreprise:</label>
+                    {loadingCompanies ? (
+                      <p className="form-input" style={{ color: '#666', fontStyle: 'italic' }}>
+                        ⏳ Chargement des entreprises...
+                      </p>
+                    ) : companies.length > 0 ? (
+                      <select
+                        id="company"
+                        value={formData.companyId}
+                        onChange={(e) => handleFormChange('companyId', e.target.value)}
+                        className="form-input"
+                      >
+                        <option value="">-- Sélectionner une entreprise --</option>
+                        {companies.map((company) => (
+                          <option key={company.id} value={company.id}>
+                            {company.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <p className="form-input" style={{ color: '#e74c3c', fontStyle: 'italic' }}>
+                        ❌ Aucune entreprise disponible
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="startDate">Date de début:</label>
+                    <input
+                      id="startDate"
+                      type="date"
+                      value={formData.startDate}
+                      onChange={(e) => handleFormChange('startDate', e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="endDate">Date estimée:</label>
+                    <input
+                      id="endDate"
+                      type="date"
+                      value={formData.endDate}
+                      onChange={(e) => handleFormChange('endDate', e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="price">Budget (Ar):</label>
+                    <input
+                      id="price"
+                      type="number"
+                      step="0.01"
+                      value={formData.price}
+                      onChange={(e) => handleFormChange('price', e.target.value)}
+                      placeholder="Ex: 150000"
+                      className="form-input"
+                    />
+                  </div>
+
+                  {error && <div className="error-message">{error}</div>}
+
+                  <div className="form-actions">
+                    <button
+                      className="action-button success"
+                      onClick={handleSubmitWork}
+                      disabled={loading}
+                    >
+                      {loading ? '⏳ Traitement...' : '✓ Ajouter et passer en cours'}
+                    </button>
+                    <button
+                      className="action-button cancel"
+                      onClick={() => setShowWorkForm(false)}
+                      disabled={loading}
+                    >
+                      ✕ Annuler
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className="action-button primary"
+                  onClick={() => setShowWorkForm(true)}
+                >
+                  ➕ Ajouter une réparation
+                </button>
+              )}
+            </>
+          )}
         </div>
 
-        {isManager && (
+        {isManager && signalement.status !== 'nouveau' && (
           <div className="modal-actions">
             {!showStatusEdit ? (
               <button
@@ -164,9 +402,24 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
           </div>
         )}
 
-        <button className="close-modal-button" onClick={onClose}>
-          Fermer
-        </button>
+        <div className="modal-footer">
+          {isManager && (
+            <>
+              <button
+                className="action-button primary"
+                onClick={handleSyncToFirebase}
+                disabled={syncLoading}
+                style={{ marginRight: '10px' }}
+              >
+                {syncLoading ? '⏳ Synchronisation...' : '🔄 Synchroniser vers Firebase'}
+              </button>
+              {syncSuccess && <span className="success-message">{syncSuccess}</span>}
+            </>
+          )}
+          <button className="close-modal-button" onClick={onClose}>
+            Fermer
+          </button>
+        </div>
       </div>
     </div>
   )

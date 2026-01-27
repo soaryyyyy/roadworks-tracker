@@ -30,6 +30,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedEvent, setSelectedEvent] = useState(null)
+  const [syncing, setSyncing] = useState(false)
+  const [syncMessage, setSyncMessage] = useState('')
 
   useEffect(() => {
     const fetchSignalements = async () => {
@@ -102,6 +104,38 @@ export default function DashboardPage() {
     }))
   }
 
+  const handleSyncFirebase = async () => {
+    try {
+      setSyncing(true)
+      setSyncMessage('')
+
+      const response = await fetch('/api/signalements/sync/firebase', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la synchronisation')
+      }
+
+      const data = await response.json()
+      setSyncMessage(`✓ ${data.imported} signalements importés depuis Firebase`)
+
+      // Rafraîchir la liste des signalements
+      setTimeout(() => {
+        window.location.reload()
+      }, 2000)
+    } catch (err) {
+      console.error('Erreur:', err)
+      setSyncMessage(`✗ Erreur: ${err.message}`)
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -111,9 +145,19 @@ export default function DashboardPage() {
         </div>
         <div className="header-actions">
           {role === 'manager' && (
-            <button onClick={() => navigate('/users')} className="action-button">
-              👥 Gestion Utilisateurs
-            </button>
+            <>
+              <button 
+                onClick={handleSyncFirebase} 
+                disabled={syncing}
+                className="action-button"
+                title="Synchroniser les données depuis Firebase"
+              >
+                {syncing ? '⏳ Synchronisation...' : '🔄 Synchroniser Firebase'}
+              </button>
+              <button onClick={() => navigate('/users')} className="action-button">
+                👥 Gestion Utilisateurs
+              </button>
+            </>
           )}
           <button onClick={handleLogout} className="logout-button">
             🚪 Déconnexion
@@ -124,6 +168,7 @@ export default function DashboardPage() {
       <div className="map-container">
         {loading && <div className="loading">Chargement des signalements...</div>}
         {error && <div className="error">Erreur: {error}</div>}
+        {syncMessage && <div className={syncMessage.includes('✓') ? 'success' : 'error'}>{syncMessage}</div>}
         
         {!loading && (
           <>
