@@ -20,6 +20,26 @@ const mapProblemTypeToIcon = (typeName) => {
   return 'warning'
 }
 
+const locationCoordinates = {
+  Analakely: { lat: -18.913, lon: 47.52 },
+  Isoraka: { lat: -18.91, lon: 47.535 },
+  'Lac Anosy': { lat: -18.91, lon: 47.51 },
+}
+
+const defaultCoords = { lat: -18.91, lon: 47.52 }
+
+const parseCoordsFromLocation = (location) => {
+  if (!location || typeof location !== 'string') return null
+  const parts = location.split(',').map((part) => part.trim())
+  if (parts.length !== 2) return null
+
+  const lat = Number(parts[0])
+  const lon = Number(parts[1])
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null
+
+  return { lat, lon }
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate()
   const role = localStorage.getItem('role')
@@ -53,13 +73,17 @@ export default function DashboardPage() {
         
         // Transformer les données pour correspondre au format attendu
         const transformedEvents = data.map(signalement => {
-          const [lat, lon] = signalement.location.split(',').map(parseFloat)
+          const coords =
+            parseCoordsFromLocation(signalement.location) ||
+            locationCoordinates[signalement.location] ||
+            defaultCoords
+
           return {
             id: signalement.id,
             type: mapProblemTypeToIcon(signalement.typeProblem),
             title: signalement.typeProblem || 'Signalement',
-            lat: lat || 0,
-            lon: lon || 0,
+            lat: coords.lat,
+            lon: coords.lon,
             description: signalement.detail?.description || 'Aucune description',
             status: signalement.detail?.etat || 'nouveau',
             date: signalement.detail?.dateProblem,

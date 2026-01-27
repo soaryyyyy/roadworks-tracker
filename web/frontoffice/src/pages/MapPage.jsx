@@ -27,6 +27,18 @@ const views = [
 
 const defaultCoords = { lat: -18.91, lon: 47.52 }
 
+const parseCoordsFromLocation = (location) => {
+  if (!location || typeof location !== 'string') return null
+  const parts = location.split(',').map((part) => part.trim())
+  if (parts.length !== 2) return null
+
+  const lat = Number(parts[0])
+  const lon = Number(parts[1])
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null
+
+  return { lat, lon }
+}
+
 const slugify = (value = '') =>
   value
     .trim()
@@ -41,7 +53,8 @@ const mapTypeKey = (typeProblem) => {
   return iconTypeMap[normalized] || slugify(typeProblem) || 'warning'
 }
 
-const mapCoords = (location) => locationCoordinates[location] || defaultCoords
+const mapCoords = (location) =>
+  parseCoordsFromLocation(location) || locationCoordinates[location] || defaultCoords
 
 const adaptDtoToEvent = (dto) => {
   const detail = dto.detail ?? {}
