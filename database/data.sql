@@ -56,3 +56,8 @@ INSERT INTO account (username, pwd, id_role, is_active, is_locked, attempts)
 SELECT 'admin', 'hmSFeWz6jXwM9xEWQCBbgwdkM1R1d1EdgfgDCumezqU=', r.id, true, false, 0
 FROM role r WHERE r.libelle = 'manager'
 ON CONFLICT (username) DO NOTHING;
+
+-- Création d'un compte manager par défaut
+-- Mot de passe: admin123 (hashé en SHA-256 puis encodé en Base64)
+INSERT INTO account (username, pwd, id_role, created_at, is_active, is_locked, attempts)
+VALUES ('admin', 'JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=', 1, NOW(), true, false, 0);

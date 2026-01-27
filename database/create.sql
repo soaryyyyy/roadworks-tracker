@@ -1,6 +1,9 @@
 
 \c roadworks;
 
+-- Required for gen_random_uuid()
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE role (
   id BIGSERIAL PRIMARY KEY,
   libelle VARCHAR(50) NOT NULL UNIQUE
@@ -152,24 +155,31 @@ LEFT JOIN LATERAL (
 ) sw ON true
 LEFT JOIN company c ON sw.id_company = c.id;
 
--- Insertion des données initiales
-INSERT INTO role (libelle) VALUES 
-  ('manager'),
-  ('utilisateur'),
-  ('visiteur');
+-- -- Insertion des données initiales
+-- INSERT INTO role (libelle) VALUES 
+--   ('manager'),
+--   ('utilisateur'),
+--   ('visiteur');
 
-INSERT INTO status_account (libelle) VALUES 
-  ('actif'),
-  ('inactif'),
-  ('suspendu');
+-- INSERT INTO status_account (libelle) VALUES 
+--   ('actif'),
+--   ('inactif'),
+--   ('suspendu');
 
-INSERT INTO status_signalement (libelle) VALUES 
-  ('nouveau'),
-  ('en_cours'),
-  ('resolu'),
-  ('rejete');
+-- INSERT INTO status_signalement (libelle) VALUES 
+--   ('nouveau'),
+--   ('en_cours'),
+--   ('resolu'),
+--   ('rejete');
 
--- Création d'un compte manager par défaut
--- Mot de passe: admin123 (hashé en SHA-256 puis encodé en Base64)
-INSERT INTO account (username, pwd, id_role, created_at, is_active, is_locked, attempts)
-VALUES ('admin', 'JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=', 1, NOW(), true, false, 0);
+-- -- Création d'un compte manager par défaut
+-- -- Mot de passe: admin123 (hashé en SHA-256 puis encodé en Base64)
+-- INSERT INTO account (username, pwd, id_role, created_at, is_active, is_locked, attempts)
+-- VALUES ('admin', 'JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=', 1, NOW(), true, false, 0);
+
+-- Migration: Ajouter colonne firebase_id à la table signalement
+ALTER TABLE signalement
+ADD COLUMN firebase_id VARCHAR(255) UNIQUE;
+
+-- Créer un index pour optimiser les recherches
+CREATE INDEX idx_signalement_firebase_id ON signalement(firebase_id);
