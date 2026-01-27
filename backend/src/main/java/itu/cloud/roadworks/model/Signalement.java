@@ -43,6 +43,9 @@ public class Signalement {
     @JoinColumn(name = "id_type_problem", nullable = false)
     private TypeProblem typeProblem;
 
+    @Column(name = "firebase_id", unique = true)
+    private String firebaseId;
+
     @OneToMany(mappedBy = "signalement", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("updatedAt DESC")
     @ToString.Exclude

@@ -4,11 +4,27 @@ import itu.cloud.roadworks.dto.SignalementProblemDto;
 import itu.cloud.roadworks.model.Signalement;
 import itu.cloud.roadworks.model.SignalementStatus;
 import itu.cloud.roadworks.model.SignalementWork;
+import itu.cloud.roadworks.model.TypeProblem;
+import itu.cloud.roadworks.model.Account;
+import itu.cloud.roadworks.model.Company;
 import itu.cloud.roadworks.repository.SignalementRepository;
+import itu.cloud.roadworks.repository.SignalementStatusRepository;
+import itu.cloud.roadworks.repository.StatusSignalementRepository;
+import itu.cloud.roadworks.repository.TypeProblemRepository;
+import itu.cloud.roadworks.repository.AccountRepository;
+import itu.cloud.roadworks.repository.SignalementWorkRepository;
+import itu.cloud.roadworks.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.api.core.ApiFuture;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -16,6 +32,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SignalementService {
     private final SignalementRepository repository;
+    private final SignalementStatusRepository statusRepository;
+    private final StatusSignalementRepository statusSignalementRepository;
+    private final TypeProblemRepository typeProblemRepository;
+    private final AccountRepository accountRepository;
+    private final SignalementWorkRepository workRepository;
+    private final CompanyRepository companyRepository;
+    private final FirebaseService firebaseService;
 
     public List<SignalementProblemDto> findAllProblems() {
         return repository.findAll()
@@ -49,5 +72,235 @@ public class SignalementService {
                 .location(signalement.getLocation())
                 .detail(detail)
                 .build();
+    }
+
+    public void updateStatus(Long signalementId, String statusName) throws Exception {
+        Signalement signalement = repository.findById(signalementId)
+                .orElseThrow(() -> new Exception("Signalement non trouvé"));
+
+        var statusSignalement = statusSignalementRepository.findByLibelle(statusName)
+                .orElseThrow(() -> new Exception("Statut invalide: " + statusName));
+
+        SignalementStatus newStatus = SignalementStatus.builder()
+                .signalement(signalement)
+                .statusSignalement(statusSignalement)
+                .updatedAt(Instant.now())
+                .build();
+
+        statusRepository.save(newStatus);
+    }
+
+    public int syncFromFirebase() throws Exception {
+        Firestore db = firebaseService.getFirestore();
+        if (db == null) {
+            throw new Exception("Firebase n'est pas initialisé");
+        }
+
+        ApiFuture<QuerySnapshot> query = db.collection("roadworks_reports").get();
+        QuerySnapshot querySnapshot = query.get();
+
+        int count = 0;
+        Account defaultAccount = accountRepository.findByUsername("admin").orElse(null);
+        TypeProblem defaultType = typeProblemRepository.findAll().stream().findFirst().orElse(null);
+
+        if (defaultAccount == null || defaultType == null) {
+            throw new Exception("Compte admin ou type de problème non trouvé");
+        }
+
+        for (var document : querySnapshot.getDocuments()) {
+            try {
+                String firebaseId = document.getId();
+                
+                // Vérifier si ce signalement a déjà été synchronisé
+                if (repository.findByFirebaseId(firebaseId).isPresent()) {
+                    System.out.println("Signalement Firebase déjà synchronisé: " + firebaseId);
+                    continue;
+                }
+
+                String description = document.getString("description");
+                Double lat = document.getDouble("lat");
+                Double lng = document.getDouble("lng");
+                String status = document.getString("status");
+
+                if (description != null && lat != null && lng != null) {
+                    Signalement signalement = Signalement.builder()
+                            .account(defaultAccount)
+                            .typeProblem(defaultType)
+                            .descriptions(description)
+                            .location(lat + "," + lng)
+                            .createdAt(Instant.now())
+                            .firebaseId(firebaseId)
+                            .build();
+
+                    Signalement saved = repository.save(signalement);
+
+                    // Créer le statut initial
+                    String statusToUse = "nouveau";
+                    if (status != null && !status.isEmpty()) {
+                        statusToUse = status;
+                    }
+
+                    var statusSignalement = statusSignalementRepository
+                            .findByLibelle(statusToUse)
+                            .orElseGet(() -> statusSignalementRepository.findByLibelle("nouveau").orElse(null));
+
+                    if (statusSignalement != null) {
+                        SignalementStatus signalStatus = SignalementStatus.builder()
+                                .signalement(saved)
+                                .statusSignalement(statusSignalement)
+                                .updatedAt(Instant.now())
+                                .build();
+                        statusRepository.save(signalStatus);
+                    }
+
+                    count++;
+                }
+            } catch (Exception e) {
+                System.err.println("Erreur lors de la synchronisation du document: " + e.getMessage());
+            }
+        }
+
+        return count;
+    }
+
+    public void addWork(Long signalementId, Map<String, Object> workData) throws Exception {
+        try {
+            Signalement signalement = repository.findById(signalementId)
+                    .orElseThrow(() -> new Exception("Signalement non trouvé"));
+
+            // Mettre à jour la surface
+            if (workData.containsKey("surface") && workData.get("surface") != null) {
+                Double surface = ((Number) workData.get("surface")).doubleValue();
+                signalement.setSurface(BigDecimal.valueOf(surface));
+            }
+
+            // Sauvegarder le signalement d'abord
+            repository.save(signalement);
+
+            // Récupérer l'entreprise par ID
+            Long companyId = null;
+            if (workData.containsKey("companyId")) {
+                Object companyIdObj = workData.get("companyId");
+                if (companyIdObj instanceof Number) {
+                    companyId = ((Number) companyIdObj).longValue();
+                } else if (companyIdObj instanceof String) {
+                    companyId = Long.parseLong((String) companyIdObj);
+                }
+            }
+
+            if (companyId == null) {
+                throw new Exception("L'ID de l'entreprise est obligatoire");
+            }
+
+            Company company = companyRepository.findById(companyId)
+                    .orElseThrow(() -> new Exception("Entreprise non trouvée"));
+
+            // Créer le SignalementWork
+            LocalDate startDate = null;
+            LocalDate endDate = null;
+
+            if (workData.containsKey("startDate") && workData.get("startDate") != null) {
+                String startDateStr = (String) workData.get("startDate");
+                if (!startDateStr.isEmpty()) {
+                    startDate = LocalDate.parse(startDateStr);
+                }
+            }
+
+            if (workData.containsKey("endDate") && workData.get("endDate") != null) {
+                String endDateStr = (String) workData.get("endDate");
+                if (!endDateStr.isEmpty()) {
+                    endDate = LocalDate.parse(endDateStr);
+                }
+            }
+
+            SignalementWork work = SignalementWork.builder()
+                    .signalement(signalement)
+                    .company(company)
+                    .startDate(startDate)
+                    .endDateEstimation(endDate)
+                    .price(BigDecimal.valueOf(((Number) workData.get("price")).doubleValue()))
+                    .build();
+
+            workRepository.save(work);
+
+            // Mettre à jour le statut à "en_cours"
+            String status = (String) workData.getOrDefault("status", "en_cours");
+            var statusSignalement = statusSignalementRepository.findByLibelle(status)
+                    .orElseThrow(() -> new Exception("Statut invalide: " + status));
+
+            SignalementStatus signalStatus = SignalementStatus.builder()
+                    .signalement(signalement)
+                    .statusSignalement(statusSignalement)
+                    .updatedAt(Instant.now())
+                    .build();
+
+            statusRepository.save(signalStatus);
+        } catch (Exception e) {
+            System.err.println("Erreur dans addWork: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void syncToFirebase(Long signalementId) throws Exception {
+        try {
+            Signalement signalement = repository.findById(signalementId)
+                    .orElseThrow(() -> new Exception("Signalement non trouvé"));
+
+            Firestore db = firebaseService.getFirestore();
+            if (db == null) {
+                throw new Exception("Firebase n'est pas initialisé");
+            }
+
+            // Récupérer le dernier statut
+            SignalementStatus latestStatus = signalement.getStatuses().stream().findFirst().orElse(null);
+            String status = latestStatus != null ? latestStatus.getStatusSignalement().getLibelle() : "nouveau";
+
+            // Récupérer le dernier work s'il existe
+            SignalementWork latestWork = signalement.getWorks().stream().findFirst().orElse(null);
+
+            // Extraire lat et lng depuis location
+            String[] coords = signalement.getLocation().split(",");
+            double lat = Double.parseDouble(coords[0].trim());
+            double lng = Double.parseDouble(coords[1].trim());
+
+            // Préparer les données à synchroniser
+            Map<String, Object> data = new java.util.HashMap<>();
+            data.put("description", signalement.getDescriptions());
+            data.put("lat", lat);
+            data.put("lng", lng);
+            data.put("status", status);
+            data.put("lastUpdated", Instant.now().toString());
+
+            // Ajouter les informations de travail si elles existent
+            if (latestWork != null) {
+                Map<String, Object> workData = new java.util.HashMap<>();
+                workData.put("surface", signalement.getSurface() != null ? signalement.getSurface().doubleValue() : null);
+                workData.put("company", latestWork.getCompany().getName());
+                workData.put("companyId", latestWork.getCompany().getId());
+                workData.put("startDate", latestWork.getStartDate() != null ? latestWork.getStartDate().toString() : null);
+                workData.put("endDateEstimation", latestWork.getEndDateEstimation() != null ? latestWork.getEndDateEstimation().toString() : null);
+                workData.put("realEndDate", latestWork.getRealEndDate() != null ? latestWork.getRealEndDate().toString() : null);
+                workData.put("price", latestWork.getPrice() != null ? latestWork.getPrice().doubleValue() : null);
+                data.put("work", workData);
+            }
+
+            // Si le signalement a un firebaseId, mettre à jour le document existant
+            // Sinon, créer un nouveau document
+            String firebaseId = signalement.getFirebaseId();
+            if (firebaseId != null && !firebaseId.isEmpty()) {
+                db.collection("roadworks_reports").document(firebaseId).set(data).get();
+            } else {
+                // Créer un nouveau document et sauvegarder son ID
+                var docRef = db.collection("roadworks_reports").add(data).get();
+                signalement.setFirebaseId(docRef.getId());
+                repository.save(signalement);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erreur dans syncToFirebase: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 }
