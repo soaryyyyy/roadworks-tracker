@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(npm run dev:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(dir /b \"f:\\\\itu\\\\S5\\\\Rojo\\\\roadworks-tracker\\\\backend\")",
+      "Bash(dir /b \"f:\\\\itu\\\\S5\\\\Rojo\\\\roadworks-tracker\\\\web\")",
+      "Bash(dir:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(curl:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker-compose restart:*)"
     ]
   }
 }

@@ -1,1 +1,5 @@
 /utilitaire/
+backend/firebase-key.json
+secrets/
+*.firebase-adminsdk*.json
+node_modules/
