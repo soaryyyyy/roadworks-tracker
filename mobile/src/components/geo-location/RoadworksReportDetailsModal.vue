@@ -81,6 +81,51 @@
         </ion-card-content>
       </ion-card>
 
+      <!-- Travaux assignés -->
+      <ion-card v-if="report.work" class="work-card">
+        <ion-card-header>
+          <ion-card-title>🔧 Travaux assignés</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item lines="none">
+            <ion-label>
+              <p class="work-label">Entreprise</p>
+              <h3>{{ report.work.company }}</h3>
+            </ion-label>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label>
+              <p class="work-label">Surface</p>
+              <h3>{{ report.work.surface }} m²</h3>
+            </ion-label>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label>
+              <p class="work-label">Prix</p>
+              <h3>{{ report.work.price.toLocaleString() }} Ar</h3>
+            </ion-label>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label>
+              <p class="work-label">Date de début</p>
+              <h3>{{ formatSimpleDate(report.work.startDate) }}</h3>
+            </ion-label>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label>
+              <p class="work-label">Date de fin estimée</p>
+              <h3>{{ formatSimpleDate(report.work.endDateEstimation) }}</h3>
+            </ion-label>
+          </ion-item>
+          <ion-item v-if="report.work.realEndDate" lines="none">
+            <ion-label>
+              <p class="work-label">Date de fin réelle</p>
+              <h3>{{ formatSimpleDate(report.work.realEndDate) }}</h3>
+            </ion-label>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
       <!-- Dates -->
       <ion-card>
         <ion-card-header>
@@ -177,9 +222,9 @@ const getStatusColor = (status: string): string => {
 
 const formatDate = (date: any): string => {
   if (!date) return 'N/A';
-  
+
   let dateObj: Date;
-  
+
   // Si c'est un Timestamp Firestore
   if (date.toDate) {
     dateObj = date.toDate();
@@ -197,6 +242,18 @@ const formatDate = (date: any): string => {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+  }).format(dateObj);
+};
+
+const formatSimpleDate = (dateString: string): string => {
+  if (!dateString) return 'N/A';
+
+  const dateObj = new Date(dateString);
+
+  return new Intl.DateTimeFormat('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   }).format(dateObj);
 };
 </script>
@@ -235,5 +292,33 @@ ion-card {
 
 ion-badge {
   margin-left: 8px;
+}
+
+.work-card {
+  border-left: 4px solid var(--ion-color-success);
+}
+
+.work-card ion-card-header {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.work-card ion-card-title {
+  color: white;
+}
+
+.work-card ion-item {
+  --padding-start: 0;
+}
+
+.work-label {
+  color: var(--ion-color-medium);
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.work-card h3 {
+  margin: 0;
+  font-weight: 600;
 }
 </style>

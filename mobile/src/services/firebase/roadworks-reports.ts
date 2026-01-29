@@ -9,6 +9,16 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 
+export interface WorkData {
+  company: string;
+  companyId: number;
+  startDate: string;
+  endDateEstimation: string;
+  realEndDate?: string | null;
+  price: number;
+  surface: number;
+}
+
 export interface RoadworksReportData {
   lat: number;
   lng: number;
@@ -18,6 +28,7 @@ export interface RoadworksReportData {
   surface?: number; // en m2
   budget?: number; // en devise locale
   company?: string; // Entreprise concernée
+  work?: WorkData; // Informations sur les travaux assignés
   userId?: string;
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
