@@ -124,9 +124,6 @@ public class SignalementApi {
                     description = "Synchronisation effectuée avec succès",
                     content = @Content(mediaType = "application/json")
             ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Erreur lors de la synchronisation"
             )
     })
     @SecurityRequirement(name = "bearerAuth")

@@ -26,9 +26,18 @@ INSERT INTO type_problem (id, icone, libelle) VALUES
   (1, '⚠️', 'Incident'),
   (2, '🚧', 'Travaux');
 
-INSERT INTO account (id, username, pwd, id_role, is_active, is_locked, attempts) VALUES
-  (1, 'admin', 'password', 3, TRUE, FALSE, 0),
-  (2, 'agent', 'password', 2, TRUE, FALSE, 0);
+
+-- Compte manager par défaut (mot de passe: manager123 hashé en SHA-256 Base64)
+-- Hash de "manager123" en UTF-8 SHA-256 Base64
+INSERT INTO account (id, username, pwd, id_role, is_active, is_locked, attempts)
+SELECT 1, 'manager', 'hmSFeWz6jXwM9xEWQCBbgwdkM1R1d1EdgfgDCumezqU=', r.id, true, false, 0
+FROM role r WHERE r.libelle = 'manager'
+ON CONFLICT (username) DO NOTHING;
+
+-- Création d'un compte manager par défaut
+-- Mot de passe: admin123 (hashé en SHA-256 puis encodé en Base64)
+INSERT INTO account (id, username, pwd, id_role, created_at, is_active, is_locked, attempts)
+VALUES (2, 'admin', 'JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=', 1, NOW(), true, false, 0);
 
 INSERT INTO account_status (id, id_account, id_status_account) VALUES
   (1, 1, 1),
@@ -48,11 +57,4 @@ INSERT INTO signalement_status (id, id_signalement, id_status_signalement) VALUE
   (3, 2, 1);
 
 -- Configuration par défaut (5 tentatives max, session de 60 minutes)
-INSERT INTO config (max_attempts, session_duration) VALUES (5, 60);
-
--- Compte manager par défaut (mot de passe: manager123 hashé en SHA-256 Base64)
--- Hash de "manager123" en UTF-8 SHA-256 Base64
-INSERT INTO account (username, pwd, id_role, is_active, is_locked, attempts)
-SELECT 'admin', 'hmSFeWz6jXwM9xEWQCBbgwdkM1R1d1EdgfgDCumezqU=', r.id, true, false, 0
-FROM role r WHERE r.libelle = 'manager'
-ON CONFLICT (username) DO NOTHING;
+INSERT INTO config (id, max_attempts, session_duration) VALUES (1, 5, 60);

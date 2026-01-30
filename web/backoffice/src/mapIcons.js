@@ -29,12 +29,10 @@ export const iconByType = {
   ok: buildSvgIcon('#27ae60', '✅'),
   accident: buildSvgIcon('#6c5ce7', '🚨'),
   // Nouveaux types alignés avec mobile
-  pothole: buildSvgIcon('#FF6B6B', '🕳️'),
   blocked_road: buildSvgIcon('#FF8C00', '🚧'),
   construction: buildSvgIcon('#FFD700', '🏗️'),
   flooding: buildSvgIcon('#1E90FF', '💧'),
   debris: buildSvgIcon('#A9A9A9', '🪨'),
   poor_surface: buildSvgIcon('#FFA500', '⚠️'),
-  other: buildSvgIcon('#808080', '❓'),
+  other: buildSvgIcon('#808080', '❓')
 }
-

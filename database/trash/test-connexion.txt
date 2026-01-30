@@ -1,0 +1,7 @@
+docker exec -it monprojet-postgres14 psql -U monprojet -d roadworks_tracker -c "\dt"
+
+
+Start-Sleep -Seconds 3; $body = @{
+    username = "admin"
+    password = "admin123"
+} | ConvertTo-Json; Invoke-RestMethod -Uri "http://localhost:8081/api/auth/login" -Method Post -ContentType "application/json" -Body $body

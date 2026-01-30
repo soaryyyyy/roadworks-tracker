@@ -33,7 +33,6 @@ export default function DashboardPage() {
   const role = localStorage.getItem('role')
   const username = localStorage.getItem('username')
   const token = localStorage.getItem('token')
-
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')

@@ -3,16 +3,18 @@ services:
     image: postgres:14
     container_name: monprojet-postgres14
     environment:
-      POSTGRES_DB: roadworks_tracker
-      POSTGRES_USER: monprojet
-      POSTGRES_PASSWORD: monprojet
+      POSTGRES_DB: roadworks
+      POSTGRES_USER: roadworks
+      POSTGRES_PASSWORD: roadworks
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./database/create.sql:/docker-entrypoint-initdb.d/create.sql
+      # Scripts exécutés automatiquement uniquement au 1er démarrage (volume vide)
+      - ./database/create.sql:/docker-entrypoint-initdb.d/01-create.sql:ro
+      - ./database/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U monprojet -d roadworks_tracker"]
+      test: ["CMD-SHELL", "pg_isready -U roadworks -d roadworks"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -24,13 +26,14 @@ services:
     volumes:
       - ./backend:/app
       - ~/.m2:/root/.m2
+      - ./roadworks-tracker-firebase-adminsdk-fbsvc-f052231349.json:/app/firebase-key.json:ro
     ports:
       - "8080:8080"
     command: sh -c "mvn spring-boot:run"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/roadworks_tracker
-      SPRING_DATASOURCE_USERNAME: monprojet
-      SPRING_DATASOURCE_PASSWORD: monprojet
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/roadworks
+      SPRING_DATASOURCE_USERNAME: roadworks
+      SPRING_DATASOURCE_PASSWORD: roadworks
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       FIREBASE_CREDENTIALS_PATH: /app/firebase-key.json
     depends_on:
