@@ -113,13 +113,23 @@ CREATE INDEX idx_session_account ON session(id_account);
 -- Insérer les données de référence
 INSERT INTO role (libelle) VALUES ('user'), ('client'), ('manager'), ('admin');
 INSERT INTO status_signalement (libelle) VALUES ('nouveau'), ('en_cours'), ('resolu'), ('rejete');
-INSERT INTO type_problem (libelle, icone) VALUES 
+INSERT INTO type_problem (libelle, icone) VALUES
     ('Danger', '⚠️'),
     ('Travaux', '🚧'),
     ('Risque', '⚡'),
     ('Inondation', '💧'),
     ('Résolu', '✅'),
-    ('Route fermée', '🚫');
+    ('Route fermée', '🚫'),
+    -- Types Firebase (mobile)
+    ('pothole', '🕳️'),
+    ('blocked_road', '🚧'),
+    ('accident', '🚨'),
+    ('construction', '🏗️'),
+    ('flooding', '💧'),
+    ('debris', '🪨'),
+    ('poor_surface', '⚠️'),
+    ('other', '❓');
+    
 
 -- Insérer l'utilisateur admin par défaut
 -- Mot de passe: admin123 (hashé avec bcrypt)

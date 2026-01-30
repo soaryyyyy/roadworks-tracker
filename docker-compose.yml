@@ -28,7 +28,7 @@ services:
       - ./backend/firebase-key.json:/app/firebase-key.json:ro
     ports:
       - "8080:8080"
-    command: sh -c "mvn spring-boot:run"
+    command: sh -c "echo 'Waiting for PostgreSQL...' && sleep 10 && mvn spring-boot:run"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/roadworks
       SPRING_DATASOURCE_USERNAME: roadworks
