@@ -118,12 +118,12 @@ public class SignalementApi {
                     Les signalements existants ne sont pas dupliqués (détection par firebase_id).
                     """
     )
+    
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "Synchronisation effectuée avec succès",
                     content = @Content(mediaType = "application/json")
-            ),
             )
     })
     @SecurityRequirement(name = "bearerAuth")

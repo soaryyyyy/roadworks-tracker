@@ -12,7 +12,6 @@ services:
       - pgdata:/var/lib/postgresql/data
       # Scripts exécutés automatiquement uniquement au 1er démarrage (volume vide)
       - ./database/create.sql:/docker-entrypoint-initdb.d/01-create.sql:ro
-      - ./database/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U roadworks -d roadworks"]
       interval: 5s
@@ -26,7 +25,7 @@ services:
     volumes:
       - ./backend:/app
       - ~/.m2:/root/.m2
-      - ./roadworks-tracker-firebase-adminsdk-fbsvc-f052231349.json:/app/firebase-key.json:ro
+      - ./backend/firebase-key.json:/app/firebase-key.json:ro
     ports:
       - "8080:8080"
     command: sh -c "mvn spring-boot:run"
