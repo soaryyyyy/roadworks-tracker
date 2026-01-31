@@ -20,20 +20,36 @@ export type ReportStatus = 'new' | 'in_progress' | 'completed';
  */
 export const getStatusLabel = (status: string): string => {
   switch (status) {
-    case 'pothole': return '🕳️ Nid-de-poule';
-    case 'blocked_road': return '🚧 Route barrée';
-    case 'accident': return '🚨 Accident';
-    case 'construction': return '🏗️ Travaux';
-    case 'flooding': return '💧 Inondation';
-    case 'debris': return '🪨 Débris';
-    case 'poor_surface': return '⚠️ Mauvaise surface';
-    case 'other': return '❓ Autre';
+    case 'pothole': return 'Nid-de-poule';
+    case 'blocked_road': return 'Route barrée';
+    case 'accident': return 'Accident';
+    case 'construction': return 'Travaux';
+    case 'flooding': return 'Inondation';
+    case 'debris': return 'Débris';
+    case 'poor_surface': return 'Mauvaise surface';
+    case 'other': return 'Autre';
     default: return status;
   }
 };
 
 /**
- * Retourne uniquement l'emoji pour un type de signalement
+ * Retourne une icone emoji pour un type de signalement (pour les markers)
+ */
+export const getStatusIcon = (status: string, color: string): string => {
+  const emoji = getStatusEmoji(status);
+  return `
+    <div style="
+      font-size: 28px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 2px rgba(0, 0, 0, 0.2));
+    ">
+      ${emoji}
+    </div>
+  `;
+};
+
+/**
+ * Retourne uniquement l'emoji pour un type de signalement (legacy, déprécié)
  */
 export const getStatusEmoji = (status: string): string => {
   switch (status) {

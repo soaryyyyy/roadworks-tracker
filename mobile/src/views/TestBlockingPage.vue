@@ -8,7 +8,9 @@
 
     <ion-content class="ion-padding">
       <ion-text color="primary">
-        <h1>🧪 Tests du Système de Blocage</h1>
+        <h1>
+          <ion-icon :icon="beakerOutline" style="margin-right: 8px;"></ion-icon>Tests du Système de Blocage
+        </h1>
       </ion-text>
 
       <!-- Email Input -->
@@ -25,34 +27,36 @@
       <!-- Test Buttons -->
       <div class="test-buttons">
         <ion-button expand="block" @click="testGetStatus">
-          📊 Voir le statut
+          <ion-icon slot="start" :icon="statsChartOutline"></ion-icon>Voir le statut
         </ion-button>
 
-        <ion-button expand="block" @click="testRecordFailed">
-          ❌ Enregistrer tentative échouée
+        <ion-button expand="block" @click="testRecordFailed" color="danger">
+          <ion-icon slot="start" :icon="closeCircleOutline"></ion-icon>Enregistrer tentative échouée
         </ion-button>
 
-        <ion-button expand="block" @click="testSimulateBlock">
-          🔒 Simuler 3 tentatives (Bloquer)
+        <ion-button expand="block" @click="testSimulateBlock" color="danger">
+          <ion-icon slot="start" :icon="lockClosedOutline"></ion-icon>Simuler 3 tentatives (Bloquer)
         </ion-button>
 
         <ion-button expand="block" @click="testCheckLocked">
-          🔍 Vérifier si bloqué
+          <ion-icon slot="start" :icon="searchOutline"></ion-icon>Vérifier si bloqué
         </ion-button>
 
         <ion-button expand="block" @click="testUnlock" color="warning">
-          🔓 Débloquer le compte
+          <ion-icon slot="start" :icon="lockOpenOutline"></ion-icon>Débloquer le compte
         </ion-button>
 
         <ion-button expand="block" @click="testReset" color="success">
-          🔄 Réinitialiser
+          <ion-icon slot="start" :icon="refreshOutline"></ion-icon>Réinitialiser
         </ion-button>
       </div>
 
       <!-- Results Card -->
       <ion-card v-if="result" class="ion-margin-top">
         <ion-card-header>
-          <ion-card-title>📝 Résultats</ion-card-title>
+          <ion-card-title>
+            <ion-icon :icon="documentTextOutline" style="margin-right: 8px;"></ion-icon>Résultats
+          </ion-card-title>
         </ion-card-header>
         <ion-card-content>
           <pre>{{ result }}</pre>
@@ -75,7 +79,7 @@
       </ion-card>
 
       <ion-button expand="block" @click="clearLogs" color="danger" class="ion-margin-top">
-        🗑️ Effacer les logs
+        <ion-icon slot="start" :icon="trashOutline"></ion-icon>Effacer les logs
       </ion-button>
     </ion-content>
   </ion-page>
@@ -86,7 +90,7 @@ import { ref } from 'vue';
 import {
   IonPage, IonHeader, IonContent,
   IonToolbar, IonTitle, IonText,
-  IonItem, IonInput, IonButton,
+  IonItem, IonInput, IonButton, IonIcon,
   IonCard, IonCardHeader, IonCardTitle, IonCardContent
 } from '@ionic/vue';
 
@@ -97,6 +101,18 @@ import {
   resetLoginAttempts,
   unlockAccount
 } from '@/services/firebase/auth-attempts';
+
+import { 
+  beakerOutline, 
+  statsChartOutline, 
+  closeCircleOutline, 
+  lockClosedOutline, 
+  searchOutline, 
+  lockOpenOutline, 
+  refreshOutline, 
+  documentTextOutline,
+  trashOutline 
+} from 'ionicons/icons';
 
 const testEmail = ref<string>('test-blocage@example.com');
 const result = ref<string>('');

@@ -62,19 +62,22 @@
             <ion-row>
               <ion-col size="4">
                 <div class="status-card status-card--primary">
+                  <ion-icon :icon="addCircleOutline" style="font-size: 28px; margin-bottom: 8px;"></ion-icon>
                   <div class="status-card__label">Nouveau</div>
                   <div class="status-card__value">{{ summary.states.new }}</div>
                 </div>
               </ion-col>
               <ion-col size="4">
                 <div class="status-card status-card--warning">
+                  <ion-icon :icon="timerOutline" style="font-size: 28px; margin-bottom: 8px; color: var(--status-warning);"></ion-icon>
                   <div class="status-card__label">En cours</div>
                   <div class="status-card__value">{{ summary.states.in_progress }}</div>
                 </div>
               </ion-col>
               <ion-col size="4">
                 <div class="status-card status-card--success">
-                  <div class="status-card__label">Termine</div>
+                  <ion-icon :icon="checkmarkDoneOutline" style="font-size: 28px; margin-bottom: 8px; color: var(--status-success);"></ion-icon>
+                  <div class="status-card__label">Terminé</div>
                   <div class="status-card__value">{{ summary.states.completed }}</div>
                 </div>
               </ion-col>
@@ -109,7 +112,9 @@ import {
   IonCol,
   IonRefresher,
   IonRefresherContent,
+  IonIcon,
 } from '@ionic/vue';
+import { addCircleOutline, timerOutline, checkmarkDoneOutline } from 'ionicons/icons';
 import { useRoadworksReportStore } from '@/pinia/geo-location/roadworks-report';
 
 const reportStore = useRoadworksReportStore();

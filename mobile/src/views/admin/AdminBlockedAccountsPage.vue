@@ -4,7 +4,9 @@
       <ion-toolbar>
         <div style="display: flex; align-items: center; width: 100%; justify-content: space-between; padding: 0 var(--spacing-md);">
           <div style="width: 40px; height: 40px; background: url('/logo-clean.png') center / contain no-repeat;"></div>
-          <ion-title style="flex-grow: 1; text-align: center; margin: 0;">🔐 Admin</ion-title>
+          <ion-title style="flex-grow: 1; text-align: center; margin: 0;">
+            <ion-icon :icon="lockClosedOutline" style="margin-right: 8px;"></ion-icon>Admin
+          </ion-title>
           <div style="width: 40px;"></div>
         </div>
       </ion-toolbar>
@@ -15,7 +17,9 @@
       <!-- Stats -->
       <ion-card>
         <ion-card-header>
-          <ion-card-title>📊 Statistiques</ion-card-title>
+          <ion-card-title>
+            <ion-icon :icon="statsChartOutline" style="margin-right: 8px;"></ion-icon>Statistiques
+          </ion-card-title>
         </ion-card-header>
         <ion-card-content>
           <ion-list>
@@ -37,7 +41,7 @@
 
       <!-- Refresh Button -->
       <ion-button expand="block" @click="refreshBlockedAccounts" class="ion-margin-top">
-        🔄 Rafraîchir
+        <ion-icon slot="start" :icon="refreshOutline"></ion-icon>Rafraîchir
       </ion-button>
 
       <!-- Search/Filter -->
@@ -57,7 +61,7 @@
         <ion-card v-for="account in filteredAccounts" :key="account.email">
           <ion-card-header>
             <ion-card-title>
-              <ion-icon icon="lockClosed" color="danger"></ion-icon>
+              <ion-icon :icon="lockClosedOutline" color="danger"></ion-icon>
               {{ account.email }}
             </ion-card-title>
           </ion-card-header>
@@ -84,13 +88,13 @@
                 color="warning" 
                 @click="unlockAccountAction(account.email)"
                 expand="block">
-                🔓 Débloquer
+                <ion-icon slot="start" :icon="lockOpenOutline"></ion-icon>Débloquer
               </ion-button>
               <ion-button 
                 color="medium" 
                 @click="resetAccountAction(account.email)"
                 expand="block">
-                🔄 Réinitialiser
+                <ion-icon slot="start" :icon="refreshOutline"></ion-icon>Réinitialiser
               </ion-button>
             </div>
           </ion-card-content>
@@ -126,6 +130,7 @@ import { lockClosed } from 'ionicons/icons';
 import { firestore } from '@/services/firebase/routeworks-tracker';
 import { collection, query, where, getDocs, updateDoc, doc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { unlockAccount } from '@/services/firebase/auth-attempts';
+import { lockClosedOutline, lockOpenOutline, refreshOutline, statsChartOutline } from 'ionicons/icons';
 
 interface BlockedAccount {
   email: string;

@@ -77,6 +77,8 @@ import router from '@/router';
 import {
   getStatusLabel,
   getStatusEmoji,
+  getStatusIcon,
+  getStatusHexColor,
   getReportStatusLabel,
   formatDateShort,
 } from '@/utils/roadworks-utils';
@@ -128,6 +130,9 @@ const mountMap = async () => {
 
       console.log('🗺️ Clic sur la carte');
       console.log('📍 Coordonnées:', e.latlng);
+      
+      // Zoom sur le point cliqué
+      map.setView([e.latlng.lat, e.latlng.lng], 17);
       
       selectedCoords.value = {
         lat: e.latlng.lat,
@@ -200,17 +205,18 @@ const displayReportsOnMap = () => {
 
   // Ajouter les marqueurs
   reportsToDisplay.forEach((report) => {
-    const emoji = getStatusEmoji(report.status);
+    const statusColor = getStatusHexColor(report.status);
+    const markerHtml = getStatusIcon(report.status, statusColor);
     
-    const emojiIcon = L.divIcon({
-      html: `<div style="font-size: 28px; line-height: 28px;">${emoji}</div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14],
+    const svgMarkerIcon = L.divIcon({
+      html: markerHtml,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
       className: 'emoji-marker',
     });
 
     const marker = L.marker([report.lat, report.lng], {
-      icon: emojiIcon,
+      icon: svgMarkerIcon,
     }).addTo(map!);
 
     const work = (report as any).work;
@@ -236,6 +242,8 @@ const displayReportsOnMap = () => {
     // Ajouter le clic pour afficher les détails
     marker.on('click', () => {
       console.log('📖 Clic sur marqueur:', report);
+      // Zoom sur le marqueur
+      map?.setView([report.lat, report.lng], 17);
       selectedReport.value = report;
       isDetailsModalOpen.value = true;
     });

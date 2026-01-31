@@ -566,6 +566,10 @@ ion-tab-button[aria-selected="true"] {
   border-radius: var(--radius-lg);
   border-left: 4px solid var(--primary-color);
   transition: all var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .status-card:hover {
@@ -682,6 +686,20 @@ ion-badge[color="warning"] {
 .header-spacer {
   width: 40px;
   flex-shrink: 0;
+}
+
+ion-icon {
+  --color: var(--primary-color);
+  font-size: var(--font-size-lg);
+}
+
+/* Inline icons in text */
+ion-text ion-icon,
+ion-card-title ion-icon,
+ion-title ion-icon,
+ion-button ion-icon {
+  margin: 0 4px;
+  vertical-align: middle;
 }
 
 /* ============================================
