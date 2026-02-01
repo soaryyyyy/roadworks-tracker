@@ -1,75 +1,122 @@
+/* ============================================
+   DASHBOARD VIEW - Minimaliste
+   ============================================ */
+
 .dashboard-panel {
   width: 100%;
   max-width: 1100px;
-  background: #fff;
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.15);
+  background: var(--neutral-white);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  border: 1px solid var(--neutral-gray-100);
+}
+
+.dashboard-summary {
+  margin-bottom: var(--spacing-xl);
 }
 
 .dashboard-summary h2,
 .dashboard-list h3 {
-  margin-top: 0;
+  margin: 0 0 var(--spacing-md);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--neutral-dark);
 }
 
+/* Summary Grid */
 .summary-grid {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-sm);
 }
 
+.summary-grid.summary-grid--highlight {
+  margin-bottom: var(--spacing-lg);
+}
+
+.summary-grid.summary-grid--highlight article,
 .summary-card {
-  flex: 1;
-  min-width: 140px;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  background: #f7f9fc;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  background: var(--neutral-gray-50);
   text-align: center;
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--neutral-gray-100);
 }
 
+.summary-grid.summary-grid--highlight article p,
 .summary-card strong {
   display: block;
-  font-size: 0.9rem;
-  color: #555;
+  font-size: var(--font-size-xs);
+  color: var(--neutral-gray-500);
+  margin: 0 0 var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 500;
 }
 
+.summary-grid.summary-grid--highlight article strong,
 .summary-card span {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #111;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--neutral-dark);
+}
+
+/* Issue List */
+.dashboard-list {
+  margin-top: var(--spacing-lg);
 }
 
 .issue-list {
-  display: grid;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
 .issue-card {
-  padding: 1rem;
-  border-radius: 1rem;
-  border: 1px solid #eee;
-  background: #fff;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--neutral-gray-100);
+  background: var(--neutral-white);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
+  transition: border-color var(--transition-fast);
+}
+
+.issue-card:hover {
+  border-color: var(--neutral-gray-200);
 }
 
 .issue-card header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-md);
 }
 
 .issue-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #1fa2ff;
-  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--neutral-gray-100);
+  color: var(--neutral-gray-600);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-size: var(--font-size-lg);
+}
+
+.issue-card header div strong {
+  display: block;
+  font-size: var(--font-size-base);
+  color: var(--neutral-dark);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.issue-card header div p {
+  margin: var(--spacing-xs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--neutral-gray-500);
 }
 
 .issue-card ul {
@@ -77,24 +124,37 @@
   padding: 0;
   margin: 0;
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-md);
   flex-wrap: wrap;
-  font-size: 0.85rem;
-  color: #555;
+  font-size: var(--font-size-xs);
+  color: var(--neutral-gray-500);
 }
 
 .issue-description {
   margin: 0;
-  font-size: 0.9rem;
-  color: #333;
+  font-size: var(--font-size-sm);
+  color: var(--neutral-gray-600);
+  line-height: 1.5;
 }
 
-.summary-grid.summary-grid--highlight article {
-  flex: 1;
-  min-width: 140px;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  background: #f7f9fc;
-  text-align: center;
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-panel {
+    padding: var(--spacing-md);
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .issue-card ul {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
 }

@@ -1,28 +1,21 @@
 <template>
   <ion-page>
-
     <ion-header>
       <ion-toolbar>
-        <div style="display: flex; align-items: center; width: 100%; justify-content: space-between; padding: 0 var(--spacing-md);">
-          <div style="width: 40px; height: 40px; background: url('/logo-clean.png') center / contain no-repeat;"></div>
-          <ion-title style="flex-grow: 1; text-align: center; margin: 0;">Explorer</ion-title>
-          <ion-buttons slot="end">
-            <ion-button @click="handleSignOut" color="danger">
-              <ion-icon slot="icon-only" :icon="logOutOutline"></ion-icon>
-            </ion-button>
-          </ion-buttons>
+        <div class="header-with-logo">
+          <div class="header-logo"></div>
+          <span class="header-title">Explorer</span>
+          <div class="header-spacer"></div>
         </div>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true" id="map-content">
       <ion-fab slot="fixed" horizontal="start" vertical="top">
-        
         <ion-fab-button @click="handleLocate">
           <ion-spinner v-if="currentLocationStore.isRefreshingCoords" name="crescent"></ion-spinner>
           <ion-icon v-else :icon="locateOutline"></ion-icon>
         </ion-fab-button>
-      
       </ion-fab>
 
       <ion-fab slot="fixed" horizontal="end" vertical="top">
@@ -46,37 +39,30 @@
         :report="selectedReport"
         @close="isDetailsModalOpen = false"
       />
-
     </ion-content>
-
   </ion-page>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
 
-import { 
-  IonPage, IonHeader, IonToolbar, 
-  IonTitle, IonContent, loadingController,
+import {
+  IonPage, IonHeader, IonToolbar,
+  IonContent, loadingController,
   IonFab, IonFabButton,
-  IonIcon, IonSpinner, IonButtons, IonButton
+  IonIcon, IonSpinner
 } from '@ionic/vue';
 
-import { locateOutline, filterOutline, logOutOutline } from 'ionicons/icons';
+import { locateOutline, filterOutline } from 'ionicons/icons';
 
 import L from 'leaflet';
 import { useCurrentLocationStore } from '@/pinia/geo-location/current-location';
 import { useRoadworksReportStore } from '@/pinia/geo-location/roadworks-report';
-import { useAuthSessionStore } from '@/pinia/auth/session';
-import { auth } from '@/services/firebase/routeworks-tracker';
 import { defaultMarker } from '@/components/geo-location/icon';
 import RoadworksReportModal from '@/components/geo-location/RoadworksReportModal.vue';
 import RoadworksReportDetailsModal from '@/components/geo-location/RoadworksReportDetailsModal.vue';
-import { signOut } from 'firebase/auth';
-import router from '@/router';
 import {
   getStatusLabel,
-  getStatusEmoji,
   getStatusIcon,
   getStatusHexColor,
   getReportStatusLabel,
@@ -100,7 +86,7 @@ const selectedReport = ref<any>(null);
 
 const mountMap = async () => {
   const mapLoading = await loadingController.create({
-    message: 'Chargement de la carte...',
+    message: 'Chargement...',
     spinner: 'crescent',
     backdropDismiss: false,
   });
@@ -115,35 +101,29 @@ const mountMap = async () => {
 
     map = L.map('map', {
       zoomControl: false
-    }).setView([-18.9184607, 47.5211293], 11); // Antananarivo
+    }).setView([-18.9184607, 47.5211293], 11);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
+      attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
-    // Utiliser l'événement 'click' de Leaflet correctement
     map.on('click', function(e: L.LeafletMouseEvent) {
-      // Vérifier que le clic n'est pas sur un marqueur
       if ((e.target as any).options && (e.target as any).options.icon) {
         return;
       }
 
-      console.log('🗺️ Clic sur la carte');
-      console.log('📍 Coordonnées:', e.latlng);
-      
-      // Zoom sur le point cliqué
       map.setView([e.latlng.lat, e.latlng.lng], 17);
-      
+
       selectedCoords.value = {
         lat: e.latlng.lat,
         lng: e.latlng.lng,
       };
-      
+
       isReportModalOpen.value = true;
     });
 
   } catch (error) {
-    console.error('❌ Erreur mountMap:', error);
+    console.error('Erreur mountMap:', error);
   } finally {
     await mapLoading.dismiss();
   }
@@ -152,7 +132,6 @@ const mountMap = async () => {
 const handleLocate = async () => {
   await currentLocationStore.refreshCoords();
 
-  // Recentrer la carte sur la position de l'utilisateur
   const coords = currentLocationStore.coords;
   if (coords && map) {
     map.setView([coords.lat, coords.lng], 15);
@@ -160,54 +139,34 @@ const handleLocate = async () => {
 }
 
 const handleReportSubmitted = async () => {
-  // Charger tous les signalements et les afficher sur la carte
-  console.log('📍 Signalement soumis, chargement des données...');
   await reportStore.loadAllReports();
   displayReportsOnMap();
 }
 
 const toggleFilter = () => {
   showOnlyMyReports.value = !showOnlyMyReports.value;
-  console.log('🔄 Filtre toggled:', showOnlyMyReports.value);
   displayReportsOnMap();
 }
-
-const handleSignOut = async () => {
-  const authStore = useAuthSessionStore();
-  await authStore.clearSession();
-  await signOut(auth);
-  router.push('/auth/signIn');
-}
-
 
 const displayReportsOnMap = () => {
   if (!map) return;
 
-  // Supprimer TOUS les marqueurs (sauf la position utilisateur)
   map.eachLayer((layer: any) => {
     if (layer instanceof L.Marker && layer !== userLocation) {
       map?.removeLayer(layer);
     }
   });
 
-  // Déterminer quels signalements afficher
   let reportsToDisplay = reportStore.reports;
-  
+
   if (showOnlyMyReports.value) {
     reportsToDisplay = reportStore.reports.filter(r => r.userId === reportStore.currentUserId);
-    console.log(`🔒 Filtre activé - Affichage mes signalements seulement`);
-    console.log(`👤 Mon ID: ${reportStore.currentUserId}`);
-    console.log(`📊 Mes signalements: ${reportsToDisplay.length}`);
-  } else {
-    console.log(`🌍 Tous les signalements`);
-    console.log(`📊 Total: ${reportsToDisplay.length}`);
   }
 
-  // Ajouter les marqueurs
   reportsToDisplay.forEach((report) => {
     const statusColor = getStatusHexColor(report.status);
     const markerHtml = getStatusIcon(report.status, statusColor);
-    
+
     const svgMarkerIcon = L.divIcon({
       html: markerHtml,
       iconSize: [32, 32],
@@ -238,32 +197,27 @@ const displayReportsOnMap = () => {
     `;
 
     marker.bindPopup(popupContent);
-    
-    // Ajouter le clic pour afficher les détails
+
     marker.on('click', () => {
-      console.log('📖 Clic sur marqueur:', report);
-      // Zoom sur le marqueur
       map?.setView([report.lat, report.lng], 17);
       selectedReport.value = report;
       isDetailsModalOpen.value = true;
     });
   });
-
-  console.log(`✅ ${reportsToDisplay.length} marqueurs affichés`);
 };
 
 watch(
   () => currentLocationStore.coords,
-  (coords) => { 
+  (coords) => {
     if (!coords) {
       return;
     }
 
-    const { lat, lng } = coords; 
+    const { lat, lng } = coords;
     if (!userLocation && map) {
       userLocation = L.marker([lat, lng]).addTo(map);
       userLocation.bindPopup(
-        '<div style="text-align: center;font-weight: bold;">Vous</div>', 
+        '<div style="text-align: center;font-weight: bold;">Vous</div>',
         { closeButton: false }
       );
       userLocation.openPopup();
@@ -275,12 +229,9 @@ watch(
 )
 
 onMounted(async () => {
-  // Make leaflet use the default icon for marker
   L.Marker.prototype.options.icon = defaultMarker;
   await mountMap();
-  
-  // Charger les signalements depuis Firebase
-  console.log('📍 Chargement des signalements...');
+
   await reportStore.loadAllReports();
   displayReportsOnMap();
 });
@@ -292,13 +243,13 @@ onMounted(async () => {
   align-items: center;
   gap: 6px;
   padding: 10px 16px;
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  background: var(--neutral-white);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-md);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  color: #666;
+  color: var(--neutral-gray-600);
   transition: all 0.2s ease;
   white-space: nowrap;
 }
@@ -308,11 +259,11 @@ onMounted(async () => {
 }
 
 .filter-chip.active {
-  background: var(--ion-color-primary);
-  color: #fff;
+  background: var(--primary-color);
+  color: var(--neutral-white);
 }
 
 .filter-chip ion-icon {
-  font-size: 18px;
+  font-size: 16px;
 }
 </style>

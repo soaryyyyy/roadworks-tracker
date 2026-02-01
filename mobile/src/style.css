@@ -1,141 +1,128 @@
 /* ============================================
    ROADWORKS TRACKER - Mobile Design System
-   Charte Graphique - Rose/Orange/Noir
+   Design Minimaliste & Épuré
    ============================================ */
 
 :root {
-  /* Couleurs Primaires - Charte Roadworks Officielle */
-  --primary-color: #FF8C00;        /* Orange principal */
-  --primary-light: #FFB84D;        /* Orange clair */
-  --primary-dark: #E67E00;         /* Orange foncé */
-  
-  /* Couleurs Secondaires */
-  --secondary-color: #1F1F1F;      /* Gris foncé/Noir */
-  --secondary-light: #4A4A4A;      /* Gris moyen */
-  --secondary-dark: #0D0D0D;       /* Noir intense */
-  
+  /* Couleurs Primaires */
+  --primary-color: #f5a623;
+  --primary-light: #ffc966;
+  --primary-dark: #d4891a;
+
   /* Couleurs Neutres */
   --neutral-white: #FFFFFF;
-  --neutral-light: #F8F9FA;
-  --neutral-gray-100: #F0F2F5;
-  --neutral-gray-200: #E8EAED;
+  --neutral-light: #FAFAFA;
+  --neutral-gray-50: #F9FAFB;
+  --neutral-gray-100: #F3F4F6;
+  --neutral-gray-200: #E5E7EB;
   --neutral-gray-300: #D1D5DB;
   --neutral-gray-400: #9CA3AF;
   --neutral-gray-500: #6B7280;
   --neutral-gray-600: #4B5563;
-  --neutral-dark: #2D3748;
-  --neutral-black: #1A1D23;
-  
+  --neutral-gray-700: #374151;
+  --neutral-dark: #1F2937;
+  --neutral-black: #111827;
+
   /* Couleurs Statuts */
-  --status-success: #10B981;       /* Vert succès */
-  --status-warning: #F59E0B;       /* Orange avertissement */
-  --status-danger: #EF4444;        /* Rouge danger */
-  --status-info: #3B82F6;          /* Bleu info */
-  
+  --status-success: #10B981;
+  --status-warning: #F59E0B;
+  --status-danger: #EF4444;
+  --status-info: #3B82F6;
+
   /* Espacements */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
   /* Border Radius */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
-  
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  
+
+  /* Shadows - Minimalistes */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+
   /* Typographie */
-  --font-family-base: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
-  --font-size-4xl: 2.25rem;
-  
-  --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.625;
-  
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
+  --font-size-lg: 17px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+
   /* Transitions */
   --transition-fast: 0.15s ease;
-  --transition-normal: 0.3s ease;
-  --transition-smooth: 0.5s ease;
+  --transition-normal: 0.25s ease;
 }
 
 /* ============================================
-   RESET & BASE STYLES
+   RESET & BASE
    ============================================ */
 
 * {
   box-sizing: border-box;
 }
 
-html,
-body,
-ion-app {
+html, body, ion-app {
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
 body {
-  margin: 0;
-  padding: 0;
   font-family: var(--font-family-base);
   font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
   color: var(--neutral-dark);
   background-color: var(--neutral-light);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ============================================
-   ION OVERRIDES
+   ION OVERRIDES - MINIMALISTE
    ============================================ */
 
+/* Header épuré */
 ion-header {
   --background: var(--neutral-white);
-  --border-color: var(--neutral-gray-200);
-  border-bottom: 2px solid var(--primary-color);
-  box-shadow: 0 2px 8px rgba(255, 140, 0, 0.1);
+}
+
+ion-header::after {
+  display: none;
 }
 
 ion-toolbar {
   --background: var(--neutral-white);
   --color: var(--neutral-dark);
-  padding: var(--spacing-md) 0;
-  min-height: 3.5rem;
+  --border-width: 0;
+  --min-height: 56px;
+  padding: 0;
 }
 
 ion-title {
-  font-size: var(--font-size-xl);
-  font-weight: 700;
-  color: var(--primary-color);
-  letter-spacing: 0.5px;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--neutral-dark);
+  letter-spacing: -0.3px;
 }
 
 ion-content {
   --background: var(--neutral-light);
-  --padding-top: var(--spacing-lg);
-  --padding-bottom: var(--spacing-lg);
+  --padding-top: var(--spacing-md);
+  --padding-bottom: var(--spacing-md);
   --padding-start: var(--spacing-md);
   --padding-end: var(--spacing-md);
 }
 
-/* Inputs */
+/* Inputs minimalistes */
 ion-item {
   --background: var(--neutral-white);
   --border-color: var(--neutral-gray-200);
@@ -144,16 +131,13 @@ ion-item {
   --padding-end: 0;
   --inner-padding-end: 0;
   --inner-padding-start: 0;
-  margin-bottom: var(--spacing-md);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--neutral-gray-200);
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-normal);
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--neutral-gray-200);
+  transition: border-color var(--transition-fast);
 }
 
-ion-item:hover,
 ion-item:focus-within {
-  box-shadow: var(--shadow-md);
   border-color: var(--primary-color);
 }
 
@@ -162,161 +146,94 @@ ion-input {
   --placeholder-color: var(--neutral-gray-400);
   font-size: var(--font-size-base);
   padding: var(--spacing-md);
-  
-  &::placeholder {
-    color: var(--neutral-gray-400);
-  }
 }
 
-ion-input::part(native) {
-  border-radius: var(--radius-md);
-}
-
-/* Buttons */
+/* Boutons minimalistes */
 ion-button {
   --background: var(--primary-color);
   --background-activated: var(--primary-dark);
-  --background-focused: var(--primary-dark);
   --background-hover: var(--primary-dark);
   --color: var(--neutral-white);
-  --border-radius: var(--radius-lg);
-  --padding-top: var(--spacing-md);
-  --padding-bottom: var(--spacing-md);
-  --padding-start: var(--spacing-lg);
-  --padding-end: var(--spacing-lg);
+  --border-radius: var(--radius-md);
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  --box-shadow: none;
   font-weight: 600;
   font-size: var(--font-size-base);
-  letter-spacing: 0.5px;
-  box-shadow: var(--shadow-md);
-  transition: all var(--transition-fast);
-  min-height: 2.75rem;
-}
-
-ion-button.secondary {
-  --background: var(--secondary-color);
-  --background-activated: var(--secondary-dark);
-  --background-focused: var(--secondary-dark);
-  --background-hover: var(--secondary-dark);
-}
-
-ion-button.outline {
-  --background: transparent;
-  --background-activated: var(--neutral-gray-100);
-  --border: 2px solid var(--primary-color);
-  --color: var(--primary-color);
-  --padding-start: calc(var(--spacing-lg) - 2px);
-  --padding-end: calc(var(--spacing-lg) - 2px);
+  letter-spacing: 0;
+  min-height: 50px;
+  text-transform: none;
 }
 
 ion-button[color="danger"] {
-  --background: #EF4444;
+  --background: var(--status-danger);
   --background-activated: #DC2626;
-  --background-focused: #DC2626;
-  --background-hover: #DC2626;
 }
 
-/* Cards */
+ion-button[color="light"] {
+  --background: var(--neutral-gray-100);
+  --color: var(--neutral-dark);
+}
+
+/* Cards minimalistes */
 ion-card {
   --background: var(--neutral-white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   margin: var(--spacing-md) 0;
-  border: none;
-  overflow: hidden;
-  transition: all var(--transition-normal);
-  border-top: 4px solid var(--primary-color);
-}
-
-ion-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-  border-top: 4px solid var(--primary-dark);
+  border: 1px solid var(--neutral-gray-100);
 }
 
 ion-card-header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-  padding: var(--spacing-lg);
-  color: var(--neutral-white);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--neutral-white);
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
 }
 
 ion-card-title {
   font-size: var(--font-size-lg);
   font-weight: 600;
-  color: var(--neutral-white);
+  color: var(--neutral-dark);
   margin: 0;
 }
 
 ion-card-content {
-  padding: var(--spacing-lg);
-  color: var(--neutral-dark);
-  line-height: var(--line-height-relaxed);
+  padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+  color: var(--neutral-gray-600);
 }
 
-ion-card[color="danger"] ion-card-header {
-  background: linear-gradient(135deg, var(--status-danger) 0%, #C9302C 100%);
+/* FAB minimaliste */
+ion-fab-button {
+  --background: var(--neutral-white);
+  --color: var(--primary-color);
+  --box-shadow: var(--shadow-md);
+  width: 48px;
+  height: 48px;
 }
 
-ion-card[color="success"] ion-card-header {
-  background: linear-gradient(135deg, var(--status-success) 0%, #059669 100%);
+ion-fab-button ion-icon {
+  font-size: 22px;
 }
 
-/* Text & Typography */
-ion-text {
-  color: var(--neutral-dark);
-}
-
-ion-text[color="primary"] {
-  color: var(--primary-color);
-}
-
-ion-text[color="secondary"] {
-  color: var(--secondary-color);
-}
-
-ion-text[color="danger"] {
-  color: var(--status-danger);
-}
-
-ion-text[color="success"] {
-  color: var(--status-success);
-}
-
-ion-text[color="warning"] {
-  color: var(--status-warning);
-}
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
 
 h1, h2, h3, h4, h5, h6 {
-  margin: 0 0 var(--spacing-md) 0;
-  font-weight: 700;
-  line-height: var(--line-height-tight);
+  margin: 0 0 var(--spacing-sm) 0;
+  font-weight: 600;
   color: var(--neutral-dark);
+  letter-spacing: -0.3px;
 }
 
-h1 {
-  font-size: var(--font-size-3xl);
-}
-
-h2 {
-  font-size: var(--font-size-2xl);
-}
-
-h3 {
-  font-size: var(--font-size-xl);
-}
-
-h4 {
-  font-size: var(--font-size-lg);
-}
-
-h5, h6 {
-  font-size: var(--font-size-base);
-}
+h1 { font-size: var(--font-size-3xl); }
+h2 { font-size: var(--font-size-2xl); }
+h3 { font-size: var(--font-size-xl); }
+h4 { font-size: var(--font-size-lg); }
 
 p {
   margin: 0 0 var(--spacing-md) 0;
   color: var(--neutral-gray-600);
-  line-height: var(--line-height-relaxed);
+  line-height: 1.5;
 }
 
 small {
@@ -325,345 +242,116 @@ small {
 }
 
 /* ============================================
-   UTILITY CLASSES
+   AUTH PAGES - MINIMALISTE
    ============================================ */
 
-/* Spacing */
-.margin-top-xs { margin-top: var(--spacing-xs); }
-.margin-top-sm { margin-top: var(--spacing-sm); }
-.margin-top-md { margin-top: var(--spacing-md); }
-.margin-top-lg { margin-top: var(--spacing-lg); }
-.margin-top-xl { margin-top: var(--spacing-xl); }
-
-.margin-bottom-xs { margin-bottom: var(--spacing-xs); }
-.margin-bottom-sm { margin-bottom: var(--spacing-sm); }
-.margin-bottom-md { margin-bottom: var(--spacing-md); }
-.margin-bottom-lg { margin-bottom: var(--spacing-lg); }
-.margin-bottom-xl { margin-bottom: var(--spacing-xl); }
-
-.padding-md { padding: var(--spacing-md); }
-.padding-lg { padding: var(--spacing-lg); }
-.padding-xl { padding: var(--spacing-xl); }
-
-/* Flexbox */
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.flex-row { flex-direction: row; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-.gap-sm { gap: var(--spacing-sm); }
-.gap-md { gap: var(--spacing-md); }
-.gap-lg { gap: var(--spacing-lg); }
-
-/* Text */
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
-.font-bold { font-weight: 700; }
-.font-semibold { font-weight: 600; }
-.font-medium { font-weight: 500; }
-.font-normal { font-weight: 400; }
-
-/* Colors */
-.text-primary { color: var(--primary-color); }
-.text-secondary { color: var(--secondary-color); }
-.text-danger { color: var(--status-danger); }
-.text-success { color: var(--status-success); }
-.text-warning { color: var(--status-warning); }
-.text-gray { color: var(--neutral-gray-500); }
-
-.bg-primary { background-color: var(--primary-color); }
-.bg-secondary { background-color: var(--secondary-color); }
-.bg-light { background-color: var(--neutral-light); }
-.bg-white { background-color: var(--neutral-white); }
-
-/* Border Radius */
-.rounded-sm { border-radius: var(--radius-sm); }
-.rounded-md { border-radius: var(--radius-md); }
-.rounded-lg { border-radius: var(--radius-lg); }
-.rounded-xl { border-radius: var(--radius-xl); }
-.rounded-full { border-radius: var(--radius-full); }
-
-/* Shadow */
-.shadow-sm { box-shadow: var(--shadow-sm); }
-.shadow-md { box-shadow: var(--shadow-md); }
-.shadow-lg { box-shadow: var(--shadow-lg); }
-
-/* ============================================
-   PAGE SPECIFIC STYLES
-   ============================================ */
-
-/* Authentication Pages */
 .auth-page {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #FF8C00 0%, #E67E00 50%, #1F1F1F 100%);
+  --background: var(--neutral-white);
+}
+
+.auth-page ion-content {
+  --background: var(--neutral-white);
 }
 
 .auth-container {
-  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
   padding: var(--spacing-xl);
 }
 
 .auth-header {
   text-align: center;
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: var(--spacing-xl);
 }
 
 .auth-logo {
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   background: url('/logo-clean.png') center / contain no-repeat;
   margin: 0 auto var(--spacing-lg);
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
 }
 
 .auth-header h1 {
-  color: var(--neutral-white);
-  font-size: var(--font-size-3xl);
-  margin-bottom: var(--spacing-sm);
+  color: var(--neutral-dark);
+  font-size: var(--font-size-2xl);
   font-weight: 700;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  margin-bottom: var(--spacing-xs);
 }
 
 .auth-header p {
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--neutral-gray-500);
   font-size: var(--font-size-base);
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  margin: 0;
 }
 
 .auth-form {
-  background: rgba(31, 31, 31, 0.95);
-  padding: var(--spacing-xl);
-  border-radius: var(--radius-xl);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-  margin-top: var(--spacing-xl);
-  border: 1px solid rgba(255, 140, 0, 0.2);
-  backdrop-filter: blur(10px);
+  background: var(--neutral-white);
 }
 
 .form-group {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
 }
 
 .form-label {
   display: block;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+  color: var(--neutral-gray-700);
+  margin-bottom: var(--spacing-xs);
   font-size: var(--font-size-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .form-input {
   width: 100%;
   padding: var(--spacing-md);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--neutral-gray-200);
+  border-radius: var(--radius-md);
   font-size: var(--font-size-base);
-  transition: all var(--transition-normal);
-  font-family: var(--font-family-base);
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--neutral-white);
+  transition: border-color var(--transition-fast);
+  background: var(--neutral-white);
+  color: var(--neutral-dark);
 }
 
 .form-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--neutral-gray-400);
 }
 
 .form-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.2);
-}
-
-.form-input:disabled {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.5);
-  cursor: not-allowed;
 }
 
 .error-message {
-  color: #FF6B6B;
-  font-size: var(--font-size-sm);
-  margin-top: var(--spacing-sm);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.success-message {
-  color: #10B981;
+  color: var(--status-danger);
   font-size: var(--font-size-sm);
   margin-top: var(--spacing-sm);
 }
 
 /* ============================================
-   TAB BAR & NAVIGATION
+   TAB BAR - MINIMALISTE
    ============================================ */
 
 ion-tab-bar {
   --background: var(--neutral-white);
-  --border-color: var(--neutral-gray-200);
   border-top: 1px solid var(--neutral-gray-200);
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  height: 56px;
 }
 
 ion-tab-button {
-  --color: var(--neutral-gray-500);
+  --color: var(--neutral-gray-400);
   --color-selected: var(--primary-color);
-  --background-selected: transparent;
-  --padding-top: var(--spacing-sm);
-  --padding-bottom: var(--spacing-sm);
+  font-size: var(--font-size-xs);
   font-weight: 500;
-  transition: all var(--transition-normal);
 }
 
-ion-tab-button:hover {
-  --color: var(--primary-color);
-}
-
-ion-tab-button[aria-selected="true"] {
-  --color: var(--primary-color);
-  border-top: 3px solid var(--primary-color);
+ion-tab-button ion-icon {
+  font-size: 22px;
+  margin-bottom: 2px;
 }
 
 /* ============================================
-   CARDS & CONTENT
-   ============================================ */
-
-.metric {
-  text-align: center;
-  padding: var(--spacing-md);
-  background: linear-gradient(135deg, rgba(255, 140, 0, 0.05) 0%, rgba(255, 140, 0, 0.02) 100%);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 140, 0, 0.1);
-}
-
-.metric__label {
-  font-size: var(--font-size-sm);
-  color: var(--neutral-gray-600);
-  margin-bottom: var(--spacing-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.metric__value {
-  font-size: var(--font-size-2xl);
-  font-weight: 700;
-  color: var(--primary-color);
-}
-
-.status-card {
-  text-align: center;
-  padding: var(--spacing-md);
-  background: var(--neutral-light);
-  border-radius: var(--radius-lg);
-  border-left: 4px solid var(--primary-color);
-  transition: all var(--transition-normal);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.status-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.status-card__label {
-  font-size: var(--font-size-sm);
-  color: var(--neutral-gray-600);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: var(--spacing-sm);
-}
-
-.status-card__value {
-  font-size: var(--font-size-2xl);
-  font-weight: 700;
-  color: var(--primary-color);
-}
-
-.status-card--primary {
-  border-left-color: var(--primary-color);
-}
-
-.status-card--primary .status-card__value {
-  color: var(--primary-color);
-}
-
-.status-card--warning {
-  border-left-color: var(--status-warning);
-}
-
-.status-card--warning .status-card__value {
-  color: var(--status-warning);
-}
-
-.status-card--success {
-  border-left-color: var(--status-success);
-}
-
-.status-card--success .status-card__value {
-  color: var(--status-success);
-}
-
-.status-card--danger {
-  border-left-color: var(--status-danger);
-}
-
-.status-card--danger .status-card__value {
-  color: var(--status-danger);
-}
-
-/* ============================================
-   LISTS & BADGES
-   ============================================ */
-
-ion-list {
-  --background: transparent;
-}
-
-ion-item {
-  --background: transparent;
-  --color: var(--neutral-dark);
-  --border-color: var(--neutral-gray-200);
-}
-
-ion-item h2 {
-  margin: 0;
-}
-
-ion-badge {
-  font-weight: 600;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-full);
-}
-
-ion-badge[color="danger"] {
-  --background: #EF4444;
-  --color: var(--neutral-white);
-}
-
-ion-badge[color="success"] {
-  --background: var(--status-success);
-  --color: var(--neutral-white);
-}
-
-ion-badge[color="warning"] {
-  --background: var(--status-warning);
-  --color: var(--neutral-white);
-}
-
-/* ============================================
-   HEADER WITH LOGO
+   HEADER AVEC LOGO
    ============================================ */
 
 .header-with-logo {
@@ -671,150 +359,159 @@ ion-badge[color="warning"] {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 0 var(--spacing-md);
-  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  height: 56px;
 }
 
 .header-logo {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   background: url('/logo-clean.png') center / contain no-repeat;
   flex-shrink: 0;
-  filter: drop-shadow(0 2px 4px rgba(255, 140, 0, 0.2));
+}
+
+.header-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--neutral-dark);
+  flex: 1;
+  text-align: center;
 }
 
 .header-spacer {
-  width: 40px;
+  width: 36px;
   flex-shrink: 0;
 }
 
-ion-icon {
-  --color: var(--primary-color);
-  font-size: var(--font-size-lg);
+/* ============================================
+   CARDS METRICS - MINIMALISTE
+   ============================================ */
+
+.metric {
+  text-align: center;
+  padding: var(--spacing-md);
+  background: var(--neutral-gray-50);
+  border-radius: var(--radius-md);
 }
 
-/* Inline icons in text */
-ion-text ion-icon,
-ion-card-title ion-icon,
-ion-title ion-icon,
-ion-button ion-icon {
-  margin: 0 4px;
-  vertical-align: middle;
+.metric__label {
+  font-size: var(--font-size-xs);
+  color: var(--neutral-gray-500);
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
 }
+
+.metric__value {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--neutral-dark);
+}
+
+/* Status Cards */
+.status-card {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-sm);
+  background: var(--neutral-white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--neutral-gray-200);
+}
+
+.status-card__label {
+  font-size: var(--font-size-xs);
+  color: var(--neutral-gray-500);
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+}
+
+.status-card__value {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--neutral-dark);
+}
+
+.status-card--primary { border-left: 3px solid var(--primary-color); }
+.status-card--warning { border-left: 3px solid var(--status-warning); }
+.status-card--success { border-left: 3px solid var(--status-success); }
+
+.status-card--primary .status-card__value { color: var(--primary-color); }
+.status-card--warning .status-card__value { color: var(--status-warning); }
+.status-card--success .status-card__value { color: var(--status-success); }
+
+/* ============================================
+   PROFILE CARD
+   ============================================ */
+
+.profile-card {
+  background: var(--neutral-white);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  text-align: center;
+  border: 1px solid var(--neutral-gray-100);
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--neutral-gray-100);
+  margin: 0 auto var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-avatar ion-icon {
+  font-size: 32px;
+  color: var(--neutral-gray-400);
+}
+
+.profile-email {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--neutral-dark);
+  margin-bottom: var(--spacing-xs);
+}
+
+.profile-id {
+  font-size: var(--font-size-xs);
+  color: var(--neutral-gray-400);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.text-center { text-align: center; }
+.text-primary { color: var(--primary-color); }
+.text-gray { color: var(--neutral-gray-500); }
+.text-danger { color: var(--status-danger); }
+.text-success { color: var(--status-success); }
+
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
 
 /* ============================================
    ANIMATIONS
    ============================================ */
 
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-slide-in {
-  animation: slideInUp var(--transition-smooth);
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeIn var(--transition-normal);
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-
-@media (max-width: 480px) {
-  ion-content {
-    --padding-top: var(--spacing-md);
-    --padding-bottom: var(--spacing-md);
-    --padding-start: var(--spacing-sm);
-    --padding-end: var(--spacing-sm);
-  }
-
-  .auth-container {
-    padding: var(--spacing-lg);
-  }
-
-  .auth-form {
-    padding: var(--spacing-lg);
-  }
-
-  h1 {
-    font-size: var(--font-size-2xl);
-  }
-
-  h2 {
-    font-size: var(--font-size-xl);
-  }
-
-  ion-button {
-    --padding-start: var(--spacing-md);
-    --padding-end: var(--spacing-md);
-  }
-}
-
-@media (min-width: 768px) {
-  .auth-container {
-    max-width: 500px;
-    margin: 0 auto;
-  }
-}
-
-/* ============================================
-   DARK MODE (Optionnel)
-   ============================================ */
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --neutral-white: #1F2937;
-    --neutral-light: #111827;
-    --neutral-gray-100: #1F2937;
-    --neutral-gray-200: #374151;
-    --neutral-gray-600: #D1D5DB;
-    --neutral-dark: #F9FAFB;
-    --neutral-black: #FFFFFF;
-  }
-
-  body {
-    background-color: var(--neutral-light);
-    color: var(--neutral-dark);
-  }
-
-  ion-card {
-    --background: var(--neutral-white);
-  }
-
-  ion-item {
-    --background: var(--neutral-white);
-    --color: var(--neutral-dark);
-  }
-
-  .auth-form {
-    background: var(--neutral-white);
-    color: var(--neutral-dark);
-  }
+  animation: fadeIn 0.3s ease;
 }

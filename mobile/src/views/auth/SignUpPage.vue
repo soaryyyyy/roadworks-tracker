@@ -1,122 +1,92 @@
 <template>
+  <ion-page class="auth-page">
+    <ion-content class="auth-container">
 
-<ion-page class="auth-page">
-  <!-- Header -->
-  <ion-header style="display: none;">
-    <ion-toolbar>
-      <ion-title>S'inscrire</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <!-- Content-->
-  <ion-content class="ion-padding auth-container">
-    
-    <div class="auth-header">
-      <div class="auth-logo"></div>
-      <ion-text>
-        <h1>Bienvenue!</h1>
-      </ion-text>
-      <p>Créez votre compte Roadworks</p>
-    </div>
-
-    <div class="auth-form">
-      <!-- Email -->
-      <div class="form-group">
-        <label class="form-label">Email *</label>
-        <ion-item lines="none" style="--background: transparent; --border-color: transparent;">
-          <ion-input 
-            type="email" 
-            class="form-input"
-            placeholder="exemple@mail.fr"
-            v-model="email"
-            :readonly="awaitSignUp">
-          </ion-input>
-        </ion-item>
+      <div class="auth-header">
+        <div class="auth-logo"></div>
+        <h1>Inscription</h1>
+        <p>Créez votre compte Roadworks</p>
       </div>
 
-      <!-- Pwd -->
-      <div class="form-group">
-        <label class="form-label">Mot de passe *</label>
-        <ion-item lines="none" style="--background: transparent; --border-color: transparent;">
-          <ion-input 
-            type="password"
-            class="form-input"
-            placeholder="Minimum 6 caractères"
-            v-model="password"
-            :readonly="awaitSignUp">
-          </ion-input>
-        </ion-item>
+      <div class="auth-form">
+        <!-- Email -->
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <ion-item lines="none">
+            <ion-input
+              type="email"
+              placeholder="exemple@mail.fr"
+              v-model="email"
+              :readonly="awaitSignUp">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label class="form-label">Mot de passe</label>
+          <ion-item lines="none">
+            <ion-input
+              type="password"
+              placeholder="Minimum 6 caractères"
+              v-model="password"
+              :readonly="awaitSignUp">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label class="form-label">Confirmer le mot de passe</label>
+          <ion-item lines="none">
+            <ion-input
+              type="password"
+              placeholder="Confirmez votre mot de passe"
+              v-model="confirmPassword"
+              :readonly="awaitSignUp">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <!-- Error card -->
+        <div v-if="errors.displayErrorCard" class="error-card">
+          <div class="error-card__title">{{ errors.errorCardTitle }}</div>
+          <div class="error-card__content">{{ errors.errorCardContent }}</div>
+        </div>
+
+        <!-- Simple error message -->
+        <div v-if="errors.simpleErrorMessage.length > 0" class="error-message">
+          <small v-html="errors.simpleErrorMessage"></small>
+        </div>
+
+        <!-- Sign up button -->
+        <ion-button
+          expand="block"
+          @click="handleSignUp"
+          :disabled="isSignUpButtonDisabled"
+          class="mt-lg">
+          <ion-spinner v-if="awaitSignUp" name="crescent"></ion-spinner>
+          <span v-else>Créer mon compte</span>
+        </ion-button>
+
+        <!-- Sign in link -->
+        <div class="auth-link">
+          <span>Vous avez déjà un compte ?</span>
+          <a @click="goToSignIn">Se connecter</a>
+        </div>
       </div>
 
-      <!-- Confirm Pwd -->
-      <div class="form-group">
-        <label class="form-label">Confirmer mot de passe *</label>
-        <ion-item lines="none" style="--background: transparent; --border-color: transparent;">
-          <ion-input 
-            type="password"
-            class="form-input"
-            placeholder="Confirmez votre mot de passe"
-            v-model="confirmPassword"
-            :readonly="awaitSignUp">
-          </ion-input>
-        </ion-item>
-      </div>
-
-      <!-- Error card -->
-      <ion-card v-if="errors.displayErrorCard" style="margin: var(--spacing-lg) 0;">
-        <ion-card-header>
-          <ion-card-title color="danger">{{ errors.errorCardTitle }}</ion-card-title>
-        </ion-card-header>
-
-        <ion-card-content>
-          {{ errors.errorCardContent }}
-        </ion-card-content>
-      </ion-card>
-
-      <!-- Simple error message -->
-      <ion-text v-if="errors.simpleErrorMessage.length > 0"
-        color="danger" class="error-message">
-        <small v-html="errors.simpleErrorMessage"></small>
-      </ion-text>
-
-      <!-- Sign up button -->
-      <ion-button 
-        expand="block" 
-        @click="handleSignUp" 
-        :disabled="isSignUpButtonDisabled"
-        style="margin-top: var(--spacing-lg);">
-
-        <ion-text v-if="!awaitSignUp">Créer un compte</ion-text>
-        <ion-spinner v-else name="crescent"></ion-spinner>  
-        <ion-icon v-if="!awaitSignUp" :icon="checkmarkOutline" slot="end"></ion-icon>
-
-      </ion-button>
-
-      <!-- Sign in link -->
-      <div style="text-align: center; margin-top: var(--spacing-lg);">
-        <span style="color: rgba(255, 255, 255, 0.7); font-size: 0.875rem;">
-          Vous avez déjà un compte? 
-          <span style="color: #FF8C00; cursor: pointer; font-weight: 600;" @click="goToSignIn">
-            Se connecter
-          </span>
-        </span>
-      </div>
-    </div>
-
-  </ion-content>
-</ion-page>
-
+    </ion-content>
+  </ion-page>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { 
-  IonPage, IonHeader, IonContent, 
-  IonToolbar, IonTitle, IonText,
-  IonItem, IonInput, IonButton, 
-  IonIcon, IonSpinner, IonCard, 
-  IonCardTitle, IonCardContent, IonCardHeader
+import {
+  IonPage, IonContent,
+  IonItem, IonInput, IonButton,
+  IonSpinner
 } from '@ionic/vue';
 
 import { checkmarkOutline, alertCircleOutline, cloudOfflineOutline } from 'ionicons/icons';
@@ -158,7 +128,7 @@ const clearErrors = () => {
 
 const handleSignUp = async () => {
   clearErrors();
-  
+
   // Validation
   if (password.value !== confirmPassword.value) {
     errors.value.simpleErrorMessage = 'Les mots de passe ne correspondent pas.';
@@ -173,9 +143,9 @@ const handleSignUp = async () => {
   awaitSignUp.value = true;
   try {
     await createUserWithEmailAndPassword(auth, email.value, password.value);
-    
-    showToast('Compte créé avec succès! Redirection...', 3000, checkmarkOutline, 'success', 'bottom');
-    
+
+    showToast('Compte créé avec succès !', 3000, checkmarkOutline, 'success', 'bottom');
+
     email.value = '';
     password.value = '';
     confirmPassword.value = '';
@@ -201,7 +171,7 @@ const handleSignUp = async () => {
           break;
 
         case 'auth/weak-password':
-          errors.value.simpleErrorMessage = 'Le mot de passe est trop faible. Utilisez au moins 6 caractères avec des majuscules et des chiffres.';
+          errors.value.simpleErrorMessage = 'Le mot de passe est trop faible. Utilisez au moins 6 caractères.';
           break;
 
         default:
@@ -219,5 +189,39 @@ const handleSignUp = async () => {
 const goToSignIn = () => {
   router.push('/auth/signIn');
 }
-
 </script>
+
+<style scoped>
+.auth-link {
+  text-align: center;
+  margin-top: var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  color: var(--neutral-gray-500);
+}
+
+.auth-link a {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-left: var(--spacing-xs);
+  cursor: pointer;
+}
+
+.error-card {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.error-card__title {
+  font-weight: 600;
+  color: var(--status-danger);
+  margin-bottom: var(--spacing-xs);
+}
+
+.error-card__content {
+  font-size: var(--font-size-sm);
+  color: var(--neutral-gray-600);
+}
+</style>
