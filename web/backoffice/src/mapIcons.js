@@ -20,7 +20,7 @@ const buildSvgIcon = (color, emoji, opacity = 1) => {
   })
 }
 
-// Fonction pour créer une icône non synchronisée (couleur cyan/turquoise avec bordure pointillée)
+// Fonction pour créer une icône non synchronisée (couleur cyan/turquoise avec badge orange)
 const buildUnsyncedSvgIcon = (emoji) => {
   const size = 44
   const pointerHeight = 12
@@ -28,20 +28,11 @@ const buildUnsyncedSvgIcon = (emoji) => {
   const color = '#17a2b8' // Couleur cyan/turquoise pour non synchronisé
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${totalHeight}" viewBox="0 0 ${size} ${totalHeight}">
-      <defs>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-      </defs>
-      <path d="M22 0C11 0 3 8 3 18c0 10 19 26 19 26s19-16 19-26C41 8 33 0 22 0z" fill="${color}" stroke="#fff" stroke-width="3" stroke-dasharray="4,2" filter="url(#glow)"/>
+      <path d="M22 0C11 0 3 8 3 18c0 10 19 26 19 26s19-16 19-26C41 8 33 0 22 0z" fill="${color}" stroke="#fff" stroke-width="3"/>
       <text x="50%" y="24" text-anchor="middle" alignment-baseline="middle" font-size="20" fill="#fff">${emoji}</text>
       <path d="M22 ${size} L15 ${size + pointerHeight} L29 ${size} Z" fill="${color}" stroke="#fff" stroke-width="2"/>
-      <circle cx="38" cy="8" r="6" fill="#ffc107" stroke="#fff" stroke-width="1"/>
-      <text x="38" y="11" text-anchor="middle" font-size="10" fill="#000" font-weight="bold">!</text>
+      <circle cx="36" cy="8" r="7" fill="#ff6b35" stroke="#fff" stroke-width="1"/>
+      <text x="36" y="12" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">!</text>
     </svg>
   `
   return new L.Icon({

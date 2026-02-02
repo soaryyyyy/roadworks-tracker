@@ -117,7 +117,6 @@ export default function DashboardPage() {
       }
 
       const data = await response.json()
-      console.log('Données Firebase reçues:', data)
 
       // Transformer les données Firebase - filtrer ceux avec coordonnées valides
       const transformedUnsyncedEvents = data
@@ -134,7 +133,6 @@ export default function DashboardPage() {
           isSynced: false,
         }))
 
-      console.log('=== UNSYNCED EVENTS ===', transformedUnsyncedEvents.length, transformedUnsyncedEvents)
       setTotalUnsyncedCount(data.length)
       setUnsyncedEvents(transformedUnsyncedEvents)
     } catch (err) {
