@@ -203,12 +203,38 @@ public class SignalementService {
                             System.out.println("  Type de problème mappé: " + typeProblem.getLibelle());
                         }
 
+                        // Récupérer le timestamp original de Firebase (champ "createdAt" ou "timestamp")
+                        Instant createdAt = Instant.now(); // Valeur par défaut
+                        Object timestampObj = document.get("createdAt");
+                        if (timestampObj == null) {
+                            timestampObj = document.get("timestamp"); // Fallback
+                        }
+                        if (timestampObj != null) {
+                            if (timestampObj instanceof com.google.cloud.Timestamp) {
+                                createdAt = ((com.google.cloud.Timestamp) timestampObj).toDate().toInstant();
+                                System.out.println("  ✓ Timestamp Firebase (Timestamp): " + createdAt);
+                            } else if (timestampObj instanceof java.util.Date) {
+                                createdAt = ((java.util.Date) timestampObj).toInstant();
+                                System.out.println("  ✓ Timestamp Firebase (Date): " + createdAt);
+                            } else if (timestampObj instanceof Long) {
+                                createdAt = Instant.ofEpochMilli((Long) timestampObj);
+                                System.out.println("  ✓ Timestamp Firebase (Long): " + createdAt);
+                            } else if (timestampObj instanceof Number) {
+                                createdAt = Instant.ofEpochMilli(((Number) timestampObj).longValue());
+                                System.out.println("  ✓ Timestamp Firebase (Number): " + createdAt);
+                            } else {
+                                System.out.println("  ⚠️ Timestamp de type inconnu: " + timestampObj.getClass().getName() + ", utilisation de now()");
+                            }
+                        } else {
+                            System.out.println("  ⚠️ Pas de createdAt/timestamp dans Firebase, utilisation de now()");
+                        }
+
                         Signalement signalement = Signalement.builder()
                                 .account(defaultAccount)
                                 .typeProblem(typeProblem)
                                 .descriptions(description != null ? description : "")
                                 .location(lat + "," + lng)
-                                .createdAt(Instant.now())
+                                .createdAt(createdAt)
                                 .firebaseId(firebaseId)
                                 .build();
 

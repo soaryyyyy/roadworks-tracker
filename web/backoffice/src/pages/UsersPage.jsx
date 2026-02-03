@@ -24,7 +24,7 @@ export default function UsersPage() {
     role: ''
   })
   const [updating, setUpdating] = useState(false)
-  const [importingFirebase, setImportingFirebase] = useState(false)
+  const [syncing, setSyncing] = useState(false)
 
   useEffect(() => {
     fetchUsers()
@@ -192,12 +192,12 @@ export default function UsersPage() {
     }
   }
 
-  const handleImportFromFirebase = async () => {
-    if (!window.confirm('Êtes-vous sûr de vouloir importer les utilisateurs depuis Firebase? Cette action créera des comptes locaux pour tous les utilisateurs Firebase.')) {
+  const handleSyncWithMobile = async () => {
+    if (!window.confirm('Êtes-vous sûr de vouloir synchroniser avec les utilisateurs mobile (Firebase)? Cette action importera les nouveaux utilisateurs et mettra à jour les statuts.')) {
       return
     }
 
-    setImportingFirebase(true)
+    setSyncing(true)
     setError('')
     setSuccess('')
 
@@ -213,15 +213,15 @@ export default function UsersPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Erreur lors de l\'import')
+        throw new Error(data.message || 'Erreur lors de la synchronisation')
       }
 
-      setSuccess(`Utilisateurs Firebase importés avec succès`)
+      setSuccess(data.message || 'Synchronisation avec mobile réussie')
       fetchUsers()
     } catch (err) {
       setError(err.message)
     } finally {
-      setImportingFirebase(false)
+      setSyncing(false)
     }
   }
 
@@ -260,11 +260,11 @@ export default function UsersPage() {
             + Créer un utilisateur
           </button>
           <button 
-            onClick={handleImportFromFirebase} 
+            onClick={handleSyncWithMobile} 
             className="import-button"
-            disabled={importingFirebase}
+            disabled={syncing}
           >
-            {importingFirebase ? '⏳ Import en cours...' : '📥 Importer de Firebase'}
+            {syncing ? '⏳ Synchronisation...' : '🔄 Synchroniser avec Mobile'}
           </button>
         </div>
 

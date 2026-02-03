@@ -90,53 +90,87 @@ public class AuthService {
                 .build();
     }
 
+    // @Transactional
+    // public AuthResponse register(RegisterRequest request) {
+    //     if (accountRepository.existsByUsername(request.getUsername())) {
+    //         return AuthResponse.builder()
+    //                 .message("Ce nom d'utilisateur existe déjà")
+    //                 .build();
+    //     }
+
+    //     String roleLibelle = request.getRole() != null ? request.getRole() : ROLE_MANAGER;
+    //     Role role = roleRepository.findByLibelle(roleLibelle)
+    //             .orElseThrow(() -> new RuntimeException("Role " + roleLibelle + " non trouvé"));
+
+    //     // Créer l'utilisateur dans Firebase
+    //     String firebaseUid;
+    //     try {
+    //         String email = request.getUsername(); // Utiliser un email par défaut
+    //         firebaseUid = firebaseService.createFirebaseUser(
+    //                 email, 
+    //                 request.getPassword(), 
+    //                 request.getUsername()
+    //         );
+    //         log.info("Utilisateur créé dans Firebase avec UID: {}", firebaseUid);
+    //     } catch (Exception e) {
+    //         log.error("Erreur lors de la création de l'utilisateur dans Firebase: {}", e.getMessage());
+    //         return AuthResponse.builder()
+    //                 .message("Erreur lors de la création de l'utilisateur: " + e.getMessage())
+    //                 .build();
+    //     }
+
+    //     Account account = Account.builder()
+    //             .username(request.getUsername())
+    //             .pwd(hashPassword(request.getPassword()))
+    //             .role(role)
+    //             .createdAt(Instant.now())
+    //             .isActive(true)
+    //             .isLocked(false)
+    //             .attempts(0)
+    //             .build();
+
+    //     accountRepository.save(account);
+
+    //     return AuthResponse.builder()
+    //             .username(account.getUsername())
+    //             .role(account.getRole().getLibelle())
+    //             .message("Compte créé avec succès")
+    //             .build();
+    // }
+
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
-        if (accountRepository.existsByUsername(request.getUsername())) {
-            return AuthResponse.builder()
-                    .message("Ce nom d'utilisateur existe déjà")
-                    .build();
-        }
+public AuthResponse register(RegisterRequest request) {
 
-        String roleLibelle = request.getRole() != null ? request.getRole() : ROLE_MANAGER;
-        Role role = roleRepository.findByLibelle(roleLibelle)
-                .orElseThrow(() -> new RuntimeException("Role " + roleLibelle + " non trouvé"));
-
-        // Créer l'utilisateur dans Firebase
-        String firebaseUid;
-        try {
-            String email = request.getUsername(); // Utiliser un email par défaut
-            firebaseUid = firebaseService.createFirebaseUser(
-                    email, 
-                    request.getPassword(), 
-                    request.getUsername()
-            );
-            log.info("Utilisateur créé dans Firebase avec UID: {}", firebaseUid);
-        } catch (Exception e) {
-            log.error("Erreur lors de la création de l'utilisateur dans Firebase: {}", e.getMessage());
-            return AuthResponse.builder()
-                    .message("Erreur lors de la création de l'utilisateur: " + e.getMessage())
-                    .build();
-        }
-
-        Account account = Account.builder()
-                .username(request.getUsername())
-                .pwd(hashPassword(request.getPassword()))
-                .role(role)
-                .createdAt(Instant.now())
-                .isActive(true)
-                .isLocked(false)
-                .attempts(0)
-                .build();
-
-        accountRepository.save(account);
-
+    if (accountRepository.existsByUsername(request.getUsername())) {
         return AuthResponse.builder()
-                .username(account.getUsername())
-                .role(account.getRole().getLibelle())
-                .message("Compte créé avec succès")
+                .message("Ce nom d'utilisateur existe déjà")
                 .build();
     }
+
+    String roleLibelle = request.getRole() != null ? request.getRole() : ROLE_MANAGER;
+
+    Role role = roleRepository.findByLibelle(roleLibelle)
+            .orElseThrow(() -> new RuntimeException("Role " + roleLibelle + " non trouvé"));
+
+    Account account = Account.builder()
+            .username(request.getUsername())
+            .pwd(hashPassword(request.getPassword()))
+            .role(role)
+            .createdAt(Instant.now())
+            .isActive(true)
+            .isLocked(false)
+            .attempts(0)
+            .build();
+
+    accountRepository.save(account);
+
+    return AuthResponse.builder()
+            .username(account.getUsername())
+            .role(account.getRole().getLibelle())
+            .message("Compte créé avec succès")
+            .build();
+}
+
 
     @Transactional
     public void logout(String token) {
@@ -215,6 +249,35 @@ public class AuthService {
         return accountRepository.findAllWithRole();
     }
 
+    /**
+     * Retourne les utilisateurs de la base de données locale (PostgreSQL)
+     * Utilisé par le module web - totalement indépendant de Firebase
+     */
+    public List<Map<String, Object>> getAllLocalUsersFormatted() {
+        List<Account> localUsers = accountRepository.findAllWithRole();
+        List<Map<String, Object>> result = new java.util.ArrayList<>();
+
+        for (Account account : localUsers) {
+            Map<String, Object> userMap = new java.util.HashMap<>();
+            userMap.put("id", account.getId());
+            userMap.put("username", account.getUsername());
+            userMap.put("email", ""); // Email non stocké localement
+            userMap.put("role", account.getRole().getLibelle());
+            userMap.put("isActive", account.getIsActive());
+            userMap.put("isLocked", account.getIsLocked());
+            userMap.put("createdAt", account.getCreatedAt() != null 
+                ? account.getCreatedAt().toString() 
+                : java.time.Instant.now().toString());
+            result.add(userMap);
+        }
+
+        return result;
+    }
+
+    /**
+     * Retourne les utilisateurs depuis Firebase (mobile)
+     * Utilisé uniquement pour la synchronisation
+     */
     public List<Map<String, Object>> getAllFirebaseUsersFormatted() {
         List<com.google.firebase.auth.UserRecord> firebaseUsers = firebaseService.getAllFirebaseUsers();
         List<Map<String, Object>> result = new java.util.ArrayList<>();

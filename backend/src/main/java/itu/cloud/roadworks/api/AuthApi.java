@@ -170,8 +170,9 @@ public class AuthApi {
     }
 
     @Operation(
-            summary = "Liste des utilisateurs Firebase",
-            description = "Récupère la liste de tous les utilisateurs Firebase avec leurs informations"
+            summary = "Liste des utilisateurs locaux",
+            description = "Récupère la liste de tous les utilisateurs de la base de données locale (PostgreSQL). " +
+                    "Cette API est indépendante de Firebase/mobile. Utilisez /api/auth/import-firebase pour synchroniser."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -183,6 +184,26 @@ public class AuthApi {
     })
     @GetMapping("/users")
     public ResponseEntity<List<Map<String, Object>>> getUsers() {
+        List<Map<String, Object>> result = authService.getAllLocalUsersFormatted();
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(
+            summary = "Liste des utilisateurs Firebase (Mobile)",
+            description = "Récupère la liste de tous les utilisateurs Firebase (application mobile). " +
+                    "Utilisé uniquement pour prévisualiser les utilisateurs avant synchronisation."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Liste des utilisateurs Firebase récupérée avec succès",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = UserResponse.class)))
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/firebase-users")
+    public ResponseEntity<List<Map<String, Object>>> getFirebaseUsers() {
         List<Map<String, Object>> result = authService.getAllFirebaseUsersFormatted();
         return ResponseEntity.ok(result);
     }
@@ -270,8 +291,8 @@ public class AuthApi {
     }
 
     @Operation(
-            summary = "Débloquer un utilisateur",
-            description = "Déverrouille un compte utilisateur bloqué après tentatives de connexion échouées"
+            summary = "Débloquer un utilisateur local",
+            description = "Déverrouille un compte utilisateur bloqué de la base de données locale"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -288,8 +309,38 @@ public class AuthApi {
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    @PostMapping("/users/{firebaseUid}/unlock")
+    @PostMapping("/users/{userId}/unlock")
     public ResponseEntity<AuthResponse> unlockUser(
+            @Parameter(description = "ID de l'utilisateur local à débloquer", required = true)
+            @PathVariable Long userId) {
+        AuthResponse response = authService.unlockUser(userId);
+        if (response.getUsername() == null) {
+            return ResponseEntity.status(404).body(response);
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Débloquer un utilisateur Firebase",
+            description = "Déverrouille un compte utilisateur Firebase (mobile) dans Firestore"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Utilisateur Firebase déverrouillé avec succès"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Non authentifié"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Utilisateur non trouvé"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping("/firebase-users/{firebaseUid}/unlock")
+    public ResponseEntity<AuthResponse> unlockFirebaseUser(
             @Parameter(description = "UID Firebase de l'utilisateur à débloquer", required = true)
             @PathVariable String firebaseUid) {
         AuthResponse response = authService.unlockFirebaseUser(firebaseUid);
