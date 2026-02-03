@@ -538,6 +538,41 @@ public class SignalementService {
         }
     }
 
+    /**
+     * Exporte tous les signalements locaux (sans firebaseId) vers Firebase
+     * pour qu'ils soient visibles dans l'application mobile.
+     */
+    public int exportLocalSignalementsToFirebase() throws Exception {
+        System.out.println("=== DEBUT exportLocalSignalementsToFirebase ===");
+        
+        Firestore db = firebaseService.getFirestore();
+        if (db == null) {
+            System.out.println("Firebase n'est pas initialisé - retour 0 exporté");
+            return 0;
+        }
+
+        // Récupérer tous les signalements sans firebaseId
+        List<Signalement> localSignalements = repository.findAll().stream()
+                .filter(s -> s.getFirebaseId() == null || s.getFirebaseId().isEmpty())
+                .collect(Collectors.toList());
+
+        System.out.println("Nombre de signalements locaux à exporter: " + localSignalements.size());
+
+        int exportedCount = 0;
+        for (Signalement signalement : localSignalements) {
+            try {
+                syncToFirebase(signalement.getId());
+                exportedCount++;
+                System.out.println("✓ Signalement " + signalement.getId() + " exporté vers Firebase");
+            } catch (Exception e) {
+                System.err.println("✗ Erreur export signalement " + signalement.getId() + ": " + e.getMessage());
+            }
+        }
+
+        System.out.println("=== FIN exportLocalSignalementsToFirebase - " + exportedCount + " exportés ===");
+        return exportedCount;
+    }
+
     public void syncToFirebase(Long signalementId) throws Exception {
         try {
             Signalement signalement = repository.findById(signalementId)

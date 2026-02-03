@@ -146,6 +146,37 @@ public class SignalementApi {
     }
 
     @Operation(
+            summary = "Exporter les signalements locaux vers Firebase",
+            description = """
+                    Envoie tous les signalements créés localement (sans firebase_id) vers Firebase
+                    pour qu'ils soient visibles dans l'application mobile.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Export effectué avec succès",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping("/sync/to-firebase")
+    public ResponseEntity<?> syncToFirebaseAll() {
+        try {
+            int count = service.exportLocalSignalementsToFirebase();
+            String username = request.getHeader("X-Username");
+            securityLogService.logSyncFirebase(null, username, getClientIp(), request.getHeader("User-Agent"));
+            return ResponseEntity.ok().body(Map.of(
+                    "message", "Export vers Firebase effectué avec succès",
+                    "exported", count
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Operation(
             summary = "Ajouter une réparation à un signalement",
             description = """
                     Ajoute les détails de réparation (entreprise, coûts, durées) à un signalement

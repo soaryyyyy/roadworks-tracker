@@ -39,6 +39,7 @@ export default function DashboardPage() {
   const [error, setError] = useState('')
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [syncing, setSyncing] = useState(false)
+  const [exporting, setExporting] = useState(false)
   const [syncMessage, setSyncMessage] = useState('')
   const [showNotifDropdown, setShowNotifDropdown] = useState(false)
   const [showUnsyncedLegend, setShowUnsyncedLegend] = useState(true) // Pour afficher/masquer la légende
@@ -212,6 +213,37 @@ export default function DashboardPage() {
     }
   }
 
+  // Envoyer les signalements locaux vers Firebase (mobile)
+  const handleExportToMobile = async () => {
+    try {
+      setExporting(true)
+      setSyncMessage('')
+
+      const response = await fetch('/api/signalements/sync/to-firebase', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'envoi vers mobile')
+      }
+
+      const data = await response.json()
+      setSyncMessage(`✓ ${data.exported} signalements envoyés vers l'application mobile`)
+
+      // Rafraîchir la liste
+      await fetchSignalements()
+    } catch (err) {
+      console.error('Erreur:', err)
+      setSyncMessage(`✗ Erreur: ${err.message}`)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -227,11 +259,19 @@ export default function DashboardPage() {
             <>
               <button
                 onClick={handleSyncFirebase}
-                disabled={syncing}
+                disabled={syncing || exporting}
                 className="action-button"
-                title="Synchroniser les signalements avec l'application mobile"
+                title="Importer les signalements depuis l'application mobile"
               >
-                {syncing ? '⏳ Synchronisation...' : '🔄 Synchroniser Mobile'}
+                {syncing ? '⏳ Import...' : '📥 Importer de Mobile'}
+              </button>
+              <button
+                onClick={handleExportToMobile}
+                disabled={syncing || exporting}
+                className="action-button"
+                title="Envoyer les nouveaux signalements vers l'application mobile"
+              >
+                {exporting ? '⏳ Export...' : '📤 Envoyer vers Mobile'}
               </button>
               <button onClick={() => navigate('/users')} className="action-button">
                 👥 Gestion Utilisateurs
@@ -311,7 +351,7 @@ export default function DashboardPage() {
               📍 {events.length} signalement{events.length > 1 ? 's' : ''} local{events.length > 1 ? 'aux' : ''}
               {role === 'manager' && (
                 <span className="sync-hint">
-                  {' '}| Cliquez sur "Synchroniser Mobile" pour importer les signalements de l'application mobile
+                  {' '}| 📥 Importer = récupérer de l'app mobile | 📤 Envoyer = exporter vers l'app mobile
                 </span>
               )}
               {role === 'manager' && totalUnsyncedCount > 0 && (
