@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import { useNavigate } from 'react-router-dom'
-import { iconByType, unsyncedIconByType } from '../mapIcons'
+import { iconByType } from '../mapIcons'
 import SignalementDetailModal from '../components/SignalementDetailModal'
 import NotificationToast from '../components/NotificationToast'
 import { useNotifications } from '../hooks/useNotifications'
@@ -212,6 +212,9 @@ export default function DashboardPage() {
           <p className="user-info">Connecté en tant que: <strong>{username}</strong> ({role})</p>
         </div>
         <div className="header-actions">
+          <button className="nav-button" onClick={() => navigate('/analytics')}>
+            📊 Analytics
+          </button>
           {role === 'manager' && (
             <>
               <button

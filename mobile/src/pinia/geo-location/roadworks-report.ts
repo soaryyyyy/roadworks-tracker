@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { Geolocation } from '@capacitor/geolocation';
 import { auth } from '@/services/firebase/routeworks-tracker';
 import {
   addRoadworksReport,
@@ -9,6 +8,7 @@ import {
   RoadworksReportData,
   RoadworksReportWithId,
 } from '@/services/firebase/roadworks-reports';
+import { readRoadworksCache, saveRoadworksCache, isCacheFresh } from '@/services/cache/roadworks-cache';
 import { showToast } from '@/utils/ui';
 import { notifyStatusChange as sendNativeNotification } from '@/services/notifications';
 import { alertCircleOutline, checkmarkCircleOutline, refreshCircleOutline, notificationsOutline } from 'ionicons/icons';
@@ -60,11 +60,19 @@ export const useRoadworksReportStore = defineStore('roadworks-report', {
       }
     },
 
-    async loadAllReports() {
+    async loadAllReports(options?: { onCacheApplied?: () => void }) {
       this.isLoading = true;
       this.error = null;
+      const onCacheApplied = options?.onCacheApplied;
 
       try {
+        const cached = await readRoadworksCache();
+        if (cached?.reports?.length) {
+          this.reports = cached.reports;
+          onCacheApplied?.();
+          console.log(`📦 ${cached.reports.length} signalements chargés depuis le cache local (${isCacheFresh(cached.cachedAt) ? 'frais' : 'stale'})`);
+        }
+
         // Récupérer l'ID utilisateur actuel
         const userId = auth.currentUser?.uid;
         if (userId) {
@@ -72,13 +80,20 @@ export const useRoadworksReportStore = defineStore('roadworks-report', {
         }
 
         this.reports = await getAllRoadworksReports();
+        await saveRoadworksCache(this.reports);
         console.log(`📍 ${this.reports.length} signalements chargés depuis Firebase`);
         console.log(`👤 User ID: ${this.currentUserId}`);
+
+        onCacheApplied?.();
       } catch (error: any) {
         const message = error?.message || 'Erreur lors du chargement des signalements';
         this.error = message;
 
         console.error('❌ Erreur:', message);
+
+        if (this.reports.length) {
+          showToast('Impossible d\'actualiser, utilisation des données en cache.', 3000, alertCircleOutline, 'warning', 'top');
+        }
       } finally {
         this.isLoading = false;
       }
