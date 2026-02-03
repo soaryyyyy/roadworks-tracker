@@ -148,11 +148,10 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     buildTypes()
-  }, [events, unsyncedEvents])
+  }, [events])
 
   const buildTypes = () => {
-    const merged = [...events, ...unsyncedEvents]
-    const values = Array.from(new Set(merged.map(e => (e.typeProblem || e.type || '').toLowerCase()).filter(Boolean)))
+    const values = Array.from(new Set(events.map(e => (e.typeProblem || e.type || '').toLowerCase()).filter(Boolean)))
       .sort()
     setTypes(values)
   }
@@ -229,7 +228,7 @@ export default function AnalyticsPage() {
   }
 
   const analytics = useMemo(() => {
-    const merged = [...events, ...unsyncedEvents].filter((evt) => {
+    const merged = [...events].filter((evt) => {
       const created = toDate(evt.date) || toDate(evt.createdAt)
       const typeOk = !selectedType || (evt.typeProblem || evt.type || '').toLowerCase() === selectedType.toLowerCase()
       if (!typeOk) return false
@@ -298,7 +297,7 @@ export default function AnalyticsPage() {
         total: average(totalTimes),
       },
     }
-  }, [events, unsyncedEvents, selectedType, startDate, endDate, weights])
+  }, [events, selectedType, startDate, endDate, weights])
 
   const formatRange = (range) => {
     if (!range.count || !range.min) return 'Aucune date'
@@ -448,7 +447,7 @@ export default function AnalyticsPage() {
                   <span className="pill pill-progress">En cours {analytics.counts.in_progress}</span>
                   <span className="pill pill-done">Terminé {analytics.counts.completed}</span>
                 </div>
-                <div className="analytic-sub">Tous les signalements (incl. non synchronisés)</div>
+                <div className="analytic-sub">Signalements synchronisés</div>
               </div>
 
             </div>
