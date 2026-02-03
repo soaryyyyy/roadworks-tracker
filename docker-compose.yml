@@ -10,7 +10,6 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      # Scripts exécutés automatiquement uniquement au 1er démarrage (volume vide)
       - ./database/reset-database.sql:/docker-entrypoint-initdb.d/01-create.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U roadworks -d roadworks"]
@@ -25,20 +24,17 @@ services:
     volumes:
       - ./backend:/app
       - ~/.m2:/root/.m2
+      - backend_target:/app/target
       - ./backend/firebase-key.json:/app/firebase-key.json:ro
     ports:
       - "8080:8080"
-    command: sh -c "echo 'Waiting for PostgreSQL...' && sleep 10 && mvn spring-boot:run"
+    command: sh -c "mvn -q -DskipTests spring-boot:run"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/roadworks
       SPRING_DATASOURCE_USERNAME: roadworks
       SPRING_DATASOURCE_PASSWORD: roadworks
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       FIREBASE_CREDENTIALS_PATH: /app/firebase-key.json
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-      - 1.1.1.1
     depends_on:
       postgres:
         condition: service_healthy
@@ -49,10 +45,10 @@ services:
     working_dir: /app
     volumes:
       - ./web/frontoffice:/app
-      - ./web/frontoffice/node_modules:/app/node_modules
+      - frontoffice_node_modules:/app/node_modules
     ports:
       - "5173:5173"
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    command: sh -c "if [ ! -f node_modules/.bin/vite ]; then npm ci; fi && npm run dev -- --host 0.0.0.0 --port 5173"
     environment:
       CHOKIDAR_USEPOLLING: "true"
     depends_on:
@@ -64,10 +60,10 @@ services:
     working_dir: /app
     volumes:
       - ./web/backoffice:/app
-      - ./web/backoffice/node_modules:/app/node_modules
+      - backoffice_node_modules:/app/node_modules
     ports:
       - "5174:5173"
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    command: sh -c "if [ ! -f node_modules/.bin/vite ]; then npm ci; fi && npm run dev -- --host 0.0.0.0 --port 5173"
     environment:
       CHOKIDAR_USEPOLLING: "true"
     depends_on:
@@ -84,3 +80,6 @@ services:
 
 volumes:
   pgdata:
+  backend_target:
+  frontoffice_node_modules:
+  backoffice_node_modules:
