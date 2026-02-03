@@ -460,7 +460,7 @@ export default function AnalyticsPage() {
 
             <div className="analytics-grid">
               <div className="analytic-card">
-                <div className="analytic-label">Phase en cours</div>
+                <div className="analytic-label">Cycle complet</div>
                 <div className="analytic-value">{formatDays(workStats.overall?.avgTotalDays)}</div>
                 <div className="analytic-sub">Début → fin</div>
               </div>
@@ -470,7 +470,6 @@ export default function AnalyticsPage() {
                 <div className="timeline-table">
                   <div className="section-header">
                     <h3>Timeline des travaux</h3>
-                    <span className="hint">Nom entreprise · Type signalement · Début · En cours · Fin</span>
                   </div>
                   <div className="table-scroll">
                     <table>
@@ -484,15 +483,22 @@ export default function AnalyticsPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {workTimelines.map((row) => (
-                          <tr key={row.id}>
-                            <td>{row.companyName || '—'}</td>
-                            <td>{row.typeProblem || '—'}</td>
-                            <td>{formatSimpleDate(row.createdAt)}</td>
-                            <td>{formatSimpleDate(row.inProgressDate)}</td>
-                            <td>{formatSimpleDate(row.endDate)}</td>
-                          </tr>
-                        ))}
+                        {workTimelines.map((row) => {
+                          const startCell = row.startDate ? formatSimpleDate(row.startDate) : '—'
+                          const endCell = row.endDate ? formatSimpleDate(row.endDate) : '—'
+                          const inProgressCell = row.endDate
+                            ? '—'
+                            : (row.inProgressDate ? formatSimpleDate(row.inProgressDate) : '—')
+                          return (
+                            <tr key={row.id}>
+                              <td>{row.companyName || '—'}</td>
+                              <td>{row.typeProblem || '—'}</td>
+                              <td>{startCell}</td>
+                              <td>{inProgressCell}</td>
+                              <td>{endCell}</td>
+                            </tr>
+                          )
+                        })}
                       </tbody>
                     </table>
                   </div>

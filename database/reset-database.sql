@@ -8,12 +8,14 @@ DROP TABLE IF EXISTS signalement_photo CASCADE;
 DROP TABLE IF EXISTS signalement CASCADE;
 DROP TABLE IF EXISTS session CASCADE;
 DROP TABLE IF EXISTS account_status CASCADE;
+DROP TABLE IF EXISTS status_account CASCADE;
 DROP TABLE IF EXISTS account CASCADE;
 DROP TABLE IF EXISTS company CASCADE;
 DROP TABLE IF EXISTS status_signalement CASCADE;
 DROP TABLE IF EXISTS type_problem CASCADE;
 DROP TABLE IF EXISTS role CASCADE;
 DROP TABLE IF EXISTS config CASCADE;
+DROP TABLE IF EXISTS advancement_rate CASCADE;
 
 -- Recréer les tables avec la structure originale
 CREATE TABLE role (
@@ -24,6 +26,11 @@ CREATE TABLE role (
 CREATE TABLE status_signalement (
     id BIGSERIAL PRIMARY KEY,
     libelle VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE status_account (
+    id BIGSERIAL PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE type_problem (
@@ -118,8 +125,14 @@ CREATE TABLE session (
 CREATE TABLE account_status (
     id BIGSERIAL PRIMARY KEY,
     id_account BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    status_label VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    id_status_account BIGINT NOT NULL REFERENCES status_account(id),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE advancement_rate (
+    id BIGSERIAL PRIMARY KEY,
+    status_key VARCHAR(50) NOT NULL UNIQUE,
+    percentage INTEGER NOT NULL CHECK (percentage BETWEEN 0 AND 100)
 );
 -- Migration: Ajouter la table security_log pour les logs d'accès aux signalements
 
@@ -156,6 +169,7 @@ CREATE INDEX idx_session_account ON session(id_account);
 -- Insérer les données de référence (seulement utilisateur et manager)
 INSERT INTO role (libelle) VALUES ('utilisateur'), ('manager');
 INSERT INTO status_signalement (libelle) VALUES ('nouveau'), ('en_cours'), ('terminé'), ('annulé');
+INSERT INTO status_account (libelle) VALUES ('active'), ('locked'), ('disabled');
 INSERT INTO type_problem (libelle, icone) VALUES
     ('Danger', '⚠️'),
     ('Travaux', '🚧'),
@@ -172,6 +186,14 @@ INSERT INTO type_problem (libelle, icone) VALUES
     ('debris', '🪨'),
     ('poor_surface', '⚠️'),
     ('other', '❓');
+
+INSERT INTO advancement_rate (status_key, percentage) VALUES
+    ('nouveau', 0),
+    ('new', 0),
+    ('en_cours', 50),
+    ('in_progress', 50),
+    ('terminé', 100),
+    ('completed', 100);
     
 
 -- Insérer l'utilisateur admin par défaut (rôle manager = id 2)
@@ -189,4 +211,3 @@ INSERT INTO config (max_attempts, session_duration) VALUES (5, 60);
 INSERT INTO signalement (id_account, id_type_problem, descriptions, location, created_at) 
 VALUES 
   (1, 1, 'Nid de poule dangereux rue de la République', '-18.8792,47.5079', NOW());
-

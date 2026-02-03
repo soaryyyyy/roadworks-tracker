@@ -85,53 +85,78 @@ public class AnalyticsService {
     }
 
     public List<WorkTimelineDto> listWorkTimelines(Optional<Long> companyIdOpt, Optional<LocalDate> startDate, Optional<LocalDate> endDate, Optional<String> typeProblem) {
-        List<SignalementWork> works = workRepository.findAll();
-        if (companyIdOpt.isPresent()) {
-            Long cid = companyIdOpt.get();
-            works = works.stream()
-                    .filter(w -> w.getCompany() != null && Objects.equals(w.getCompany().getId(), cid))
-                    .collect(Collectors.toList());
-        }
+        List<Signalement> signalements = signalementRepository.findAll();
 
         if (typeProblem.isPresent()) {
             String typeKey = typeProblem.get().toLowerCase();
-            works = works.stream()
-                    .filter(w -> w.getSignalement() != null
-                            && w.getSignalement().getTypeProblem() != null
-                            && w.getSignalement().getTypeProblem().getLibelle() != null
-                            && w.getSignalement().getTypeProblem().getLibelle().toLowerCase().equals(typeKey))
+            signalements = signalements.stream()
+                    .filter(s -> s.getTypeProblem() != null
+                            && s.getTypeProblem().getLibelle() != null
+                            && s.getTypeProblem().getLibelle().toLowerCase().equals(typeKey))
                     .collect(Collectors.toList());
         }
 
         if (startDate.isPresent() || endDate.isPresent()) {
             LocalDate start = startDate.orElse(LocalDate.MIN);
             LocalDate end = endDate.orElse(LocalDate.MAX);
-            works = works.stream()
-                    .filter(w -> {
-                        LocalDate created = toLocalDate(w.getSignalement() != null && w.getSignalement().getCreatedAt() != null
-                                ? Date.from(w.getSignalement().getCreatedAt())
-                                : null);
-                        LocalDate s = w.getStartDate();
-                        LocalDate e = w.getRealEndDate() != null ? w.getRealEndDate() : w.getEndDateEstimation();
-                        LocalDate pivot = created != null ? created : (s != null ? s : e);
-                        if (pivot == null) return false;
-                        return !pivot.isBefore(start) && !pivot.isAfter(end);
+            signalements = signalements.stream()
+                    .filter(s -> {
+                        LocalDate created = toLocalDate(Date.from(s.getCreatedAt()));
+                        if (created == null) return false;
+                        return !created.isBefore(start) && !created.isAfter(end);
                     })
                     .collect(Collectors.toList());
         }
 
-        return works.stream()
-                .map(w -> WorkTimelineDto.builder()
-                        .id(w.getId())
-                        .companyName(w.getCompany() != null ? w.getCompany().getName() : null)
-                        .typeProblem(w.getSignalement() != null && w.getSignalement().getTypeProblem() != null
-                                ? w.getSignalement().getTypeProblem().getLibelle()
-                                : null)
-                        .createdAt(w.getSignalement() != null ? w.getSignalement().getCreatedAt() : null)
-                        .startDate(w.getStartDate())
-                        .inProgressDate(w.getStartDate()) // simplification: début du travail = passage en cours
-                        .endDate(w.getRealEndDate() != null ? w.getRealEndDate() : w.getEndDateEstimation())
-                        .build())
+        return signalements.stream()
+                // ne garder que ceux qui ont un work associé
+                .filter(s -> s.getWorks() != null && !s.getWorks().isEmpty())
+                .map(signalement -> {
+                    SignalementWork latestWork = signalement.getWorks().stream().findFirst().orElse(null);
+                    if (latestWork == null) return null;
+
+                    String status = signalement.getStatuses().stream()
+                            .findFirst()
+                            .map(s -> s.getStatusSignalement().getLibelle())
+                            .orElse(null);
+
+                    LocalDate start = latestWork.getStartDate() != null
+                            ? latestWork.getStartDate()
+                            : toLocalDate(Date.from(signalement.getCreatedAt()));
+
+                    LocalDate inProgress = null;
+                    LocalDate end = null;
+
+                    if ("en_cours".equalsIgnoreCase(status)) {
+                        inProgress = start;
+                    }
+                    if ("terminé".equalsIgnoreCase(status) || "resolu".equalsIgnoreCase(status) || "completed".equalsIgnoreCase(status)) {
+                        end = latestWork.getRealEndDate();
+                        if (end == null && signalement.getStatuses().stream().findFirst().isPresent()) {
+                            end = toLocalDate(Date.from(signalement.getStatuses().stream().findFirst().get().getUpdatedAt()));
+                        }
+                        inProgress = null;
+                    }
+
+                    Long workCompanyId = latestWork.getCompany() != null ? latestWork.getCompany().getId() : null;
+                    String workCompanyName = latestWork.getCompany() != null ? latestWork.getCompany().getName() : null;
+
+                    // filtre companyId sur la ligne mappée
+                    if (companyIdOpt.isPresent() && !Objects.equals(workCompanyId, companyIdOpt.get())) {
+                        return null;
+                    }
+
+                    return WorkTimelineDto.builder()
+                            .id(signalement.getId())
+                            .companyName(workCompanyName)
+                            .typeProblem(signalement.getTypeProblem() != null ? signalement.getTypeProblem().getLibelle() : null)
+                            .createdAt(signalement.getCreatedAt())
+                            .startDate(start)
+                            .inProgressDate(inProgress)
+                            .endDate(end)
+                            .build();
+                })
+                .filter(Objects::nonNull)
                 .sorted(Comparator.comparing(WorkTimelineDto::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())))
                 .toList();
     }
