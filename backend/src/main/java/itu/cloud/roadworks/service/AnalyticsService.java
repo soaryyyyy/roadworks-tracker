@@ -54,7 +54,7 @@ public class AnalyticsService {
                                 ? Date.from(w.getSignalement().getCreatedAt())
                                 : null);
                         LocalDate s = w.getStartDate();
-                        LocalDate e = w.getRealEndDate() != null ? w.getRealEndDate() : w.getEndDateEstimation();
+                        LocalDate e = w.getRealEndDate();
                         LocalDate pivot = created != null ? created : (s != null ? s : e);
                         if (pivot == null) return false;
                         return !pivot.isBefore(start) && !pivot.isAfter(end);
@@ -109,18 +109,14 @@ public class AnalyticsService {
         }
 
         return signalements.stream()
-                // ne garder que ceux qui ont un work associé
-                .filter(s -> s.getWorks() != null && !s.getWorks().isEmpty())
                 .map(signalement -> {
                     SignalementWork latestWork = signalement.getWorks().stream().findFirst().orElse(null);
-                    if (latestWork == null) return null;
-
                     String status = signalement.getStatuses().stream()
                             .findFirst()
                             .map(s -> s.getStatusSignalement().getLibelle())
                             .orElse(null);
 
-                    LocalDate start = latestWork.getStartDate() != null
+                    LocalDate start = latestWork != null && latestWork.getStartDate() != null
                             ? latestWork.getStartDate()
                             : toLocalDate(Date.from(signalement.getCreatedAt()));
 
@@ -131,15 +127,19 @@ public class AnalyticsService {
                         inProgress = start;
                     }
                     if ("terminé".equalsIgnoreCase(status) || "resolu".equalsIgnoreCase(status) || "completed".equalsIgnoreCase(status)) {
-                        end = latestWork.getRealEndDate();
-                        if (end == null && signalement.getStatuses().stream().findFirst().isPresent()) {
-                            end = toLocalDate(Date.from(signalement.getStatuses().stream().findFirst().get().getUpdatedAt()));
+                        if (latestWork != null && latestWork.getRealEndDate() != null) {
+                            end = latestWork.getRealEndDate();
+                        } else if (signalement.getStatuses() != null && !signalement.getStatuses().isEmpty()) {
+                            end = signalement.getStatuses().stream()
+                                    .findFirst()
+                                    .map(st -> toLocalDate(Date.from(st.getUpdatedAt())))
+                                    .orElse(null);
                         }
                         inProgress = null;
                     }
 
-                    Long workCompanyId = latestWork.getCompany() != null ? latestWork.getCompany().getId() : null;
-                    String workCompanyName = latestWork.getCompany() != null ? latestWork.getCompany().getName() : null;
+                    Long workCompanyId = latestWork != null && latestWork.getCompany() != null ? latestWork.getCompany().getId() : null;
+                    String workCompanyName = latestWork != null && latestWork.getCompany() != null ? latestWork.getCompany().getName() : null;
 
                     // filtre companyId sur la ligne mappée
                     if (companyIdOpt.isPresent() && !Objects.equals(workCompanyId, companyIdOpt.get())) {
@@ -172,7 +172,28 @@ public class AnalyticsService {
                     ? LocalDate.ofInstant(s.getCreatedAt(), ZoneId.systemDefault())
                     : null;
             LocalDate start = w.getStartDate();
-            LocalDate end = w.getRealEndDate() != null ? w.getRealEndDate() : w.getEndDateEstimation();
+            LocalDate end = w.getRealEndDate();
+
+            // fallback: si pas de realEndDate mais statut signalement terminé, utiliser la date de statut
+            if (end == null && s != null && s.getStatuses() != null && !s.getStatuses().isEmpty()) {
+                var latestStatus = s.getStatuses().stream().findFirst().orElse(null);
+                if (latestStatus != null) {
+                    String label = latestStatus.getStatusSignalement().getLibelle();
+                    if ("terminé".equalsIgnoreCase(label) || "resolu".equalsIgnoreCase(label) || "completed".equalsIgnoreCase(label)) {
+                        end = LocalDate.ofInstant(latestStatus.getUpdatedAt(), ZoneId.systemDefault());
+                    }
+                }
+            }
+
+            // si pas de date de fin, ignorer pour le cycle complet
+            if (end == null) {
+                continue;
+            }
+
+            // fallback start: si pas de start, utiliser date de création
+            if (start == null) {
+                start = created;
+            }
 
             if (created != null && start != null) {
                 lead.add(daysBetween(start, created));
@@ -191,7 +212,7 @@ public class AnalyticsService {
                 .avgLeadDays(avg(lead))
                 .avgInProgressDays(avg(inProgress))
                 .avgTotalDays(avg(total))
-                .count((long) works.size())
+                .count((long) total.size()) // nombre de travaux avec une fin connue
                 .build();
     }
 

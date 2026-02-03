@@ -269,7 +269,7 @@ export default function AnalyticsPage() {
 
       const createdAt = toDate(evt.date) || toDate(evt.createdAt)
       const startDate = toDate(evt.work?.startDate)
-      const completedDate = toDate(evt.work?.realEndDate || evt.work?.endDate || evt.work?.endDateEstimation || evt.updatedAt)
+      const completedDate = toDate(evt.work?.realEndDate || evt.work?.endDate || evt.updatedAt)
 
       addDateToRange(ranges.new, createdAt)
       addDateToRange(ranges.in_progress, startDate)
@@ -298,6 +298,20 @@ export default function AnalyticsPage() {
       },
     }
   }, [events, selectedType, startDate, endDate, weights])
+
+  const cycleAvgDays = useMemo(() => {
+    const durations = workTimelines
+      .filter(row => row.startDate && row.endDate)
+      .map(row => {
+        const start = new Date(row.startDate)
+        const end = new Date(row.endDate)
+        const diffMs = end.getTime() - start.getTime()
+        return diffMs >= 0 ? diffMs / (1000 * 60 * 60 * 24) : null
+      })
+      .filter(v => v != null)
+    if (!durations.length) return null
+    return durations.reduce((a, b) => a + b, 0) / durations.length
+  }, [workTimelines])
 
   const formatRange = (range) => {
     if (!range.count || !range.min) return 'Aucune date'
@@ -450,23 +464,16 @@ export default function AnalyticsPage() {
                 <div className="analytic-sub">Signalements synchronisés</div>
               </div>
 
+              <div className="analytic-card">
+                <div className="analytic-label">Cycle complet (moyenne)</div>
+                <div className="analytic-value">{formatDays(cycleAvgDays)}</div>
+                <div className="analytic-sub">Début → fin</div>
+              </div>
+
             </div>
 
             {workStats && (
               <>
-            <div className="section-header inline">
-              <h3>Cycle complet moyen</h3>
-            </div>
-
-            <div className="analytics-grid">
-              <div className="analytic-card">
-                <div className="analytic-label">Cycle complet</div>
-                <div className="analytic-value">{formatDays(workStats.overall?.avgTotalDays)}</div>
-                <div className="analytic-sub">Début → fin</div>
-              </div>
-            </div>
-
-                
                 <div className="timeline-table">
                   <div className="section-header">
                     <h3>Timeline des travaux</h3>
