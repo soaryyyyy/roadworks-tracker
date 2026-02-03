@@ -434,23 +434,21 @@ public AuthResponse register(RegisterRequest request) {
             Role defaultRole = roleRepository.findByLibelle(ROLE_UTILISATEUR)
                     .orElseThrow(() -> new RuntimeException("Rôle " + ROLE_UTILISATEUR + " non trouvé"));
 
-            // Créer un set des usernames Firebase pour éviter les doublons
-            java.util.Set<String> firebaseUsernames = new java.util.HashSet<>();
+            // Créer un set des emails Firebase pour éviter les doublons
+            java.util.Set<String> firebaseEmails = new java.util.HashSet<>();
 
             for (com.google.firebase.auth.UserRecord firebaseUser : firebaseUsers) {
-                String username = firebaseUser.getDisplayName();
-
-                // Si pas de displayName, utiliser la partie email avant @
-                if (username == null || username.isEmpty()) {
-                    String email = firebaseUser.getEmail();
-                    if (email != null && !email.isEmpty()) {
-                        username = email.split("@")[0];
-                    } else {
-                        username = firebaseUser.getUid();
-                    }
+                String email = firebaseUser.getEmail();
+                
+                // Utiliser l'email complet comme username
+                if (email == null || email.isEmpty()) {
+                    // Si pas d'email, ignorer cet utilisateur
+                    log.warn("Utilisateur Firebase {} ignoré car pas d'email", firebaseUser.getUid());
+                    continue;
                 }
 
-                firebaseUsernames.add(username);
+                String username = email; // Utiliser l'email complet comme username
+                firebaseEmails.add(email);
 
                 // Importer le statut de l'utilisateur depuis Firebase
                 boolean isActive = !firebaseUser.isDisabled();
@@ -491,41 +489,48 @@ public AuthResponse register(RegisterRequest request) {
                 log.info("Utilisateur {} importé depuis Firebase (actif: {}, bloqué: {})", username, isActive, isLocked);
             }
 
-            // ===== ÉTAPE 2: Exporter les utilisateurs locaux vers Firebase =====
+            // ===== ÉTAPE 2: Exporter les utilisateurs locaux (non-manager) vers Firebase =====
             List<Account> localUsers = accountRepository.findAllWithRole();
 
             for (Account localUser : localUsers) {
-                // Ignorer les utilisateurs qui viennent déjà de Firebase
-                if (firebaseUsernames.contains(localUser.getUsername())) {
+                // Ne pas exporter les managers vers Firebase
+                if (ROLE_MANAGER.equals(localUser.getRole().getLibelle())) {
                     continue;
                 }
 
-                // Construire un email pour Firebase (username@roadworks.local)
-                String email = localUser.getUsername();
-                if (!email.contains("@")) {
-                    email = localUser.getUsername() + "@roadworks.local";
+                String username = localUser.getUsername();
+                
+                // Le username doit contenir @ pour être un email valide pour Firebase
+                if (!username.contains("@")) {
+                    log.debug("Utilisateur {} ignoré pour l'export (pas un email)", username);
+                    continue;
+                }
+
+                // Ignorer les utilisateurs qui viennent déjà de Firebase
+                if (firebaseEmails.contains(username)) {
+                    continue;
                 }
 
                 try {
                     // Vérifier si l'utilisateur existe déjà dans Firebase
-                    com.google.firebase.auth.UserRecord existingFirebaseUser = firebaseService.getFirebaseUserByEmail(email);
+                    com.google.firebase.auth.UserRecord existingFirebaseUser = firebaseService.getFirebaseUserByEmail(username);
                     
                     if (existingFirebaseUser != null) {
                         // Mettre à jour le statut dans Firebase si nécessaire
                         boolean shouldBeDisabled = localUser.getIsLocked();
                         if (existingFirebaseUser.isDisabled() != shouldBeDisabled) {
-                            firebaseService.createOrUpdateFirebaseUser(email, localUser.getUsername(), shouldBeDisabled);
+                            firebaseService.createOrUpdateFirebaseUser(username, localUser.getUsername(), shouldBeDisabled);
                             updatedInFirebase++;
-                            log.info("Utilisateur {} mis à jour dans Firebase (désactivé: {})", localUser.getUsername(), shouldBeDisabled);
+                            log.info("Utilisateur {} mis à jour dans Firebase (désactivé: {})", username, shouldBeDisabled);
                         }
                     } else {
                         // Créer l'utilisateur dans Firebase
-                        firebaseService.createOrUpdateFirebaseUser(email, localUser.getUsername(), localUser.getIsLocked());
+                        firebaseService.createOrUpdateFirebaseUser(username, localUser.getUsername(), localUser.getIsLocked());
                         exportedToFirebase++;
-                        log.info("Utilisateur {} exporté vers Firebase", localUser.getUsername());
+                        log.info("Utilisateur {} exporté vers Firebase", username);
                     }
                 } catch (Exception e) {
-                    log.warn("Impossible d'exporter l'utilisateur {} vers Firebase: {}", localUser.getUsername(), e.getMessage());
+                    log.warn("Impossible d'exporter l'utilisateur {} vers Firebase: {}", username, e.getMessage());
                 }
             }
 

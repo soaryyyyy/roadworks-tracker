@@ -342,7 +342,7 @@ export default function UsersPage() {
               <div className="form-group">
                 <label htmlFor="username">Nom d'utilisateur</label>
                 <input
-                  type="text"
+                  type="email"
                   id="username"
                   value={newUser.username}
                   onChange={e => setNewUser({ ...newUser, username: e.target.value })}
