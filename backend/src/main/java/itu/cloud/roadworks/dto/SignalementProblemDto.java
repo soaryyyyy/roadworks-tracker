@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @Builder
@@ -29,6 +30,9 @@ public class SignalementProblemDto {
 
     @Schema(description = "Informations sur les travaux assignés")
     private WorkInfo work;
+
+    @Schema(description = "Photos associées au signalement (Base64 ou URLs)")
+    private List<String> photos;
 
     @Data
     @Builder

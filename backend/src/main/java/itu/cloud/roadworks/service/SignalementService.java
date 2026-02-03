@@ -4,6 +4,7 @@ import itu.cloud.roadworks.dto.SignalementProblemDto;
 import itu.cloud.roadworks.model.Signalement;
 import itu.cloud.roadworks.model.SignalementStatus;
 import itu.cloud.roadworks.model.SignalementWork;
+import itu.cloud.roadworks.model.SignalementPhoto;
 import itu.cloud.roadworks.model.TypeProblem;
 import itu.cloud.roadworks.model.Account;
 import itu.cloud.roadworks.model.Company;
@@ -13,6 +14,7 @@ import itu.cloud.roadworks.repository.StatusSignalementRepository;
 import itu.cloud.roadworks.repository.TypeProblemRepository;
 import itu.cloud.roadworks.repository.AccountRepository;
 import itu.cloud.roadworks.repository.SignalementWorkRepository;
+import itu.cloud.roadworks.repository.SignalementPhotoRepository;
 import itu.cloud.roadworks.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,7 @@ public class SignalementService {
     private final TypeProblemRepository typeProblemRepository;
     private final AccountRepository accountRepository;
     private final SignalementWorkRepository workRepository;
+    private final SignalementPhotoRepository photoRepository;
     private final CompanyRepository companyRepository;
     private final FirebaseService firebaseService;
     private final NotificationService notificationService;
@@ -66,12 +69,18 @@ public class SignalementService {
                 .description(signalement.getDescriptions())
                 .build();
 
+        // Récupérer les photos du signalement
+        List<String> photosList = signalement.getPhotos().stream()
+                .map(SignalementPhoto::getPhotoData)
+                .collect(Collectors.toList());
+
         return SignalementProblemDto.builder()
                 .id(signalement.getId())
                 .typeProblem(signalement.getTypeProblem().getLibelle())
                 .illustrationProblem(signalement.getTypeProblem().getIcone())
                 .location(signalement.getLocation())
                 .detail(detail)
+                .photos(photosList.isEmpty() ? null : photosList)
                 .build();
     }
 
@@ -204,6 +213,34 @@ public class SignalementService {
 
                         Signalement saved = repository.save(signalement);
                         System.out.println("✓ Signalement sauvegardé avec ID: " + saved.getId());
+
+                        // Synchroniser les photos depuis Firebase
+                        List<String> photos = (List<String>) document.get("photos");
+                        if (photos != null && !photos.isEmpty()) {
+                            System.out.println("✓ " + photos.size() + " photo(s) trouvée(s) dans Firebase");
+                            int photoOrder = 1;
+                            for (String photoData : photos) {
+                                // Ignorer les photos vides ou nulles
+                                if (photoData == null || photoData.trim().isEmpty()) {
+                                    System.out.println("  ⚠️ Photo ignorée (vide ou nulle)");
+                                    continue;
+                                }
+                                try {
+                                    SignalementPhoto photo = SignalementPhoto.builder()
+                                            .signalement(saved)
+                                            .photoData(photoData)
+                                            .photoOrder(photoOrder++)
+                                            .createdAt(Instant.now())
+                                            .build();
+                                    photoRepository.save(photo);
+                                    System.out.println("  ✓ Photo " + (photoOrder - 1) + " sauvegardée (taille: " + photoData.length() + " caractères)");
+                                } catch (Exception e) {
+                                    System.err.println("  ⚠️ Erreur lors de la sauvegarde de la photo: " + e.getMessage());
+                                }
+                            }
+                        } else {
+                            System.out.println("✓ Pas de photos dans le document Firebase");
+                        }
 
                         // Vérifier s'il y a des informations de travail dans le document Firebase
                         Map<String, Object> workInfo = (Map<String, Object>) document.get("work");
@@ -537,6 +574,16 @@ public class SignalementService {
                 workData.put("realEndDate", latestWork.getRealEndDate() != null ? latestWork.getRealEndDate().toString() : null);
                 workData.put("price", latestWork.getPrice() != null ? latestWork.getPrice().doubleValue() : null);
                 data.put("work", workData);
+            }
+
+            // Ajouter les photos si elles existent
+            List<SignalementPhoto> photos = photoRepository.findBySignalementIdOrderByPhotoOrderAsc(signalementId);
+            if (!photos.isEmpty()) {
+                List<String> photoDataList = photos.stream()
+                        .map(SignalementPhoto::getPhotoData)
+                        .collect(Collectors.toList());
+                data.put("photos", photoDataList);
+                System.out.println("✓ " + photos.size() + " photo(s) ajoutée(s) à la synchronisation Firebase");
             }
 
             // Si le signalement a un firebaseId, mettre à jour le document existant
