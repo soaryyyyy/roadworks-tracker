@@ -11,7 +11,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       # Scripts exécutés automatiquement uniquement au 1er démarrage (volume vide)
-      - ./database/create.sql:/docker-entrypoint-initdb.d/01-create.sql:ro
+      - ./database/reset-database.sql:/docker-entrypoint-initdb.d/01-create.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U roadworks -d roadworks"]
       interval: 5s

@@ -232,8 +232,9 @@ onMounted(async () => {
   L.Marker.prototype.options.icon = defaultMarker;
   await mountMap();
 
-  await reportStore.loadAllReports();
-  displayReportsOnMap();
+  await reportStore.loadAllReports({
+    onCacheApplied: () => displayReportsOnMap(),
+  });
 });
 </script>
 
