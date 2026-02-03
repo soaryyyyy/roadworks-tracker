@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import itu.cloud.roadworks.dto.SignalementDto;
+import itu.cloud.roadworks.dto.SignalementPhotoDto;
 import itu.cloud.roadworks.dto.SignalementProblemDto;
 import itu.cloud.roadworks.service.SecurityLogService;
 import itu.cloud.roadworks.service.SignalementService;
@@ -303,6 +304,37 @@ public class SignalementApi {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Erreur lors de la récupération des signalements Firebase: " + e.getMessage()));
+        }
+    }
+
+    @Operation(
+            summary = "Récupérer les photos d'un signalement",
+            description = "Récupère toutes les photos associées à un signalement spécifique, triées par ordre"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Photos récupérées avec succès",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = SignalementPhotoDto.class))
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Signalement non trouvé"
+            )
+    })
+    @GetMapping("/{id}/photos")
+    public ResponseEntity<?> getPhotosBySignalementId(
+            @Parameter(description = "ID du signalement", required = true)
+            @PathVariable Long id) {
+        try {
+            List<SignalementPhotoDto> photos = service.getPhotosBySignalementId(id);
+            return ResponseEntity.ok().body(photos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 }

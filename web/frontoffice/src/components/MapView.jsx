@@ -1,4 +1,5 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { iconByType } from '../mapIcons'
 
@@ -27,6 +28,21 @@ export function MapView({ events }) {
                 <li>Budget : {event.detail_problem.budget.toLocaleString()} Ar</li>
                 <li>Entreprise : {entreprise?.name ?? 'Non attribué'}</li>
               </ul>
+              <Link
+                to={`/signalements/${event.id}/photos`}
+                style={{
+                  display: 'inline-block',
+                  marginTop: '10px',
+                  padding: '8px 15px',
+                  backgroundColor: '#007bff',
+                  color: 'white',
+                  textDecoration: 'none',
+                  borderRadius: '5px',
+                  fontSize: '14px'
+                }}
+              >
+                Voir les photos
+              </Link>
             </Popup>
           </Marker>
         )
