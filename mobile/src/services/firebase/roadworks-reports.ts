@@ -26,6 +26,7 @@ export interface RoadworksReportData {
   lng: number;
   status: 'pothole' | 'blocked_road' | 'accident' | 'construction' | 'flooding' | 'debris' | 'poor_surface' | 'other';
   description?: string;
+  photos?: string[]; // URLs ou base64 des photos
   reportStatus?: 'new' | 'in_progress' | 'completed'; // Statut du rapport
   surface?: number; // en m2
   budget?: number; // en devise locale
@@ -41,6 +42,19 @@ export interface RoadworksReportWithId extends RoadworksReportData {
 }
 
 /**
+ * Supprimer les valeurs undefined d'un objet (Firestore ne les accepte pas)
+ */
+const removeUndefinedValues = <T extends Record<string, any>>(obj: T): Partial<T> => {
+  const result: Partial<T> = {};
+  for (const key in obj) {
+    if (obj[key] !== undefined) {
+      result[key] = obj[key];
+    }
+  }
+  return result;
+};
+
+/**
  * Ajouter un signalement à Firestore
  */
 export const addRoadworksReport = async (
@@ -48,13 +62,16 @@ export const addRoadworksReport = async (
 ): Promise<RoadworksReportWithId> => {
   try {
     const userId = auth.currentUser?.uid;
-    
+
     if (!userId) {
       throw new Error('Utilisateur non authentifié');
     }
 
+    // Nettoyer les valeurs undefined (Firestore ne les accepte pas)
+    const cleanedReport = removeUndefinedValues(report);
+
     const docRef = await addDoc(collection(firestore, 'roadworks_reports'), {
-      ...report,
+      ...cleanedReport,
       userId,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
@@ -62,11 +79,11 @@ export const addRoadworksReport = async (
 
     return {
       id: docRef.id,
-      ...report,
+      ...cleanedReport,
       userId,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
-    };
+    } as RoadworksReportWithId;
   } catch (error) {
     console.error('Erreur lors de l\'ajout du signalement:', error);
     throw error;
