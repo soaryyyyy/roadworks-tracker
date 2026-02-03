@@ -177,6 +177,37 @@ public class SignalementApi {
     }
 
     @Operation(
+            summary = "Synchroniser tous les statuts vers Firebase",
+            description = """
+                    Met à jour les statuts de tous les signalements existants dans Firebase
+                    pour que l'application mobile affiche les derniers changements de statut.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Synchronisation des statuts effectuée avec succès",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping("/sync/status-to-firebase")
+    public ResponseEntity<?> syncStatusToFirebase() {
+        try {
+            int count = service.syncAllStatusToFirebase();
+            String username = request.getHeader("X-Username");
+            securityLogService.logSyncFirebase(null, username, getClientIp(), request.getHeader("User-Agent"));
+            return ResponseEntity.ok().body(Map.of(
+                    "message", "Synchronisation des statuts vers Firebase effectuée avec succès",
+                    "synced", count
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Operation(
             summary = "Ajouter une réparation à un signalement",
             description = """
                     Ajoute les détails de réparation (entreprise, coûts, durées) à un signalement

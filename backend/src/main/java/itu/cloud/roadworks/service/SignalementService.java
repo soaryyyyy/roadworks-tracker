@@ -573,6 +573,41 @@ public class SignalementService {
         return exportedCount;
     }
 
+    /**
+     * Synchronise tous les statuts des signalements existants vers Firebase
+     * pour que l'application mobile affiche les derniers changements.
+     */
+    public int syncAllStatusToFirebase() throws Exception {
+        System.out.println("=== DEBUT syncAllStatusToFirebase ===");
+        
+        Firestore db = firebaseService.getFirestore();
+        if (db == null) {
+            System.out.println("Firebase n'est pas initialisé - retour 0 synchronisé");
+            return 0;
+        }
+
+        // Récupérer tous les signalements avec un firebaseId (déjà synchronisés)
+        List<Signalement> syncedSignalements = repository.findAll().stream()
+                .filter(s -> s.getFirebaseId() != null && !s.getFirebaseId().isEmpty())
+                .collect(Collectors.toList());
+
+        System.out.println("Nombre de signalements à synchroniser: " + syncedSignalements.size());
+
+        int syncedCount = 0;
+        for (Signalement signalement : syncedSignalements) {
+            try {
+                syncToFirebase(signalement.getId());
+                syncedCount++;
+                System.out.println("✓ Statut du signalement " + signalement.getId() + " synchronisé vers Firebase");
+            } catch (Exception e) {
+                System.err.println("✗ Erreur sync statut signalement " + signalement.getId() + ": " + e.getMessage());
+            }
+        }
+
+        System.out.println("=== FIN syncAllStatusToFirebase - " + syncedCount + " synchronisés ===");
+        return syncedCount;
+    }
+
     public void syncToFirebase(Long signalementId) throws Exception {
         try {
             Signalement signalement = repository.findById(signalementId)

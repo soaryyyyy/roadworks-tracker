@@ -40,6 +40,7 @@ export default function DashboardPage() {
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [syncing, setSyncing] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [syncingStatus, setSyncingStatus] = useState(false)
   const [syncMessage, setSyncMessage] = useState('')
   const [showNotifDropdown, setShowNotifDropdown] = useState(false)
   const [showUnsyncedLegend, setShowUnsyncedLegend] = useState(true) // Pour afficher/masquer la légende
@@ -244,6 +245,34 @@ export default function DashboardPage() {
     }
   }
 
+  // Synchroniser tous les statuts modifiés vers Firebase (mobile)
+  const handleSyncStatusToMobile = async () => {
+    try {
+      setSyncingStatus(true)
+      setSyncMessage('')
+
+      const response = await fetch('/api/signalements/sync/status-to-firebase', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la synchronisation des statuts')
+      }
+
+      const data = await response.json()
+      setSyncMessage(`✓ ${data.synced} statuts synchronisés vers l'application mobile`)
+    } catch (err) {
+      console.error('Erreur:', err)
+      setSyncMessage(`✗ Erreur: ${err.message}`)
+    } finally {
+      setSyncingStatus(false)
+    }
+  }
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -259,7 +288,7 @@ export default function DashboardPage() {
             <>
               <button
                 onClick={handleSyncFirebase}
-                disabled={syncing || exporting}
+                disabled={syncing || exporting || syncingStatus}
                 className="action-button"
                 title="Importer les signalements depuis l'application mobile"
               >
@@ -267,11 +296,19 @@ export default function DashboardPage() {
               </button>
               <button
                 onClick={handleExportToMobile}
-                disabled={syncing || exporting}
+                disabled={syncing || exporting || syncingStatus}
                 className="action-button"
                 title="Envoyer les nouveaux signalements vers l'application mobile"
               >
                 {exporting ? '⏳ Export...' : '📤 Envoyer vers Mobile'}
+              </button>
+              <button
+                onClick={handleSyncStatusToMobile}
+                disabled={syncing || exporting || syncingStatus}
+                className="action-button"
+                title="Synchroniser tous les statuts modifiés vers l'application mobile"
+              >
+                {syncingStatus ? '⏳ Sync...' : '🔄 Sync Statuts'}
               </button>
               <button onClick={() => navigate('/users')} className="action-button">
                 👥 Gestion Utilisateurs
