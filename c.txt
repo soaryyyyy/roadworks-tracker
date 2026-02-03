@@ -1,5 +1,7 @@
 docker cp "f:\itu\S5\Rojo\roadworks-tracker\database\reset-database.sql" monprojet-postgres14:/tmp/reset-database.sql; docker exec monprojet-postgres14 psql -U roadworks -d roadworks -f /tmp/reset-database.sql
 
+docker cp "D:\ITU\S5\Web Avance\roadworks-tracker\database\reset-database.sql" monprojet-postgres14:/tmp/reset-database.sql; docker exec monprojet-postgres14 psql -U roadworks -d roadworks -f /tmp/reset-database.sql
+
 docker-compose down 2>&1 | Select-Object -Last 3 ; docker-compose up -d 2>&1           
 
 
