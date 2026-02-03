@@ -714,7 +714,8 @@ body {
 }
 
 .create-button,
-.import-button {
+.import-button,
+.export-button {
   padding: var(--spacing-sm) var(--spacing-md);
   color: var(--neutral-white);
   border: none;
@@ -742,6 +743,19 @@ body {
 }
 
 .import-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.export-button {
+  background: var(--status-warning);
+}
+
+.export-button:hover:not(:disabled) {
+  background: #d97706;
+}
+
+.export-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

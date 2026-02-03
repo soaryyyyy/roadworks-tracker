@@ -254,6 +254,33 @@ public class AuthApi {
     }
 
     @Operation(
+            summary = "Synchroniser les statuts utilisateurs vers Firebase",
+            description = """
+                    Envoie les modifications de statut (bloqué/débloqué) des utilisateurs locaux vers Firebase/Firestore.
+                    - Les managers ne sont pas synchronisés
+                    - Seuls les utilisateurs avec un email valide sont synchronisés
+                    - Met à jour la collection loginAttempts dans Firestore
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Synchronisation réussie",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Non authentifié"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping("/sync-status-to-firebase")
+    public ResponseEntity<AuthResponse> syncStatusToFirebase() {
+        AuthResponse response = authService.syncUserStatusToFirebase();
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
             summary = "Mettre à jour un utilisateur",
             description = """
                     Met à jour les informations d'un utilisateur existant (rôle, mot de passe).

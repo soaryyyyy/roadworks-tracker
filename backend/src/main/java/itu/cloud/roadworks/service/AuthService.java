@@ -608,6 +608,71 @@ public AuthResponse register(RegisterRequest request) {
         }
     }
 
+    /**
+     * Synchronise uniquement les statuts (lock/unlock) des utilisateurs locaux vers Firebase/Firestore
+     * Sans importer depuis Firebase
+     */
+    @Transactional
+    public AuthResponse syncUserStatusToFirebase() {
+        try {
+            int syncedCount = 0;
+            int errorCount = 0;
+
+            List<Account> localUsers = accountRepository.findAllWithRole();
+
+            for (Account localUser : localUsers) {
+                // Ne pas synchroniser les managers vers Firebase
+                if (ROLE_MANAGER.equals(localUser.getRole().getLibelle())) {
+                    continue;
+                }
+
+                String username = localUser.getUsername();
+                
+                // Le username doit contenir @ pour être un email valide pour Firebase
+                if (!username.contains("@")) {
+                    log.debug("Utilisateur {} ignoré pour sync statut (pas un email)", username);
+                    continue;
+                }
+
+                try {
+                    // Vérifier si l'utilisateur existe dans Firebase
+                    com.google.firebase.auth.UserRecord existingFirebaseUser = firebaseService.getFirebaseUserByEmail(username);
+                    
+                    if (existingFirebaseUser != null) {
+                        // Synchroniser le statut bloqué vers Firestore loginAttempts
+                        boolean localIsLocked = localUser.getIsLocked();
+                        
+                        if (localIsLocked) {
+                            lockUserInFirestore(username);
+                        } else {
+                            unlockUserInFirestore(username);
+                        }
+                        syncedCount++;
+                        log.info("Statut de {} envoyé vers Firestore (bloqué: {})", username, localIsLocked);
+                    }
+                } catch (Exception e) {
+                    log.warn("Impossible de synchroniser le statut de {} vers Firebase: {}", username, e.getMessage());
+                    errorCount++;
+                }
+            }
+
+            String message = String.format("Synchronisation des statuts réussie: %d utilisateurs synchronisés", syncedCount);
+            if (errorCount > 0) {
+                message += String.format(", %d erreurs", errorCount);
+            }
+
+            return AuthResponse.builder()
+                    .message(message)
+                    .build();
+
+        } catch (Exception e) {
+            log.error("Erreur lors de la synchronisation des statuts: {}", e.getMessage());
+            return AuthResponse.builder()
+                    .message("Erreur lors de la synchronisation des statuts: " + e.getMessage())
+                    .build();
+        }
+    }
+
     @Transactional
     public AuthResponse updateUser(String visitorId, Map<String, String> updateData) {
         // L'ID peut être un UID Firebase ou un ID local

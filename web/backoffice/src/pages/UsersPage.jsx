@@ -25,6 +25,7 @@ export default function UsersPage() {
   })
   const [updating, setUpdating] = useState(false)
   const [syncing, setSyncing] = useState(false)
+  const [syncingStatus, setSyncingStatus] = useState(false)
 
   useEffect(() => {
     fetchUsers()
@@ -225,6 +226,38 @@ export default function UsersPage() {
     }
   }
 
+  const handleSyncStatusToMobile = async () => {
+    if (!window.confirm('Êtes-vous sûr de vouloir envoyer les modifications de statut (bloqué/débloqué) vers Firebase?')) {
+      return
+    }
+
+    setSyncingStatus(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch('/api/auth/sync-status-to-firebase', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Erreur lors de la synchronisation des statuts')
+      }
+
+      setSuccess(data.message || 'Statuts envoyés vers mobile avec succès')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSyncingStatus(false)
+    }
+  }
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
       day: '2-digit',
@@ -264,7 +297,14 @@ export default function UsersPage() {
             className="import-button"
             disabled={syncing}
           >
-            {syncing ? '⏳ Synchronisation...' : '🔄 Synchroniser avec Mobile'}
+            {syncing ? '⏳ Synchronisation...' : '📥 Importer de Mobile'}
+          </button>
+          <button 
+            onClick={handleSyncStatusToMobile} 
+            className="export-button"
+            disabled={syncingStatus}
+          >
+            {syncingStatus ? '⏳ Envoi...' : '📤 Envoyer Statuts vers Mobile'}
           </button>
         </div>
 
