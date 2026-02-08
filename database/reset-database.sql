@@ -211,3 +211,9 @@ INSERT INTO config (max_attempts, session_duration) VALUES (5, 60);
 INSERT INTO signalement (id_account, id_type_problem, descriptions, location, created_at) 
 VALUES 
   (1, 1, 'Nid de poule dangereux rue de la République', '-18.8792,47.5079', NOW());
+
+INSERT INTO signalement_status (
+    id_signalement,
+    id_status_signalement)
+VALUES 
+    (1, 1);
