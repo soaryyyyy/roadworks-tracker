@@ -457,7 +457,7 @@ export default function DashboardPage() {
               📍 {events.length} signalement{events.length > 1 ? 's' : ''} local{events.length > 1 ? 'aux' : ''}
               {role === 'manager' && (
                 <span className="sync-hint">
-                  {' '}| 📥 Importer = récupérer de l'app mobile | 📤 Envoyer = exporter vers l'app mobile
+                  {' '}| 📥 Importer = récupérer de l app mobile | 📤 Envoyer = exporter vers l app mobile
                 </span>
               )}
               {role === 'manager' && totalUnsyncedCount > 0 && (
