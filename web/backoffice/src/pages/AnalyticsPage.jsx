@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from 'react'
+﻿import { useEffect, useMemo, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BackofficeSidebar from '../components/BackofficeSidebar'
 
@@ -6,7 +6,7 @@ const normalizeStatus = (status) => {
   const s = (status || '').toString().toLowerCase()
   if (['nouveau', 'new'].includes(s)) return 'new'
   if (['en_cours', 'en cours', 'in_progress', 'in progress'].includes(s)) return 'in_progress'
-  if (['terminé', 'termine', 'completed', 'done', 'complete'].includes(s)) return 'completed'
+  if (['terminÃ©', 'termine', 'completed', 'done', 'complete'].includes(s)) return 'completed'
   return 'new'
 }
 
@@ -50,9 +50,9 @@ const daysBetween = (end, start) => {
 }
 
 const formatSimpleDate = (value) => {
-  if (!value) return '—'
+  if (!value) return 'â€”'
   const d = typeof value === 'string' || typeof value === 'number' ? new Date(value) : value
-  if (isNaN(new Date(d).getTime())) return '—'
+  if (isNaN(new Date(d).getTime())) return 'â€”'
   return new Intl.DateTimeFormat('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d)
 }
 
@@ -320,10 +320,10 @@ export default function AnalyticsPage() {
     if (!range.max || range.min.getTime() === range.max.getTime()) {
       return formatter.format(range.min)
     }
-    return `${formatter.format(range.min)} → ${formatter.format(range.max)}`
+    return `${formatter.format(range.min)} â†’ ${formatter.format(range.max)}`
   }
 
-  const formatDays = (value) => (value == null ? '—' : `${value.toFixed(1)} j`)
+  const formatDays = (value) => (value == null ? 'â€”' : `${value.toFixed(1)} j`)
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -365,11 +365,11 @@ export default function AnalyticsPage() {
       }
 
       const data = await response.json()
-      setSyncMessage(`✓ ${data.imported} signalements importés depuis Firebase`)
+      setSyncMessage(`âœ“ ${data.imported} signalements importÃ©s depuis Firebase`)
       await fetchSignalements()
       await fetchUnsynced()
     } catch (err) {
-      setSyncMessage(`✗ Erreur: ${err.message}`)
+      setSyncMessage(`âœ— Erreur: ${err.message}`)
     } finally {
       setSyncing(false)
     }
@@ -377,38 +377,31 @@ export default function AnalyticsPage() {
 
   return (
     <div className="dashboard-container analytics-page">
-      <header className="dashboard-header">
-        <div className="header-left">
-          <h1>Analyse des travaux</h1>
-          <p className="user-info">Connecté en tant que: <strong>{username}</strong> ({role})</p>
-        </div>
-        <div className="header-actions">
-          <button className="nav-button" onClick={() => navigate('/analytics')} disabled>
-            📊 Analytics
-          </button>
-          <button className="nav-button" onClick={() => navigate('/dashboard')}>⬅️ Dashboard</button>
-          {role === 'manager' && (
-            <>
-              <button
-                className="action-button"
-                onClick={handleSyncFirebase}
-                disabled={syncing}
-                title="Synchroniser les données depuis Firebase"
-              >
-                {syncing ? '⏳ Synchronisation...' : '🔄 Synchroniser Firebase'}
-              </button>
-              <button className="nav-button" onClick={() => navigate('/users')}>👥 Utilisateurs</button>
-            </>
-          )}
-          <button className="logout-button" onClick={handleLogout}>🚪 Déconnexion</button>
-        </div>
-      </header>
+      <div className="dashboard-layout">
+        <BackofficeSidebar
+          title="Menu principal"
+          subtitle="Analyse"
+          username={username}
+          role={role}
+          primaryItems={primaryMenu}
+          secondaryItems={secondaryMenu}
+          onLogout={handleLogout}
+        />
+        <main className="dashboard-main">
+          <header className="dashboard-header">
+            <div className="header-left">
+              <div>
+                <h1>Analyse des travaux</h1>
+                <p className="user-info">Connecte en tant que: <strong>{username}</strong> ({role})</p>
+              </div>
+            </div>
+          </header>
 
-      <div className="analytics-content">
+          <div className="analytics-content">
         <div className="filter-row filter-row--wrap">
           <label>Filtrer par dates :</label>
           <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-          <span>→</span>
+          <span>â†’</span>
           <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
 
           <label>Entreprise :</label>
@@ -439,17 +432,17 @@ export default function AnalyticsPage() {
           </select>
 
           <button className="nav-button" onClick={() => { setStartDate(''); setEndDate(''); setSelectedCompanyId(''); setSelectedType(''); fetchWorkStats(); fetchWorkTimelines(); }}>
-            Réinitialiser
+            RÃ©initialiser
           </button>
         </div>
 
         {syncMessage && (
-          <div className={syncMessage.startsWith('✓') ? 'success' : 'error'} style={{ marginBottom: '8px' }}>
+          <div className={syncMessage.startsWith('âœ“') ? 'success' : 'error'} style={{ marginBottom: '8px' }}>
             {syncMessage}
           </div>
         )}
         {error && <div className="error">Erreur: {error}</div>}
-        {loading && <div className="loading">Chargement des données...</div>}
+        {loading && <div className="loading">Chargement des donnÃ©es...</div>}
 
         {!loading && (
           <>
@@ -465,26 +458,26 @@ export default function AnalyticsPage() {
                   />
                 </div>
                 <div className="analytic-sub">
-                  Nouveau 0% · En cours 50% · Terminé 100%
+                  Nouveau 0% Â· En cours 50% Â· TerminÃ© 100%
                 </div>
               </div>
 
               
 
               <div className="analytic-card">
-                <div className="analytic-label">Répartition</div>
+                <div className="analytic-label">RÃ©partition</div>
                 <div className="badge-row">
                   <span className="pill pill-new">Nouveau {analytics.counts.new}</span>
                   <span className="pill pill-progress">En cours {analytics.counts.in_progress}</span>
-                  <span className="pill pill-done">Terminé {analytics.counts.completed}</span>
+                  <span className="pill pill-done">TerminÃ© {analytics.counts.completed}</span>
                 </div>
-                <div className="analytic-sub">Signalements synchronisés</div>
+                <div className="analytic-sub">Signalements synchronisÃ©s</div>
               </div>
 
               <div className="analytic-card">
                 <div className="analytic-label">Cycle complet (moyenne)</div>
                 <div className="analytic-value">{formatDays(cycleAvgDays)}</div>
-                <div className="analytic-sub">Début → fin</div>
+                <div className="analytic-sub">DÃ©but â†’ fin</div>
               </div>
 
             </div>
@@ -501,22 +494,22 @@ export default function AnalyticsPage() {
                         <tr>
                           <th>Entreprise</th>
                           <th>Type</th>
-                          <th>Début</th>
+                          <th>DÃ©but</th>
                           <th>En cours</th>
                           <th>Fin</th>
                         </tr>
                       </thead>
                       <tbody>
                         {workTimelines.map((row) => {
-                          const startCell = row.startDate ? formatSimpleDate(row.startDate) : '—'
-                          const endCell = row.endDate ? formatSimpleDate(row.endDate) : '—'
+                          const startCell = row.startDate ? formatSimpleDate(row.startDate) : 'â€”'
+                          const endCell = row.endDate ? formatSimpleDate(row.endDate) : 'â€”'
                           const inProgressCell = row.endDate
-                            ? '—'
-                            : (row.inProgressDate ? formatSimpleDate(row.inProgressDate) : '—')
+                            ? 'â€”'
+                            : (row.inProgressDate ? formatSimpleDate(row.inProgressDate) : 'â€”')
                           return (
                             <tr key={row.id}>
-                              <td>{row.companyName || '—'}</td>
-                              <td>{row.typeProblem || '—'}</td>
+                              <td>{row.companyName || 'â€”'}</td>
+                              <td>{row.typeProblem || 'â€”'}</td>
                               <td>{startCell}</td>
                               <td>{inProgressCell}</td>
                               <td>{endCell}</td>
@@ -533,7 +526,10 @@ export default function AnalyticsPage() {
             
           </>
         )}
+          </div>
+        </main>
       </div>
     </div>
   )
 }
+
