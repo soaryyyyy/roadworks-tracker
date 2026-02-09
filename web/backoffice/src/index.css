@@ -300,6 +300,7 @@ textarea {
   box-shadow: var(--shadow-card);
   position: relative;
   min-height: 520px;
+  height: 520px;
 }
 
 .map-root {
