@@ -996,13 +996,81 @@ textarea {
 .users-content {
   width: min(1200px, 100%);
   margin: 0 auto;
+  background: rgba(15, 23, 42, 0.54);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 14px 32px rgba(2, 6, 23, 0.24);
+}
+
+.alert {
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border: 1px solid transparent;
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.14);
+  color: #fecaca;
+  border-color: rgba(248, 113, 113, 0.36);
+}
+
+.alert-success {
+  background: rgba(34, 197, 94, 0.14);
+  color: #bbf7d0;
+  border-color: rgba(74, 222, 128, 0.36);
+}
+
+.users-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.create-button,
+.import-button,
+.export-button {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #e2e8f0;
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.72), rgba(15, 23, 42, 0.72));
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.create-button:hover:not(:disabled),
+.import-button:hover:not(:disabled),
+.export-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(94, 234, 212, 0.6);
+}
+
+.create-button {
+  background: linear-gradient(120deg, rgba(20, 184, 166, 0.34), rgba(15, 23, 42, 0.8));
+}
+
+.import-button {
+  background: linear-gradient(120deg, rgba(59, 130, 246, 0.28), rgba(15, 23, 42, 0.8));
+}
+
+.export-button {
+  background: linear-gradient(120deg, rgba(245, 158, 11, 0.28), rgba(15, 23, 42, 0.8));
 }
 
 .users-table-container {
-  border-radius: var(--radius-lg);
+  border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(15, 23, 42, 0.62);
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .users-table th,
@@ -1016,24 +1084,80 @@ textarea {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: 0.75rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.users-table td {
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .users-table tr:nth-child(odd) {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.users-table tr:hover {
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.role-badge,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.role-directeur {
+  background: rgba(250, 204, 21, 0.18);
+  color: #fde68a;
+  border-color: rgba(250, 204, 21, 0.4);
+}
+
+.role-utilisateur,
+.role-manager {
+  background: rgba(59, 130, 246, 0.18);
+  color: #bfdbfe;
+  border-color: rgba(59, 130, 246, 0.38);
+}
+
+.status-active {
+  background: rgba(34, 197, 94, 0.16);
+  color: #bbf7d0;
+  border-color: rgba(74, 222, 128, 0.36);
+}
+
+.status-locked,
+.status-inactive {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fecaca;
+  border-color: rgba(248, 113, 113, 0.36);
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.users-content .action-button {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  margin-right: 6px;
+  box-shadow: none;
+}
+
 .edit-button,
 .unlock-button {
-  padding: 6px 12px;
-  border-radius: 12px;
-  border: none;
-  font-weight: 600;
   cursor: pointer;
 }
 
 .edit-button {
   background: linear-gradient(120deg, #34d399, #10b981);
-  color: #0f172a;
+  color: #052e2b;
 }
 
 .unlock-button {
