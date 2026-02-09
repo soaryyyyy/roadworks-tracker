@@ -296,27 +296,42 @@ textarea {
   border-radius: 30px;
   border: 1px solid rgba(148, 163, 184, 0.2);
   overflow: hidden;
-  background: rgba(2, 6, 23, 0.4);
-  backdrop-filter: blur(30px);
-  display: flex;
-  flex-direction: column;
+  background: rgba(6, 11, 32, 0.6);
+  position: relative;
   box-shadow: var(--shadow-card);
-  min-height: 520px;
+}
+
+.map-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(14, 116, 110, 0.55), transparent 60%),
+    radial-gradient(circle at 10% 50%, rgba(20, 184, 166, 0.6), transparent 45%);
+  opacity: 0.65;
+  filter: blur(20px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .map-root {
   flex: 1;
-  min-height: 520px;
+  min-height: 0;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
 }
 
 .map-inner {
+  flex: 1;
   height: 100%;
+  width: 100%;
   position: relative;
 }
 
 .map-inner .leaflet-container {
   height: 100%;
+  width: 100%;
   background: transparent !important;
 }
 
