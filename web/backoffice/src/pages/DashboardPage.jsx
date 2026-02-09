@@ -44,6 +44,7 @@ export default function DashboardPage() {
   const [syncMessage, setSyncMessage] = useState('')
   const [showNotifDropdown, setShowNotifDropdown] = useState(false)
   const [showUnsyncedLegend, setShowUnsyncedLegend] = useState(true) // Pour afficher/masquer la légende
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const fetchSignalements = useCallback(async () => {
     try {
@@ -272,6 +273,41 @@ export default function DashboardPage() {
       setSyncingStatus(false)
     }
   }
+
+  const actionsMenu = [
+    {
+      label: 'Analyses',
+      icon: '📊',
+      onClick: () => navigate('/analytics'),
+    },
+    {
+      label: 'Importer de Mobile',
+      icon: '📥',
+      onClick: handleSyncFirebase,
+      disabled: syncing || exporting || syncingStatus,
+      requiresManager: true,
+    },
+    {
+      label: 'Envoyer vers mobile',
+      icon: '📤',
+      onClick: handleExportToMobile,
+      disabled: syncing || exporting || syncingStatus,
+      requiresManager: true,
+    },
+    {
+      label: 'Synchroniser les statuts',
+      icon: '🔁',
+      onClick: handleSyncStatusToMobile,
+      disabled: syncing || exporting || syncingStatus,
+      requiresManager: true,
+    },
+    {
+      label: 'Gestion des utilisateurs',
+      icon: '👥',
+      onClick: () => navigate('/users'),
+      requiresManager: true,
+    },
+  ]
 
   return (
     <div className="dashboard-container">
