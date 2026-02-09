@@ -28,11 +28,21 @@
   gap: var(--spacing-md);
 }
 
+.filters-panel.is-collapsed {
+  padding-bottom: var(--spacing-md);
+}
+
 .filters-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: var(--spacing-md);
+}
+
+.filters-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
 .filters-header h2 {
@@ -50,7 +60,7 @@
 
 .filters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: var(--spacing-md);
 }
 
@@ -58,6 +68,27 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
+  grid-column: span 12;
+}
+
+.filter-field--status {
+  grid-column: span 3;
+}
+
+.filter-field--entreprise {
+  grid-column: span 5;
+}
+
+.filter-field--date {
+  grid-column: span 4;
+}
+
+.filter-field--surface {
+  grid-column: span 6;
+}
+
+.filter-field--budget {
+  grid-column: span 6;
 }
 
 .filter-field label {
@@ -104,6 +135,22 @@
 .filters-actions {
   display: flex;
   justify-content: flex-end;
+}
+
+.filters-toggle {
+  border: 1px solid var(--neutral-gray-200);
+  background: var(--neutral-white);
+  color: var(--neutral-gray-700);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filters-toggle:hover {
+  background: var(--neutral-gray-100);
+  border-color: var(--neutral-gray-300);
 }
 
 .view-wrapper {
@@ -205,6 +252,32 @@
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .filters-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .filter-field--status {
+    grid-column: span 2;
+  }
+
+  .filter-field--entreprise {
+    grid-column: span 4;
+  }
+
+  .filter-field--date {
+    grid-column: span 6;
+  }
+
+  .filter-field--surface {
+    grid-column: span 3;
+  }
+
+  .filter-field--budget {
+    grid-column: span 3;
+  }
+}
+
 @media (max-width: 768px) {
   .filters-panel {
     padding: var(--spacing-md);
@@ -221,6 +294,18 @@
 
   .view-wrapper {
     padding: var(--spacing-md);
+  }
+
+  .filters-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-field--status,
+  .filter-field--entreprise,
+  .filter-field--date,
+  .filter-field--surface,
+  .filter-field--budget {
+    grid-column: span 2;
   }
 
   .dashboard-grid {
