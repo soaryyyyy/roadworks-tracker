@@ -81,6 +81,7 @@ const showOnlyMyReports = ref<boolean>(false);
 
 const isDetailsModalOpen = ref<boolean>(false);
 const selectedReport = ref<any>(null);
+let markerClicked = false;
 
 const mountMap = async () => {
   const mapLoading = await loadingController.create({
@@ -106,7 +107,9 @@ const mountMap = async () => {
     }).addTo(map);
 
     map.on('click', function(e: L.LeafletMouseEvent) {
-      if ((e.target as any).options && (e.target as any).options.icon) {
+      // Ignorer si un marker vient d'etre clique (le click bubble vers la map)
+      if (markerClicked) {
+        markerClicked = false;
         return;
       }
 
@@ -196,6 +199,7 @@ const displayReportsOnMap = () => {
     marker.bindPopup(popupContent);
 
     marker.on('click', () => {
+      markerClicked = true;
       map?.setView([report.lat, report.lng], 17);
       selectedReport.value = report;
       isDetailsModalOpen.value = true;
