@@ -487,7 +487,7 @@ export default function AnalyticsPage() {
               <div className="analytic-card">
                 <div className="analytic-label">Cycle complet (moyenne)</div>
                 <div className="analytic-value">{formatDays(cycleAvgDays)}</div>
-                <div className="analytic-sub">Debut -> fin</div>
+                <div className="analytic-sub">Debut vers fin</div>
               </div>
 
             </div>
