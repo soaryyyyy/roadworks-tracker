@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MapView } from '../components/MapView'
 import { DashboardView } from '../components/DashboardView'
+import DatePickerInput from '../components/DatePickerInput'
 import logo from '../assets/logo.png'
 import './MapPage.css'
 
@@ -30,8 +31,8 @@ const views = [
 const defaultCoords = { lat: -18.91, lon: 47.52 }
 const defaultFilters = {
   status: '',
-  dateFrom: '',
-  dateTo: '',
+  dateFrom: null,
+  dateTo: null,
   surfaceMin: '',
   surfaceMax: '',
   budgetMin: '',
@@ -83,17 +84,30 @@ const parseNumber = (value) => {
 
 const parseDateInput = (value, endOfDay = false) => {
   if (!value) return null
-  const [year, month, day] = value.split('-').map(Number)
-  if (!year || !month || !day) return null
-  return new Date(
-    year,
-    month - 1,
-    day,
-    endOfDay ? 23 : 0,
-    endOfDay ? 59 : 0,
-    endOfDay ? 59 : 0,
-    endOfDay ? 999 : 0
-  )
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) return null
+    const date = new Date(value)
+    if (endOfDay) {
+      date.setHours(23, 59, 59, 999)
+    } else {
+      date.setHours(0, 0, 0, 0)
+    }
+    return date
+  }
+  if (typeof value === 'string') {
+    const [year, month, day] = value.split('-').map(Number)
+    if (!year || !month || !day) return null
+    return new Date(
+      year,
+      month - 1,
+      day,
+      endOfDay ? 23 : 0,
+      endOfDay ? 59 : 0,
+      endOfDay ? 59 : 0,
+      endOfDay ? 999 : 0
+    )
+  }
+  return null
 }
 
 const normalizeRange = (minValue, maxValue) => {
@@ -143,6 +157,8 @@ export function MapPage() {
   const [error, setError] = useState(null)
   const [filters, setFilters] = useState({ ...defaultFilters })
   const [showFilters, setShowFilters] = useState(true)
+  const [showEntrepriseSuggestions, setShowEntrepriseSuggestions] = useState(false)
+  const [showStatusOptions, setShowStatusOptions] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -175,6 +191,18 @@ export function MapPage() {
       ),
     [events]
   )
+
+  const entrepriseSuggestions = useMemo(() => {
+    const query = normalizeText(filters.entreprise)
+    const matches = entrepriseOptions.filter((option) => {
+      if (!query) return true
+      return normalizeText(option).includes(query)
+    })
+    return matches.slice(0, 8)
+  }, [entrepriseOptions, filters.entreprise])
+
+  const statusChoices = useMemo(() => [''].concat(statusOptions), [statusOptions])
+  const statusLabel = (value) => (value ? value : 'Tous')
 
   const filteredEvents = useMemo(() => {
     const statusFilter = normalizeText(filters.status)
@@ -229,7 +257,17 @@ export function MapPage() {
     setFilters({ ...defaultFilters })
   }
 
-  const hasActiveFilters = Object.values(filters).some((value) => value !== '')
+  const hasActiveFilters = Object.values(filters).some((value) => value !== '' && value !== null)
+
+  const handleEntrepriseSelect = (value) => {
+    setFilters((prev) => ({ ...prev, entreprise: value }))
+    setShowEntrepriseSuggestions(false)
+  }
+
+  const handleStatusSelect = (value) => {
+    setFilters((prev) => ({ ...prev, status: value }))
+    setShowStatusOptions(false)
+  }
 
   const renderView = () => {
     if (loading) {
@@ -329,50 +367,111 @@ export function MapPage() {
                   <div className="filters-grid">
                     <div className="filter-field filter-field--status">
                       <label htmlFor="filter-status">Statut</label>
-                      <select
-                        id="filter-status"
-                        value={filters.status}
-                        onChange={handleFilterChange('status')}
-                      >
-                        <option value="">Tous</option>
-                        {statusOptions.map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="autocomplete autocomplete--select">
+                        <input
+                          id="filter-status"
+                          value={statusLabel(filters.status)}
+                          readOnly
+                          onFocus={() => {
+                            setShowStatusOptions(true)
+                            setShowEntrepriseSuggestions(false)
+                          }}
+                          onClick={() => setShowStatusOptions((prev) => !prev)}
+                          onBlur={() => setShowStatusOptions(false)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Escape') {
+                              setShowStatusOptions(false)
+                            }
+                          }}
+                          aria-autocomplete="list"
+                          aria-expanded={showStatusOptions}
+                        />
+                        <span className="autocomplete-caret" aria-hidden="true" />
+                        {showStatusOptions && (
+                          <div className="autocomplete-list" role="listbox">
+                            {statusChoices.map((status) => (
+                              <button
+                                key={status || 'all'}
+                                type="button"
+                                className="autocomplete-item"
+                                role="option"
+                                onMouseDown={(event) => {
+                                  event.preventDefault()
+                                  handleStatusSelect(status)
+                                }}
+                              >
+                                {statusLabel(status)}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div className="filter-field filter-field--entreprise">
                       <label htmlFor="filter-entreprise">Entreprise</label>
-                      <input
-                        id="filter-entreprise"
-                        list="entreprise-list"
-                        placeholder="Nom de l'entreprise"
-                        value={filters.entreprise}
-                        onChange={handleFilterChange('entreprise')}
-                      />
-                      <datalist id="entreprise-list">
-                        {entrepriseOptions.map((entreprise) => (
-                          <option key={entreprise} value={entreprise} />
-                        ))}
-                      </datalist>
+                      <div className="autocomplete">
+                        <input
+                          id="filter-entreprise"
+                          placeholder="Nom de l'entreprise"
+                          value={filters.entreprise}
+                          onChange={handleFilterChange('entreprise')}
+                          onFocus={() => {
+                            setShowEntrepriseSuggestions(true)
+                            setShowStatusOptions(false)
+                          }}
+                          onBlur={() => setShowEntrepriseSuggestions(false)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Escape') {
+                              setShowEntrepriseSuggestions(false)
+                            }
+                          }}
+                          aria-autocomplete="list"
+                          aria-expanded={showEntrepriseSuggestions}
+                        />
+                        {showEntrepriseSuggestions && (
+                          <div className="autocomplete-list" role="listbox">
+                            {entrepriseSuggestions.length > 0 ? (
+                              entrepriseSuggestions.map((entreprise) => (
+                                <button
+                                  key={entreprise}
+                                  type="button"
+                                  className="autocomplete-item"
+                                  role="option"
+                                  onMouseDown={(event) => {
+                                    event.preventDefault()
+                                    handleEntrepriseSelect(entreprise)
+                                  }}
+                                >
+                                  {entreprise}
+                                </button>
+                              ))
+                            ) : (
+                              <div className="autocomplete-empty">Aucun résultat</div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div className="filter-field filter-field--date">
                       <label>Dates</label>
                       <div className="filter-range">
-                        <input
-                          type="date"
-                          value={filters.dateFrom}
-                          onChange={handleFilterChange('dateFrom')}
-                        />
+                        <div className="control-shell control-shell--date">
+                          <DatePickerInput
+                            value={filters.dateFrom}
+                            onChange={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                            placeholder="jj/mm/aaaa"
+                          />
+                        </div>
                         <span className="range-separator">—</span>
-                        <input
-                          type="date"
-                          value={filters.dateTo}
-                          onChange={handleFilterChange('dateTo')}
-                        />
+                        <div className="control-shell control-shell--date">
+                          <DatePickerInput
+                            value={filters.dateTo}
+                            onChange={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
+                            placeholder="jj/mm/aaaa"
+                          />
+                        </div>
                       </div>
                     </div>
 
