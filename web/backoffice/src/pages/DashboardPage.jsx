@@ -280,6 +280,37 @@ export default function DashboardPage() {
   }
 
   const actionsMenu = [
+    { label: 'Analyses', icon: '📊', onClick: () => navigate('/analytics') },
+    {
+      label: 'Importer de Mobile',
+      icon: '📥',
+      onClick: handleSyncFirebase,
+      disabled: syncing || exporting || syncingStatus,
+      requiresManager: true,
+    },
+    {
+      label: 'Envoyer vers mobile',
+      icon: '📤',
+      onClick: handleExportToMobile,
+      disabled: syncing || exporting || syncingStatus,
+      requiresManager: true,
+    },
+    {
+      label: 'Synchroniser les statuts',
+      icon: '🔁',
+      onClick: handleSyncStatusToMobile,
+      disabled: syncing || exporting || syncingStatus,
+      requiresManager: true,
+    },
+    {
+      label: 'Gestion des utilisateurs',
+      icon: '👥',
+      onClick: () => navigate('/users'),
+      requiresManager: true,
+    },
+  ]
+
+  const actionsMenu = [
     {
       label: 'Analyses',
       icon: '📊',
