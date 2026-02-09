@@ -303,42 +303,42 @@ export default function UsersPage() {
           </header>
 
           <section className="users-content">
-        {error && <div className="alert alert-error">{error}</div>}
-        {success && <div className="alert alert-success">{success}</div>}
+            {error && <div className="alert alert-error">{error}</div>}
+            {success && <div className="alert alert-success">{success}</div>}
 
-        <div className="users-toolbar">
-          <button onClick={() => setShowModal(true)} className="create-button">
-            + CrÃ©er un utilisateur
-          </button>
-          <button 
-            onClick={handleSyncWithMobile} 
-            className="import-button"
-            disabled={syncing}
-          >
-            {syncing ? 'â³ Synchronisation...' : 'ðŸ“¥ Importer de Mobile'}
-          </button>
-          <button 
-            onClick={handleSyncStatusToMobile} 
-            className="export-button"
-            disabled={syncingStatus}
-          >
-            {syncingStatus ? 'â³ Envoi...' : 'ðŸ“¤ Envoyer Statuts vers Mobile'}
-          </button>
-        </div>
+            <div className="users-toolbar">
+              <button onClick={() => setShowModal(true)} className="create-button">
+                + Creer un utilisateur
+              </button>
+              <button
+                onClick={handleSyncWithMobile}
+                className="import-button"
+                disabled={syncing}
+              >
+                {syncing ? 'Synchronisation...' : 'Importer de mobile'}
+              </button>
+              <button
+                onClick={handleSyncStatusToMobile}
+                className="export-button"
+                disabled={syncingStatus}
+              >
+                {syncingStatus ? 'Envoi...' : 'Envoyer statuts vers mobile'}
+              </button>
+            </div>
 
-        {loading ? (
-          <div className="loading">Chargement...</div>
-        ) : (
-          <div className="users-table-container">
-            <table className="users-table">
+            {loading ? (
+              <div className="loading">Chargement...</div>
+            ) : (
+              <div className="users-table-container">
+                <table className="users-table">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>Identifiant</th>
                   <th>Nom d'utilisateur</th>
-                  <th>RÃ´le</th>
+                  <th>Role</th>
                   <th>Statut</th>
-                  <th>CrÃ©Ã© le</th>
-                  <th>Actions</th>
+                  <th>Cree le</th>
+                  <th>Actes</th>
                 </tr>
               </thead>
               <tbody>
@@ -353,7 +353,7 @@ export default function UsersPage() {
                     </td>
                     <td>
                       {user.isLocked ? (
-                        <span className="status-badge status-locked">BloquÃ©</span>
+                        <span className="status-badge status-locked">Bloque</span>
                       ) : user.isActive ? (
                         <span className="status-badge status-active">Actif</span>
                       ) : (
@@ -367,25 +367,25 @@ export default function UsersPage() {
                         className="action-button edit-button"
                         title="Modifier l'utilisateur"
                       >
-                        âœï¸ Modifier
+                        Modifier
                       </button>
                       {user.isLocked && (
                         <button 
                           onClick={() => handleUnlockUser(user.id)}
                           className="action-button unlock-button"
-                          title="DÃ©bloquer l'utilisateur"
+                          title="Debloquer l'utilisateur"
                         >
-                          ðŸ”“ DÃ©bloquer
+                          Debloquer
                         </button>
                       )}
                     </td>
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
-        )}
-                </section>
+                </table>
+              </div>
+            )}
+          </section>
         </main>
       </div>
 
