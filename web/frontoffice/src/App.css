@@ -4,6 +4,7 @@
 
 .app-shell {
   min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--neutral-light);
@@ -94,11 +95,11 @@
 
 .app-main {
   flex: 1;
-  padding: var(--spacing-lg);
+  padding: 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: stretch;
-  min-height: calc(100vh - 80px);
+  min-height: 0;
 }
 
 /* ============================================
@@ -108,11 +109,8 @@
 .map-inner {
   height: 100%;
   width: 100%;
-  min-height: 70vh;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
   background: var(--neutral-white);
-  border: 1px solid var(--neutral-gray-200);
+  min-height: 70vh;
 }
 
 /* ============================================
@@ -126,6 +124,7 @@
   padding: var(--spacing-xl);
   border-radius: var(--radius-lg);
   border: 1px solid var(--neutral-gray-100);
+  margin: 0 auto;
 }
 
 .list-view h2 {
@@ -293,7 +292,7 @@
   }
 
   .app-main {
-    padding: var(--spacing-md);
+    padding: 0;
   }
 
   .list-view {
