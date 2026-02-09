@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import BackofficeSidebar from '../components/BackofficeSidebar'
 
 export default function UsersPage() {
   const navigate = useNavigate()
+  const role = localStorage.getItem('role')
+  const username = localStorage.getItem('username')
   const [users, setUsers] = useState([])
   const [roles, setRoles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -108,8 +111,16 @@ export default function UsersPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('username')
+    localStorage.removeItem('role')
     navigate('/login')
   }
+
+  const primaryMenu = [
+    { label: 'Tableau de bord', icon: 'Map', onClick: () => navigate('/dashboard'), path: '/dashboard' },
+    { label: 'Analyses', icon: 'Stats', onClick: () => navigate('/analytics'), path: '/analytics' },
+    { label: 'Utilisateurs', icon: 'Users', onClick: () => navigate('/users'), path: '/users', requiresManager: true },
+  ]
 
   const handleEditUser = (user) => {
     setEditingUser(user)
