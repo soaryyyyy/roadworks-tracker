@@ -113,11 +113,18 @@ public class SignalementService {
             }
         }
 
-        // Notification WebSocket
-        notificationService.notifyStatusUpdated(signalement, statusName);
+        // Synchroniser automatiquement vers Firebase pour que le mobile soit a jour
+        try {
+            syncToFirebase(signalementId);
+        } catch (Exception e) {
+            System.err.println("Erreur sync Firebase apres updateStatus: " + e.getMessage());
+        }
 
-        // Note: La synchronisation vers Firebase se fait manuellement via le bouton "Sync Statuts"
-        // pour éviter d'envoyer les statuts avant que l'utilisateur ne le souhaite
+        // Recharger le signalement pour avoir le firebaseId a jour (mis a jour par syncToFirebase)
+        signalement = repository.findById(signalementId).orElse(signalement);
+
+        // Notification WebSocket + Push FCM
+        notificationService.notifyStatusUpdated(signalement, statusName);
     }
 
     // Méthode surchargée pour la rétro-compatibilité
@@ -523,7 +530,17 @@ public class SignalementService {
 
             statusRepository.save(signalStatus);
 
-            // Notification WebSocket
+            // Synchroniser automatiquement vers Firebase
+            try {
+                syncToFirebase(signalement.getId());
+            } catch (Exception syncErr) {
+                System.err.println("Erreur sync Firebase apres addWork: " + syncErr.getMessage());
+            }
+
+            // Recharger le signalement pour avoir le firebaseId a jour
+            signalement = repository.findById(signalement.getId()).orElse(signalement);
+
+            // Notification WebSocket + Push FCM
             notificationService.notifyWorkAdded(signalement, company.getName());
         } catch (Exception e) {
             System.err.println("Erreur dans addWork: " + e.getMessage());

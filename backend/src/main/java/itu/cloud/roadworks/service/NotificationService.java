@@ -15,6 +15,15 @@ import java.time.Instant;
 public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final FcmService fcmService;
+
+    // Labels pour le contenu des push notifications
+    private static final java.util.Map<String, String> STATUS_LABELS = java.util.Map.of(
+            "nouveau", "Nouveau",
+            "en_cours", "En cours",
+            "terminé", "Terminé",
+            "annulé", "Annulé"
+    );
 
     public void notifyNewSignalement(Signalement signalement) {
         SignalementNotification notification = SignalementNotification.builder()
@@ -42,6 +51,18 @@ public class NotificationService {
                 .build();
 
         sendNotification(notification);
+
+        // Envoyer push FCM au proprietaire du signalement
+        String statusLabel = STATUS_LABELS.getOrDefault(newStatus, newStatus);
+        String desc = signalement.getDescriptions();
+        String shortDesc = (desc != null && desc.length() > 50)
+                ? desc.substring(0, 50) + "..." : (desc != null ? desc : "Votre signalement");
+
+        fcmService.sendPushToReportOwner(
+                signalement.getFirebaseId(),
+                "Statut mis à jour",
+                shortDesc + " → " + statusLabel
+        );
     }
 
     public void notifyWorkAdded(Signalement signalement, String companyName) {
@@ -55,6 +76,17 @@ public class NotificationService {
                 .build();
 
         sendNotification(notification);
+
+        // Envoyer push FCM au proprietaire du signalement
+        String desc = signalement.getDescriptions();
+        String shortDesc = (desc != null && desc.length() > 50)
+                ? desc.substring(0, 50) + "..." : (desc != null ? desc : "Votre signalement");
+
+        fcmService.sendPushToReportOwner(
+                signalement.getFirebaseId(),
+                "Travaux assignés",
+                shortDesc + " — Entreprise: " + companyName
+        );
     }
 
     public void notifySyncCompleted(int count) {

@@ -8,6 +8,7 @@ import { createPinia } from 'pinia';
 import { useConfigStore } from './pinia/firebase/routeworks-tracker';
 import { useGeoLocationPermissionStore } from './pinia/geo-location/permission';
 import { initNotifications, createNotificationChannel, setupNotificationListeners } from './services/notifications';
+import { registerPushNotifications, setupPushListeners } from './services/push-notifications';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
@@ -65,6 +66,10 @@ const initApp = async () => {
     await createNotificationChannel();
     await initNotifications();
     setupNotificationListeners();
+
+    // Push notifications FCM (arrive meme si l'app est fermee)
+    setupPushListeners();
+    await registerPushNotifications();
   } catch (error) {
     console.error(error);
   } finally {
