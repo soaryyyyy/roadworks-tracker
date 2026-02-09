@@ -306,38 +306,18 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-layout">
-        <aside className={`sidebar ${sidebarOpen ? 'open' : 'collapsed'}`}>
-          <div className="sidebar-header">
-            <div>
-              <p className="sidebar-title">Menu principal</p>
-              <span className="sidebar-subtitle">Actions rapides</span>
-            </div>
-            <button className="sidebar-toggle close" onClick={() => setSidebarOpen(false)}>
-              âœ•
-            </button>
-          </div>
-          <div className="sidebar-actions">
-            {actionsMenu
-              .filter((item) => !item.requiresManager || role === 'manager')
-              .map((item) => (
-                <button
-                  key={item.label}
-                  className="sidebar-action"
-                  onClick={item.onClick}
-                  disabled={item.disabled}
-                >
-                  <span className="sidebar-icon">{item.icon}</span>
-                  <span>{item.label}</span>
-                </button>
-              ))}
-          </div>
-        </aside>
-        <main className="dashboard-main">
+      <div className="dashboard-layout">        <BackofficeSidebar
+          title="Menu principal"
+          subtitle="Operations"
+          username={username}
+          role={role}
+          primaryItems={primaryMenu}
+          secondaryItems={secondaryMenu}
+          onLogout={handleLogout}
+        /><main className="dashboard-main">
           <header className="dashboard-header">
         <div className="header-left">
-          {!sidebarOpen && (
-            <button className="sidebar-toggle open" onClick={() => setSidebarOpen(true)}>
+>
               â˜°
             </button>
           )}
@@ -403,11 +383,7 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
-
-          <button onClick={handleLogout} className="logout-button">
-            ðŸšª DÃ©connexion
-          </button>
-        </div>
+</div>
           </header>
           
           <div className="map-container">
@@ -565,6 +541,8 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+
 
 
 
