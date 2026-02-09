@@ -274,33 +274,32 @@ export default function DashboardPage() {
     }
   }
 
-  const actionsMenu = [
-    { label: 'Analyses', icon: 'ðŸ“Š', onClick: () => navigate('/analytics') },
+  const primaryMenu = [
+    { label: 'Tableau de bord', icon: 'Map', onClick: () => navigate('/dashboard'), path: '/dashboard' },
+    { label: 'Analyses', icon: 'Stats', onClick: () => navigate('/analytics'), path: '/analytics' },
+    { label: 'Utilisateurs', icon: 'Users', onClick: () => navigate('/users'), path: '/users', requiresManager: true },
+  ]
+
+  const secondaryMenu = [
     {
       label: 'Importer de Mobile',
-      icon: 'ðŸ“¥',
+      icon: 'Import',
       onClick: handleSyncFirebase,
       disabled: syncing || exporting || syncingStatus,
       requiresManager: true,
     },
     {
       label: 'Envoyer vers mobile',
-      icon: 'ðŸ“¤',
+      icon: 'Export',
       onClick: handleExportToMobile,
       disabled: syncing || exporting || syncingStatus,
       requiresManager: true,
     },
     {
-      label: 'Synchroniser les statuts',
-      icon: 'ðŸ”',
+      label: 'Sync statuts',
+      icon: 'Sync',
       onClick: handleSyncStatusToMobile,
       disabled: syncing || exporting || syncingStatus,
-      requiresManager: true,
-    },
-    {
-      label: 'Gestion des utilisateurs',
-      icon: 'ðŸ‘¥',
-      onClick: () => navigate('/users'),
       requiresManager: true,
     },
   ]
@@ -566,5 +565,6 @@ export default function DashboardPage() {
     </div>
   )
 }
+
 
 
