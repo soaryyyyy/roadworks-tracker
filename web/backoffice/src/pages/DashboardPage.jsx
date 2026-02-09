@@ -45,6 +45,7 @@ export default function DashboardPage() {
   const [showNotifDropdown, setShowNotifDropdown] = useState(false)
   const [showUnsyncedLegend, setShowUnsyncedLegend] = useState(true) // Pour afficher/masquer la légende
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const fetchSignalements = useCallback(async () => {
     try {
