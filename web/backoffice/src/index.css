@@ -294,21 +294,20 @@ textarea {
   margin: 0 auto;
   flex: 1;
   border-radius: 30px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.25);
   overflow: hidden;
-  background: rgba(15, 23, 42, 0.2);
+  background: rgba(255, 255, 255, 0.04);
   box-shadow: var(--shadow-card);
   position: relative;
   min-height: 520px;
-  height: 520px;
 }
 
 .map-root {
-  flex: 1;
-  min-height: 0;
+  height: 520px;
   position: relative;
   display: flex;
   flex-direction: column;
+  z-index: 1;
 }
 
 .map-inner {
