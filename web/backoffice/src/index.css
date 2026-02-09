@@ -233,19 +233,21 @@ textarea {
 }
 
 .sidebar {
-  width: 280px;
-  background: rgba(15, 23, 42, 0.85);
-  border-radius: 26px;
-  padding: var(--spacing-md);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  box-shadow: var(--shadow-card);
-  transition: transform 0.4s ease, opacity 0.4s ease, width 0.4s ease;
-  min-height: 480px;
-  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 20px;
+  width: 272px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(12, 23, 42, 0.88));
+  border-radius: 22px;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: 0 18px 44px rgba(2, 6, 23, 0.45);
+  transition: transform 0.35s ease, opacity 0.3s ease, width 0.3s ease, padding 0.3s ease;
+  min-height: 420px;
+  backdrop-filter: blur(16px);
 }
 
 .sidebar.collapsed {
-  transform: translateX(-100%);
+  transform: translateX(calc(-100% - 28px));
   opacity: 0;
   width: 0;
   padding: 0;
@@ -259,58 +261,73 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
 }
 
 .sidebar-title {
-  margin: 0;
-  font-weight: 600;
-  font-size: 1rem;
+  margin: 0 0 2px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
 }
 
 .sidebar-subtitle {
-  font-size: 0.8rem;
-  color: var(--neutral-gray-400);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(203, 213, 225, 0.72);
 }
 
 .sidebar-actions {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: 9px;
 }
 
 .sidebar-action {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  color: #e2e8f0;
+  gap: 12px;
+  padding: 11px 12px;
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.06), rgba(30, 41, 59, 0.36));
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #dbe6f3;
   font-weight: 600;
+  font-size: 0.94rem;
   text-align: left;
   cursor: pointer;
-  transition: transform var(--transition-fast), background var(--transition-fast);
+  transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .sidebar-action:hover:not(:disabled) {
-  transform: translateX(4px);
-  background: rgba(20, 184, 166, 0.15);
+  transform: translateX(3px);
+  background: linear-gradient(140deg, rgba(45, 212, 191, 0.2), rgba(30, 41, 59, 0.45));
+  border-color: rgba(45, 212, 191, 0.55);
 }
 
 .sidebar-action:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
 .sidebar-icon {
-  font-size: 1.1rem;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  font-size: 0.95rem;
 }
 
 .sidebar-toggle {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.32);
   color: #fff;
   border-radius: 999px;
   width: 34px;
@@ -324,11 +341,12 @@ textarea {
 
 .sidebar-toggle.open {
   border-color: rgba(20, 184, 166, 0.8);
-  background: rgba(20, 184, 166, 0.2);
+  background: rgba(20, 184, 166, 0.24);
 }
 
 .sidebar-toggle.close {
-  padding: 6px 10px;
+  width: 30px;
+  height: 30px;
   line-height: 1;
 }
 
@@ -367,9 +385,9 @@ textarea {
 
 .header-actions {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 12px;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .action-button,
@@ -860,6 +878,29 @@ textarea {
    ============================================ */
 
 @media (max-width: 960px) {
+  .dashboard-layout {
+    position: relative;
+    gap: var(--spacing-md);
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    bottom: 16px;
+    z-index: 120;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+  }
+
+  .sidebar.collapsed {
+    transform: translateX(calc(-100% - 32px));
+  }
+
+  .dashboard-main {
+    width: 100%;
+  }
+
   .dashboard-header,
   .map-container {
     width: calc(100% - 40px);
@@ -872,6 +913,11 @@ textarea {
 }
 
 @media (max-width: 640px) {
+  .dashboard-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
   .dashboard-header {
     flex-direction: column;
     align-items: flex-start;

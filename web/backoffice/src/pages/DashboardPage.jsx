@@ -350,41 +350,6 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="header-actions">
-          <button className="nav-button" onClick={() => navigate('/analytics')}>
-            📊 Analytics
-          </button>
-          {role === 'manager' && (
-            <>
-              <button
-                onClick={handleSyncFirebase}
-                disabled={syncing || exporting || syncingStatus}
-                className="action-button"
-                title="Importer les signalements depuis l'application mobile"
-              >
-                {syncing ? '⏳ Import...' : '📥 Importer de Mobile'}
-              </button>
-              <button
-                onClick={handleExportToMobile}
-                disabled={syncing || exporting || syncingStatus}
-                className="action-button"
-                title="Envoyer les nouveaux signalements vers l'application mobile"
-              >
-                {exporting ? '⏳ Export...' : '📤 Envoyer vers Mobile'}
-              </button>
-              <button
-                onClick={handleSyncStatusToMobile}
-                disabled={syncing || exporting || syncingStatus}
-                className="action-button"
-                title="Synchroniser tous les statuts modifiés vers l'application mobile"
-              >
-                {syncingStatus ? '⏳ Sync...' : '🔄 Sync Statuts'}
-              </button>
-              <button onClick={() => navigate('/users')} className="action-button">
-                👥 Gestion Utilisateurs
-              </button>
-            </>
-          )}
-
           {/* Icône de notification */}
           <div className="notification-bell-container">
             <button
