@@ -178,7 +178,7 @@ const handleSignUp = async () => {
           errors.value.simpleErrorMessage = 'Une erreur est survenue lors de la création du compte.';
       }
     } else {
-      console.log(error);
+      console.error(error);
       showToast('Une erreur inattendue est survenue', 5000, alertCircleOutline, 'danger', 'bottom')
     }
   } finally {

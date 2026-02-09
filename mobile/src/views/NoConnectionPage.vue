@@ -18,7 +18,7 @@ import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
 import { wifiOutline } from 'ionicons/icons'
 
 const retry = () => {
-  console.log('Tentative de reconnexion...')
+  window.location.reload();
 }
 </script>
 

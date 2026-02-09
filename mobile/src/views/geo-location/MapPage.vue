@@ -64,12 +64,10 @@ import RoadworksReportDetailsModal from '@/components/geo-location/RoadworksRepo
 import {
   getStatusLabel,
   getStatusIcon,
-  getStatusHexColor,
   getReportStatusLabel,
   formatDateShort,
 } from '@/utils/roadworks-utils';
 
-const isGeoLocationModalOpen = ref<boolean>(false);
 let map: L.Map | null = null;
 let userLocation: L.Marker | null = null;
 
@@ -164,8 +162,7 @@ const displayReportsOnMap = () => {
   }
 
   reportsToDisplay.forEach((report) => {
-    const statusColor = getStatusHexColor(report.status);
-    const markerHtml = getStatusIcon(report.status, statusColor);
+    const markerHtml = getStatusIcon(report.status);
 
     const svgMarkerIcon = L.divIcon({
       html: markerHtml,

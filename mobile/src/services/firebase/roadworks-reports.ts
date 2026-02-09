@@ -109,34 +109,6 @@ export const getAllRoadworksReports = async (): Promise<RoadworksReportWithId[]>
 };
 
 /**
- * Récupérer les signalements de l'utilisateur actuel
- */
-export const getCurrentUserReports = async (): Promise<RoadworksReportWithId[]> => {
-  try {
-    const userId = auth.currentUser?.uid;
-
-    if (!userId) {
-      throw new Error('Utilisateur non authentifié');
-    }
-
-    const q = query(
-      collection(firestore, 'roadworks_reports'),
-      where('userId', '==', userId)
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    } as RoadworksReportWithId));
-  } catch (error) {
-    console.error('Erreur lors de la récupération des signalements utilisateur:', error);
-    throw error;
-  }
-};
-
-/**
  * Écouter les changements en temps réel sur les signalements de l'utilisateur
  * Retourne une fonction pour se désabonner
  */
@@ -174,7 +146,6 @@ export const subscribeToUserReports = (
         const newStatus = report.reportStatus;
 
         if (oldStatus !== newStatus && newStatus) {
-          console.log(`📢 Statut changé pour ${report.id}: ${oldStatus} -> ${newStatus}`);
           onStatusChange(report, oldStatus, newStatus);
         }
       }
