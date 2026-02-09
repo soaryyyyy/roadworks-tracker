@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import BackofficeSidebar from '../components/BackofficeSidebar'
 
 const normalizeStatus = (status) => {
   const s = (status || '').toString().toLowerCase()
@@ -330,6 +331,22 @@ export default function AnalyticsPage() {
     localStorage.removeItem('role')
     navigate('/login')
   }
+
+  const primaryMenu = [
+    { label: 'Tableau de bord', icon: 'Map', onClick: () => navigate('/dashboard'), path: '/dashboard' },
+    { label: 'Analyses', icon: 'Stats', onClick: () => navigate('/analytics'), path: '/analytics' },
+    { label: 'Utilisateurs', icon: 'Users', onClick: () => navigate('/users'), path: '/users', requiresManager: true },
+  ]
+
+  const secondaryMenu = [
+    {
+      label: syncing ? 'Synchronisation...' : 'Sync Firebase',
+      icon: 'Sync',
+      onClick: handleSyncFirebase,
+      disabled: syncing,
+      requiresManager: true,
+    },
+  ]
 
   const handleSyncFirebase = async () => {
     try {
