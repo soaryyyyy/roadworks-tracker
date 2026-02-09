@@ -305,120 +305,124 @@ export function MapPage() {
       </header>
       <main className="app-main">
         <div className="content-stack">
-          <section className="filters-panel">
-            <div className="filters-header">
-              <h2>Filtres</h2>
-              <span className="filters-count">
-                {filteredEvents.length} signalement{filteredEvents.length > 1 ? 's' : ''}
-              </span>
-            </div>
-            <div className="filters-grid">
-              <div className="filter-field">
-                <label htmlFor="filter-status">Statut</label>
-                <select
-                  id="filter-status"
-                  value={filters.status}
-                  onChange={handleFilterChange('status')}
+          <section className="filters-bar">
+            <div className="filters-panel">
+              <div className="filters-header">
+                <h2>Filtres</h2>
+                <span className="filters-count">
+                  {filteredEvents.length} signalement{filteredEvents.length > 1 ? 's' : ''}
+                </span>
+              </div>
+              <div className="filters-grid">
+                <div className="filter-field">
+                  <label htmlFor="filter-status">Statut</label>
+                  <select
+                    id="filter-status"
+                    value={filters.status}
+                    onChange={handleFilterChange('status')}
+                  >
+                    <option value="">Tous</option>
+                    {statusOptions.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="filter-field">
+                  <label>Dates</label>
+                  <div className="filter-range">
+                    <input
+                      type="date"
+                      value={filters.dateFrom}
+                      onChange={handleFilterChange('dateFrom')}
+                    />
+                    <span className="range-separator">—</span>
+                    <input
+                      type="date"
+                      value={filters.dateTo}
+                      onChange={handleFilterChange('dateTo')}
+                    />
+                  </div>
+                </div>
+
+                <div className="filter-field">
+                  <label>Surface (m²)</label>
+                  <div className="filter-range">
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Min"
+                      value={filters.surfaceMin}
+                      onChange={handleFilterChange('surfaceMin')}
+                    />
+                    <span className="range-separator">—</span>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Max"
+                      value={filters.surfaceMax}
+                      onChange={handleFilterChange('surfaceMax')}
+                    />
+                  </div>
+                </div>
+
+                <div className="filter-field">
+                  <label>Budget (Ar)</label>
+                  <div className="filter-range">
+                    <input
+                      type="number"
+                      min="0"
+                      step="1000"
+                      placeholder="Min"
+                      value={filters.budgetMin}
+                      onChange={handleFilterChange('budgetMin')}
+                    />
+                    <span className="range-separator">—</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1000"
+                      placeholder="Max"
+                      value={filters.budgetMax}
+                      onChange={handleFilterChange('budgetMax')}
+                    />
+                  </div>
+                </div>
+
+                <div className="filter-field">
+                  <label htmlFor="filter-entreprise">Entreprise</label>
+                  <input
+                    id="filter-entreprise"
+                    list="entreprise-list"
+                    placeholder="Nom de l'entreprise"
+                    value={filters.entreprise}
+                    onChange={handleFilterChange('entreprise')}
+                  />
+                  <datalist id="entreprise-list">
+                    {entrepriseOptions.map((entreprise) => (
+                      <option key={entreprise} value={entreprise} />
+                    ))}
+                  </datalist>
+                </div>
+              </div>
+              <div className="filters-actions">
+                <button
+                  type="button"
+                  className="filters-reset"
+                  onClick={resetFilters}
+                  disabled={!hasActiveFilters}
                 >
-                  <option value="">Tous</option>
-                  {statusOptions.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
+                  Réinitialiser
+                </button>
               </div>
-
-              <div className="filter-field">
-                <label>Dates</label>
-                <div className="filter-range">
-                  <input
-                    type="date"
-                    value={filters.dateFrom}
-                    onChange={handleFilterChange('dateFrom')}
-                  />
-                  <span className="range-separator">—</span>
-                  <input
-                    type="date"
-                    value={filters.dateTo}
-                    onChange={handleFilterChange('dateTo')}
-                  />
-                </div>
-              </div>
-
-              <div className="filter-field">
-                <label>Surface (m²)</label>
-                <div className="filter-range">
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="Min"
-                    value={filters.surfaceMin}
-                    onChange={handleFilterChange('surfaceMin')}
-                  />
-                  <span className="range-separator">—</span>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="Max"
-                    value={filters.surfaceMax}
-                    onChange={handleFilterChange('surfaceMax')}
-                  />
-                </div>
-              </div>
-
-              <div className="filter-field">
-                <label>Budget (Ar)</label>
-                <div className="filter-range">
-                  <input
-                    type="number"
-                    min="0"
-                    step="1000"
-                    placeholder="Min"
-                    value={filters.budgetMin}
-                    onChange={handleFilterChange('budgetMin')}
-                  />
-                  <span className="range-separator">—</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1000"
-                    placeholder="Max"
-                    value={filters.budgetMax}
-                    onChange={handleFilterChange('budgetMax')}
-                  />
-                </div>
-              </div>
-
-              <div className="filter-field">
-                <label htmlFor="filter-entreprise">Entreprise</label>
-                <input
-                  id="filter-entreprise"
-                  list="entreprise-list"
-                  placeholder="Nom de l'entreprise"
-                  value={filters.entreprise}
-                  onChange={handleFilterChange('entreprise')}
-                />
-                <datalist id="entreprise-list">
-                  {entrepriseOptions.map((entreprise) => (
-                    <option key={entreprise} value={entreprise} />
-                  ))}
-                </datalist>
-              </div>
-            </div>
-            <div className="filters-actions">
-              <button
-                type="button"
-                className="filters-reset"
-                onClick={resetFilters}
-                disabled={!hasActiveFilters}
-              >
-                Réinitialiser
-              </button>
             </div>
           </section>
 
-          {renderView()}
+          <div className={`view-wrapper ${activeView === 'map' ? 'is-map' : ''}`}>
+            {renderView()}
+          </div>
         </div>
       </main>
     </div>

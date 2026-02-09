@@ -4,21 +4,28 @@
 
 .content-stack {
   width: 100%;
-  max-width: 1200px;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.filters-bar {
+  width: 100%;
+  background: var(--neutral-white);
+  border-bottom: 1px solid var(--neutral-gray-100);
+  box-shadow: var(--shadow-sm);
 }
 
 .filters-panel {
-  background: var(--neutral-white);
-  border: 1px solid var(--neutral-gray-100);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-lg) var(--spacing-xl);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-  box-shadow: var(--shadow-sm);
 }
 
 .filters-header {
@@ -97,6 +104,28 @@
 .filters-actions {
   display: flex;
   justify-content: flex-end;
+}
+
+.view-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-lg);
+}
+
+.view-wrapper.is-map {
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.map-view {
+  flex: 1;
+  min-height: 70vh;
+  height: 100%;
+  border-radius: 0;
+  overflow: hidden;
 }
 
 .filters-reset {
@@ -188,6 +217,10 @@
 
   .filters-actions {
     justify-content: flex-start;
+  }
+
+  .view-wrapper {
+    padding: var(--spacing-md);
   }
 
   .dashboard-grid {

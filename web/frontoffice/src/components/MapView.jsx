@@ -5,49 +5,51 @@ import { iconByType } from '../mapIcons'
 
 export function MapView({ events }) {
   return (
-    <MapContainer center={[-18.91, 47.52]} zoom={13} className="map-inner" scrollWheelZoom>
-      <TileLayer
-        url="http://localhost:8089/styles/basic-preview/512/{z}/{x}/{y}.png"
-        attribution="© OpenStreetMap contributors"
-      />
+    <div className="map-view">
+      <MapContainer center={[-18.91, 47.52]} zoom={13} className="map-inner" scrollWheelZoom>
+        <TileLayer
+          url="http://localhost:8089/styles/basic-preview/512/{z}/{x}/{y}.png"
+          attribution="© OpenStreetMap contributors"
+        />
 
-      {events.map((event) => {
-        const icon = iconByType[event.icon_key] || iconByType.warning
-        const entreprise = event.detail_problem.entreprise_assign
-        return (
-          <Marker key={event.id} position={[event.lat, event.lon]} icon={icon}>
-            <Popup>
-              <strong>
-                {event.illustration_problem} {event.type_problem.replace(/_/g, ' ')}
-              </strong>
-              <p>{event.detail_problem.description}</p>
-              <ul>
-                <li>Status : {event.detail_problem.etat}</li>
-                <li>Date : {new Date(event.detail_problem.date_problem).toLocaleString()}</li>
-                <li>Surface : {event.detail_problem.surface_m2} m²</li>
-                <li>Budget : {event.detail_problem.budget.toLocaleString()} Ar</li>
-                <li>Entreprise : {entreprise?.name ?? 'Non attribué'}</li>
-              </ul>
-              <Link
-                to={`/signalements/${event.id}/photos`}
-                style={{
-                  display: 'inline-block',
-                  marginTop: '10px',
-                  padding: '8px 15px',
-                  backgroundColor: '#007bff',
-                  color: 'white',
-                  textDecoration: 'none',
-                  borderRadius: '5px',
-                  fontSize: '14px'
-                }}
-              >
-                Voir les photos
-              </Link>
-            </Popup>
-          </Marker>
-        )
-      })}
-    </MapContainer>
+        {events.map((event) => {
+          const icon = iconByType[event.icon_key] || iconByType.warning
+          const entreprise = event.detail_problem.entreprise_assign
+          return (
+            <Marker key={event.id} position={[event.lat, event.lon]} icon={icon}>
+              <Popup>
+                <strong>
+                  {event.illustration_problem} {event.type_problem.replace(/_/g, ' ')}
+                </strong>
+                <p>{event.detail_problem.description}</p>
+                <ul>
+                  <li>Status : {event.detail_problem.etat}</li>
+                  <li>Date : {new Date(event.detail_problem.date_problem).toLocaleString()}</li>
+                  <li>Surface : {event.detail_problem.surface_m2} m²</li>
+                  <li>Budget : {event.detail_problem.budget.toLocaleString()} Ar</li>
+                  <li>Entreprise : {entreprise?.name ?? 'Non attribué'}</li>
+                </ul>
+                <Link
+                  to={`/signalements/${event.id}/photos`}
+                  style={{
+                    display: 'inline-block',
+                    marginTop: '10px',
+                    padding: '8px 15px',
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    textDecoration: 'none',
+                    borderRadius: '5px',
+                    fontSize: '14px'
+                  }}
+                >
+                  Voir les photos
+                </Link>
+              </Popup>
+            </Marker>
+          )
+        })}
+      </MapContainer>
+    </div>
   )
 }
 
