@@ -306,7 +306,8 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-layout">        <BackofficeSidebar
+      <div className="dashboard-layout">
+        <BackofficeSidebar
           title="Menu principal"
           subtitle="Operations"
           username={username}
@@ -314,21 +315,18 @@ export default function DashboardPage() {
           primaryItems={primaryMenu}
           secondaryItems={secondaryMenu}
           onLogout={handleLogout}
-        /><main className="dashboard-main">
+        />
+        <main className="dashboard-main">
           <header className="dashboard-header">
-        <div className="header-left">
->
-              â˜°
-            </button>
-          )}
-          <div>
-            <h1>Dashboard - Suivi des travaux routiers</h1>
-            <p className="user-info">
-              ConnectÃ© en tant que: <strong>{username}</strong> ({role})
-            </p>
-          </div>
-        </div>
-        <div className="header-actions">
+            <div className="header-left">
+              <div>
+                <h1>Dashboard - Suivi des travaux routiers</h1>
+                <p className="user-info">
+                  Connecte en tant que: <strong>{username}</strong> ({role})
+                </p>
+              </div>
+            </div>
+            <div className="header-actions">
           {/* IcÃ´ne de notification */}
           <div className="notification-bell-container">
             <button
@@ -541,6 +539,7 @@ export default function DashboardPage() {
     </div>
   )
 }
+
 
 
 
