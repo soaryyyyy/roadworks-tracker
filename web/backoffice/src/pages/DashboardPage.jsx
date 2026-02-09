@@ -45,7 +45,6 @@ export default function DashboardPage() {
   const [showNotifDropdown, setShowNotifDropdown] = useState(false)
   const [showUnsyncedLegend, setShowUnsyncedLegend] = useState(true) // Pour afficher/masquer la légende
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const fetchSignalements = useCallback(async () => {
     try {
@@ -312,10 +311,47 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
+      <div className="dashboard-layout">
+        <aside className={`sidebar ${sidebarOpen ? 'open' : 'collapsed'}`}>
+          <div className="sidebar-header">
+            <div>
+              <p className="sidebar-title">Menu principal</p>
+              <span className="sidebar-subtitle">Actions rapides</span>
+            </div>
+            <button className="sidebar-toggle close" onClick={() => setSidebarOpen(false)}>
+              ✕
+            </button>
+          </div>
+          <div className="sidebar-actions">
+            {actionsMenu
+              .filter((item) => !item.requiresManager || role === 'manager')
+              .map((item) => (
+                <button
+                  key={item.label}
+                  className="sidebar-action"
+                  onClick={item.onClick}
+                  disabled={item.disabled}
+                >
+                  <span className="sidebar-icon">{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+          </div>
+        </aside>
+        <main className="dashboard-main">
+          <header className="dashboard-header">
         <div className="header-left">
-          <h1>Dashboard - Suivi des travaux routiers</h1>
-          <p className="user-info">Connecté en tant que: <strong>{username}</strong> ({role})</p>
+          {!sidebarOpen && (
+            <button className="sidebar-toggle open" onClick={() => setSidebarOpen(true)}>
+              ☰
+            </button>
+          )}
+          <div>
+            <h1>Dashboard - Suivi des travaux routiers</h1>
+            <p className="user-info">
+              Connecté en tant que: <strong>{username}</strong> ({role})
+            </p>
+          </div>
         </div>
         <div className="header-actions">
           <button className="nav-button" onClick={() => navigate('/analytics')}>
@@ -412,9 +448,9 @@ export default function DashboardPage() {
             🚪 Déconnexion
           </button>
         </div>
-      </header>
-      
-      <div className="map-container">
+          </header>
+          
+          <div className="map-container">
         {loading && <div className="loading">Chargement des signalements...</div>}
         {error && <div className="error">Erreur: {error}</div>}
         {syncMessage && <div className={syncMessage.includes('✓') ? 'success' : 'error'}>{syncMessage}</div>}
@@ -540,6 +576,8 @@ export default function DashboardPage() {
             </div>
           </>
         )}
+          </div>
+        </main>
       </div>
 
       {selectedEvent && (
