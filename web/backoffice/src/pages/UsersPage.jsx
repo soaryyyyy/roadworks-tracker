@@ -384,7 +384,9 @@ export default function UsersPage() {
             </table>
           </div>
         )}
-                </section>`r`n        </main>`r`n      </div>
+                </section>
+        </main>
+      </div>
 
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
@@ -505,5 +507,6 @@ export default function UsersPage() {
     </div>
   )
 }
+
 
 
