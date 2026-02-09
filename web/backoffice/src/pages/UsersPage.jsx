@@ -279,7 +279,7 @@ export default function UsersPage() {
     })
   }
 
-  return (    <div className="dashboard-container users-shell">
+  return (`r`n    <div className="dashboard-container users-shell">
       <div className="dashboard-layout">
         <BackofficeSidebar
           title="Menu principal"
@@ -505,4 +505,5 @@ export default function UsersPage() {
     </div>
   )
 }
+
 
