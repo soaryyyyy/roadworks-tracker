@@ -87,7 +87,7 @@ public class OpenApiConfig {
                                 .url("http://localhost:" + serverPort)
                                 .description("Serveur de développement local"),
                         new Server()
-                                .url("http://localhost:8080")
+                                .url("http://host.docker.internal:" + serverPort)
                                 .description("Serveur Docker")
                 ))
                 .components(new Components()
