@@ -1,11 +1,8 @@
 ﻿import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import BackofficeSidebar from '../components/BackofficeSidebar'
 
 export default function UsersPage() {
   const navigate = useNavigate()
-  const role = localStorage.getItem('role')
-  const username = localStorage.getItem('username')
   const [users, setUsers] = useState([])
   const [roles, setRoles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -63,7 +60,7 @@ export default function UsersPage() {
       })
       if (!response.ok) {
         const text = await response.text()
-        throw new Error(`Erreur ${response.status}: ${text || 'Erreur lors du chargement des rÃ´les'}`)
+        throw new Error(`Erreur ${response.status}: ${text || 'Erreur lors du chargement des rôles'}`)
       }
       const data = await response.json()
       setRoles(data)
@@ -95,10 +92,10 @@ export default function UsersPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Erreur lors de la crÃ©ation')
+        throw new Error(data.message || 'Erreur lors de la création')
       }
 
-      setSuccess(`Utilisateur "${data.username}" crÃ©Ã© avec succÃ¨s`)
+      setSuccess(`Utilisateur "${data.username}" créé avec succès`)
       setShowModal(false)
       setNewUser({ username: '', password: '', role: roles[0]?.libelle || '' })
       fetchUsers()
@@ -111,16 +108,8 @@ export default function UsersPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('token')
-    localStorage.removeItem('username')
-    localStorage.removeItem('role')
     navigate('/login')
   }
-
-  const primaryMenu = [
-    { label: 'Tableau de bord', icon: 'Map', onClick: () => navigate('/dashboard'), path: '/dashboard' },
-    { label: 'Analyses', icon: 'Stats', onClick: () => navigate('/analytics'), path: '/analytics' },
-    { label: 'Utilisateurs', icon: 'Users', onClick: () => navigate('/users'), path: '/users', requiresManager: true },
-  ]
 
   const handleEditUser = (user) => {
     setEditingUser(user)
@@ -160,10 +149,10 @@ export default function UsersPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Erreur lors de la mise Ã  jour')
+        throw new Error(data.message || 'Erreur lors de la mise à jour')
       }
 
-      setSuccess(`Utilisateur "${editingUser.username}" modifiÃ© avec succÃ¨s`)
+      setSuccess(`Utilisateur "${editingUser.username}" modifié avec succès`)
       setShowEditModal(false)
       setEditingUser(null)
       fetchUsers()
@@ -175,7 +164,7 @@ export default function UsersPage() {
   }
 
   const handleUnlockUser = async (userId) => {
-    if (!window.confirm('ÃŠtes-vous sÃ»r de vouloir dÃ©bloquer cet utilisateur ?')) {
+    if (!window.confirm('Êtes-vous sûr de vouloir débloquer cet utilisateur ?')) {
       return
     }
 
@@ -194,10 +183,10 @@ export default function UsersPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Erreur lors du dÃ©verrouillage')
+        throw new Error(data.message || 'Erreur lors du déverrouillage')
       }
 
-      setSuccess(`Utilisateur dÃ©verrouillÃ© avec succÃ¨s`)
+      setSuccess(`Utilisateur déverrouillé avec succès`)
       fetchUsers()
     } catch (err) {
       setError(err.message)
@@ -205,7 +194,7 @@ export default function UsersPage() {
   }
 
   const handleSyncWithMobile = async () => {
-    if (!window.confirm('ÃŠtes-vous sÃ»r de vouloir synchroniser avec les utilisateurs mobile (Firebase)? Cette action importera les nouveaux utilisateurs et mettra Ã  jour les statuts.')) {
+    if (!window.confirm('Êtes-vous sûr de vouloir synchroniser avec les utilisateurs mobile (Firebase)? Cette action importera les nouveaux utilisateurs et mettra à jour les statuts.')) {
       return
     }
 
@@ -228,7 +217,7 @@ export default function UsersPage() {
         throw new Error(data.message || 'Erreur lors de la synchronisation')
       }
 
-      setSuccess(data.message || 'Synchronisation avec mobile rÃ©ussie')
+      setSuccess(data.message || 'Synchronisation avec mobile réussie')
       fetchUsers()
     } catch (err) {
       setError(err.message)
@@ -238,7 +227,7 @@ export default function UsersPage() {
   }
 
   const handleSyncStatusToMobile = async () => {
-    if (!window.confirm('ÃŠtes-vous sÃ»r de vouloir envoyer les modifications de statut (bloquÃ©/dÃ©bloquÃ©) vers Firebase?')) {
+    if (!window.confirm('Êtes-vous sûr de vouloir envoyer les modifications de statut (bloqué/débloqué) vers Firebase?')) {
       return
     }
 
@@ -261,7 +250,7 @@ export default function UsersPage() {
         throw new Error(data.message || 'Erreur lors de la synchronisation des statuts')
       }
 
-      setSuccess(data.message || 'Statuts envoyÃ©s vers mobile avec succÃ¨s')
+      setSuccess(data.message || 'Statuts envoyés vers mobile avec succès')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -280,65 +269,58 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="dashboard-container users-shell">
-      <div className="dashboard-layout">
-        <BackofficeSidebar
-          title="Menu principal"
-          subtitle="Administration"
-          username={username}
-          role={role}
-          primaryItems={primaryMenu}
-          onLogout={handleLogout}
-        />
-        <main className="dashboard-main">
-          <header className="dashboard-header">
-            <div className="header-left">
-              <div>
-                <h1>Gestion des utilisateurs</h1>
-                <p className="user-info">
-                  Connecte en tant que: <strong>{username}</strong> ({role})
-                </p>
-              </div>
-            </div>
-          </header>
+    <div className="users-container">
+      <header className="users-header">
+        <div className="header-left">
+          <h1>Gestion des Utilisateurs</h1>
+        </div>
+        <div className="header-right">
+          <button onClick={() => navigate('/dashboard')} className="logout-button">
+            Dashboard
+          </button>
+          <button onClick={handleLogout} className="logout-button">
+            Déconnexion
+          </button>
+        </div>
+      </header>
 
-          <section className="users-content">
-            {error && <div className="alert alert-error">{error}</div>}
-            {success && <div className="alert alert-success">{success}</div>}
+      <main className="users-content">
+        {error && <div className="alert alert-error">{error}</div>}
+        {success && <div className="alert alert-success">{success}</div>}
 
-            <div className="users-toolbar">
-              <button onClick={() => setShowModal(true)} className="create-button">
-                + Creer un utilisateur
-              </button>
-              <button
-                onClick={handleSyncWithMobile}
-                className="import-button"
-                disabled={syncing}
-              >
-                {syncing ? 'Synchronisation...' : 'Importer de mobile'}
-              </button>
-              <button
-                onClick={handleSyncStatusToMobile}
-                className="export-button"
-                disabled={syncingStatus}
-              >
-                {syncingStatus ? 'Envoi...' : 'Envoyer statuts vers mobile'}
-              </button>
-            </div>
+        <div className="users-toolbar">
+          <button onClick={() => setShowModal(true)} className="create-button">
+            + Créer un utilisateur
+          </button>
+          <button 
+            onClick={handleSyncWithMobile} 
+            className="import-button"
+            disabled={syncing}
+          >
+            {syncing ? '⏳ Synchronisation...' : '📥 Importer de Mobile'}
+          </button>
+          <button 
+            onClick={handleSyncStatusToMobile} 
+            className="export-button"
+            disabled={syncingStatus}
+          >
+            {syncingStatus ? '⏳ Envoi...' : '📤 Envoyer Statuts vers Mobile'}
+          </button>
+        </div>
 
-            {loading ? (
-              <div className="loading">Chargement...</div>
-            ) : (
-              <div className="users-table-container">
-                <table className="users-table">
+        {loading ? (
+          <div className="loading">Chargement...</div>
+        ) : (
+          <div className="users-table-container">
+            <table className="users-table">
               <thead>
                 <tr>
-                  <th>Identifiant</th>
+                  <th>ID</th>
                   <th>Nom d'utilisateur</th>
-                  <th>Role</th>
+                  <th>Rôle</th>
                   <th>Statut</th>
-                  <th>Cree le</th>
-                  <th>Actes</th>
+                  <th>Créé le</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -353,7 +335,7 @@ export default function UsersPage() {
                     </td>
                     <td>
                       {user.isLocked ? (
-                        <span className="status-badge status-locked">Bloque</span>
+                        <span className="status-badge status-locked">Bloqué</span>
                       ) : user.isActive ? (
                         <span className="status-badge status-active">Actif</span>
                       ) : (
@@ -367,33 +349,31 @@ export default function UsersPage() {
                         className="action-button edit-button"
                         title="Modifier l'utilisateur"
                       >
-                        Modifier
+                        ✏️ Modifier
                       </button>
                       {user.isLocked && (
                         <button 
                           onClick={() => handleUnlockUser(user.id)}
                           className="action-button unlock-button"
-                          title="Debloquer l'utilisateur"
+                          title="Débloquer l'utilisateur"
                         >
-                          Debloquer
+                          🔓 Débloquer
                         </button>
                       )}
                     </td>
                   </tr>
                 ))}
               </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-        </main>
-      </div>
+            </table>
+          </div>
+        )}
+      </main>
 
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>CrÃ©er un utilisateur</h2>
+              <h2>Créer un utilisateur</h2>
               <button onClick={() => setShowModal(false)} className="modal-close">
                 &times;
               </button>
@@ -422,7 +402,7 @@ export default function UsersPage() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="role">RÃ´le</label>
+                <label htmlFor="role">Rôle</label>
                 <select
                   id="role"
                   value={newUser.role}
@@ -441,7 +421,7 @@ export default function UsersPage() {
                   Annuler
                 </button>
                 <button type="submit" className="btn-create" disabled={creating}>
-                  {creating ? 'CrÃ©ation...' : 'CrÃ©er'}
+                  {creating ? 'Création...' : 'Créer'}
                 </button>
               </div>
             </form>
@@ -479,7 +459,7 @@ export default function UsersPage() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="edit-role">RÃ´le</label>
+                <label htmlFor="edit-role">Rôle</label>
                 <select
                   id="edit-role"
                   value={editData.role}
@@ -498,7 +478,7 @@ export default function UsersPage() {
                   Annuler
                 </button>
                 <button type="submit" className="btn-create" disabled={updating}>
-                  {updating ? 'Mise Ã  jour...' : 'Mettre Ã  jour'}
+                  {updating ? 'Mise à jour...' : 'Mettre à jour'}
                 </button>
               </div>
             </form>
@@ -508,7 +488,3 @@ export default function UsersPage() {
     </div>
   )
 }
-
-
-
-

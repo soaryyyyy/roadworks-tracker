@@ -1,12 +1,11 @@
 ﻿import { useEffect, useMemo, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import BackofficeSidebar from '../components/BackofficeSidebar'
 
 const normalizeStatus = (status) => {
   const s = (status || '').toString().toLowerCase()
   if (['nouveau', 'new'].includes(s)) return 'new'
   if (['en_cours', 'en cours', 'in_progress', 'in progress'].includes(s)) return 'in_progress'
-  if (['terminÃ©', 'termine', 'completed', 'done', 'complete'].includes(s)) return 'completed'
+  if (['terminé', 'termine', 'completed', 'done', 'complete'].includes(s)) return 'completed'
   return 'new'
 }
 
@@ -50,9 +49,9 @@ const daysBetween = (end, start) => {
 }
 
 const formatSimpleDate = (value) => {
-  if (!value) return 'â€”'
+  if (!value) return '—'
   const d = typeof value === 'string' || typeof value === 'number' ? new Date(value) : value
-  if (isNaN(new Date(d).getTime())) return 'â€”'
+  if (isNaN(new Date(d).getTime())) return '—'
   return new Intl.DateTimeFormat('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d)
 }
 
@@ -320,10 +319,10 @@ export default function AnalyticsPage() {
     if (!range.max || range.min.getTime() === range.max.getTime()) {
       return formatter.format(range.min)
     }
-    return `${formatter.format(range.min)} â†’ ${formatter.format(range.max)}`
+    return `${formatter.format(range.min)} → ${formatter.format(range.max)}`
   }
 
-  const formatDays = (value) => (value == null ? 'â€”' : `${value.toFixed(1)} j`)
+  const formatDays = (value) => (value == null ? '—' : `${value.toFixed(1)} j`)
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -349,110 +348,91 @@ export default function AnalyticsPage() {
       }
 
       const data = await response.json()
-      setSyncMessage(`âœ“ ${data.imported} signalements importÃ©s depuis Firebase`)
+      setSyncMessage(`✓ ${data.imported} signalements importés depuis Firebase`)
       await fetchSignalements()
       await fetchUnsynced()
     } catch (err) {
-      setSyncMessage(`âœ— Erreur: ${err.message}`)
+      setSyncMessage(`✗ Erreur: ${err.message}`)
     } finally {
       setSyncing(false)
     }
   }
 
-  const primaryMenu = [
-    { label: 'Tableau de bord', icon: 'Map', onClick: () => navigate('/dashboard'), path: '/dashboard' },
-    { label: 'Analyses', icon: 'Stats', onClick: () => navigate('/analytics'), path: '/analytics' },
-    { label: 'Utilisateurs', icon: 'Users', onClick: () => navigate('/users'), path: '/users', requiresManager: true },
-  ]
-
-  const secondaryMenu = [
-    {
-      label: syncing ? 'Synchronisation...' : 'Sync Firebase',
-      icon: 'Sync',
-      onClick: handleSyncFirebase,
-      disabled: syncing,
-      requiresManager: true,
-    },
-  ]
-
   return (
     <div className="dashboard-container analytics-page">
-      <div className="dashboard-layout">
-        <BackofficeSidebar
-          title="Menu principal"
-          subtitle="Analyse"
-          username={username}
-          role={role}
-          primaryItems={primaryMenu}
-          secondaryItems={secondaryMenu}
-          onLogout={handleLogout}
-        />
-        <main className="dashboard-main">
-          <header className="dashboard-header">
-            <div className="header-left">
-              <div>
-                <h1>Analyse des travaux</h1>
-                <p className="user-info">Connecte en tant que: <strong>{username}</strong> ({role})</p>
-              </div>
-            </div>
-          </header>
-
-          <div className="analytics-content">
-        <div className="analytics-filters">
-          <div className="filter-row filter-row--wrap">
-            <label className="filter-field filter-field--date">
-              <span className="filter-label">Date debut</span>
-              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-            </label>
-            <label className="filter-field filter-field--date">
-              <span className="filter-label">Date fin</span>
-              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-            </label>
-
-            <label className="filter-field">
-              <span className="filter-label">Entreprise</span>
-              <select
-                value={selectedCompanyId}
-                onChange={(e) => {
-                  const val = e.target.value
-                  setSelectedCompanyId(val)
-                  fetchWorkStats(val || null)
-                  fetchWorkTimelines(val || null)
-                }}
+      <header className="dashboard-header">
+        <div className="header-left">
+          <h1>Analyse des travaux</h1>
+          <p className="user-info">Connecté en tant que: <strong>{username}</strong> ({role})</p>
+        </div>
+        <div className="header-actions">
+          <button className="nav-button" onClick={() => navigate('/analytics')} disabled>
+            📊 Analytics
+          </button>
+          <button className="nav-button" onClick={() => navigate('/dashboard')}>⬅️ Dashboard</button>
+          {role === 'manager' && (
+            <>
+              <button
+                className="action-button"
+                onClick={handleSyncFirebase}
+                disabled={syncing}
+                title="Synchroniser les données depuis Firebase"
               >
-                <option value="">Toutes</option>
-                {companies.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-            </label>
+                {syncing ? '⏳ Synchronisation...' : '🔄 Synchroniser Firebase'}
+              </button>
+              <button className="nav-button" onClick={() => navigate('/users')}>👥 Utilisateurs</button>
+            </>
+          )}
+          <button className="logout-button" onClick={handleLogout}>🚪 Déconnexion</button>
+        </div>
+      </header>
 
-            <label className="filter-field">
-              <span className="filter-label">Type</span>
-              <select
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-              >
-                <option value="">Tous</option>
-                {types.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </label>
+      <div className="analytics-content">
+        <div className="filter-row filter-row--wrap">
+          <label>Filtrer par dates :</label>
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <span>→</span>
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
 
-            <button className="analytics-reset" onClick={() => { setStartDate(''); setEndDate(''); setSelectedCompanyId(''); setSelectedType(''); fetchWorkStats(); fetchWorkTimelines(); }}>
-              Reinitialiser
-            </button>
-          </div>
+          <label>Entreprise :</label>
+          <select
+            value={selectedCompanyId}
+            onChange={(e) => {
+              const val = e.target.value
+              setSelectedCompanyId(val)
+              fetchWorkStats(val || null)
+              fetchWorkTimelines(val || null)
+            }}
+          >
+            <option value="">Toutes</option>
+            {companies.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+
+          <label>Type :</label>
+          <select
+            value={selectedType}
+            onChange={(e) => setSelectedType(e.target.value)}
+          >
+            <option value="">Tous</option>
+            {types.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+
+          <button className="nav-button" onClick={() => { setStartDate(''); setEndDate(''); setSelectedCompanyId(''); setSelectedType(''); fetchWorkStats(); fetchWorkTimelines(); }}>
+            Réinitialiser
+          </button>
         </div>
 
         {syncMessage && (
-          <div className={syncMessage.startsWith('âœ“') ? 'success' : 'error'} style={{ marginBottom: '8px' }}>
+          <div className={syncMessage.startsWith('✓') ? 'success' : 'error'} style={{ marginBottom: '8px' }}>
             {syncMessage}
           </div>
         )}
         {error && <div className="error">Erreur: {error}</div>}
-        {loading && <div className="loading">Chargement des donnÃ©es...</div>}
+        {loading && <div className="loading">Chargement des données...</div>}
 
         {!loading && (
           <>
@@ -468,26 +448,26 @@ export default function AnalyticsPage() {
                   />
                 </div>
                 <div className="analytic-sub">
-                  Nouveau 0% · En cours 50% · Termine 100%
+                  Nouveau 0% · En cours 50% · Terminé 100%
                 </div>
               </div>
 
               
 
               <div className="analytic-card">
-                <div className="analytic-label">Repartition</div>
+                <div className="analytic-label">Répartition</div>
                 <div className="badge-row">
                   <span className="pill pill-new">Nouveau {analytics.counts.new}</span>
                   <span className="pill pill-progress">En cours {analytics.counts.in_progress}</span>
-                  <span className="pill pill-done">Termine {analytics.counts.completed}</span>
+                  <span className="pill pill-done">Terminé {analytics.counts.completed}</span>
                 </div>
-                <div className="analytic-sub">Signalements synchronises</div>
+                <div className="analytic-sub">Signalements synchronisés</div>
               </div>
 
               <div className="analytic-card">
                 <div className="analytic-label">Cycle complet (moyenne)</div>
                 <div className="analytic-value">{formatDays(cycleAvgDays)}</div>
-                <div className="analytic-sub">Debut vers fin</div>
+                <div className="analytic-sub">Début → fin</div>
               </div>
 
             </div>
@@ -496,7 +476,7 @@ export default function AnalyticsPage() {
               <>
                 <div className="timeline-table">
                   <div className="section-header">
-                    <h3>Chronologie des travaux</h3>
+                    <h3>Timeline des travaux</h3>
                   </div>
                   <div className="table-scroll">
                     <table>
@@ -504,22 +484,22 @@ export default function AnalyticsPage() {
                         <tr>
                           <th>Entreprise</th>
                           <th>Type</th>
-                          <th>DÃ©but</th>
+                          <th>Début</th>
                           <th>En cours</th>
                           <th>Fin</th>
                         </tr>
                       </thead>
                       <tbody>
                         {workTimelines.map((row) => {
-                          const startCell = row.startDate ? formatSimpleDate(row.startDate) : 'â€”'
-                          const endCell = row.endDate ? formatSimpleDate(row.endDate) : 'â€”'
+                          const startCell = row.startDate ? formatSimpleDate(row.startDate) : '—'
+                          const endCell = row.endDate ? formatSimpleDate(row.endDate) : '—'
                           const inProgressCell = row.endDate
-                            ? 'â€”'
-                            : (row.inProgressDate ? formatSimpleDate(row.inProgressDate) : 'â€”')
+                            ? '—'
+                            : (row.inProgressDate ? formatSimpleDate(row.inProgressDate) : '—')
                           return (
                             <tr key={row.id}>
-                              <td>{row.companyName || 'â€”'}</td>
-                              <td>{row.typeProblem || 'â€”'}</td>
+                              <td>{row.companyName || '—'}</td>
+                              <td>{row.typeProblem || '—'}</td>
                               <td>{startCell}</td>
                               <td>{inProgressCell}</td>
                               <td>{endCell}</td>
@@ -536,10 +516,7 @@ export default function AnalyticsPage() {
             
           </>
         )}
-          </div>
-        </main>
       </div>
     </div>
   )
 }
-
