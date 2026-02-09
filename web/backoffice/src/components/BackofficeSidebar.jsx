@@ -2,6 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const SIDEBAR_STORAGE_KEY = 'backoffice_sidebar_open'
+const ICON_MAP = {
+  Map: '🗺️',
+  Stats: '📊',
+  Users: '👥',
+  Import: '📥',
+  Export: '📤',
+  Sync: '🔁',
+}
 
 export default function BackofficeSidebar({
   title = 'Backoffice',
@@ -31,6 +39,8 @@ export default function BackofficeSidebar({
     () => secondaryItems.filter((item) => !item.requiresManager || role === 'manager'),
     [secondaryItems, role],
   )
+
+  const getIcon = (icon) => ICON_MAP[icon] || icon || '•'
 
   return (
     <>
@@ -69,8 +79,8 @@ export default function BackofficeSidebar({
                 onClick={item.onClick}
                 disabled={item.disabled}
               >
-                <span className="sidebar-nav-icon">{item.icon}</span>
-                <span>{item.label}</span>
+                <span className="sidebar-nav-icon">{getIcon(item.icon)}</span>
+                <span className="sidebar-nav-label">{item.label}</span>
               </button>
             )
           })}
@@ -87,8 +97,8 @@ export default function BackofficeSidebar({
                   onClick={item.onClick}
                   disabled={item.disabled}
                 >
-                  <span className="sidebar-nav-icon">{item.icon}</span>
-                  <span>{item.label}</span>
+                  <span className="sidebar-nav-icon">{getIcon(item.icon)}</span>
+                  <span className="sidebar-nav-label">{item.label}</span>
                 </button>
               ))}
             </div>
