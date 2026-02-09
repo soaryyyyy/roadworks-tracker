@@ -398,42 +398,52 @@ export default function AnalyticsPage() {
           </header>
 
           <div className="analytics-content">
-        <div className="filter-row filter-row--wrap">
-          <label>Filtrer par dates :</label>
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-          <span>â†’</span>
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+        <div className="analytics-filters">
+          <div className="filter-row filter-row--wrap">
+            <label className="filter-field filter-field--date">
+              <span className="filter-label">Date debut</span>
+              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            </label>
+            <label className="filter-field filter-field--date">
+              <span className="filter-label">Date fin</span>
+              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+            </label>
 
-          <label>Entreprise :</label>
-          <select
-            value={selectedCompanyId}
-            onChange={(e) => {
-              const val = e.target.value
-              setSelectedCompanyId(val)
-              fetchWorkStats(val || null)
-              fetchWorkTimelines(val || null)
-            }}
-          >
-            <option value="">Toutes</option>
-            {companies.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+            <label className="filter-field">
+              <span className="filter-label">Entreprise</span>
+              <select
+                value={selectedCompanyId}
+                onChange={(e) => {
+                  const val = e.target.value
+                  setSelectedCompanyId(val)
+                  fetchWorkStats(val || null)
+                  fetchWorkTimelines(val || null)
+                }}
+              >
+                <option value="">Toutes</option>
+                {companies.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </label>
 
-          <label>Type :</label>
-          <select
-            value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
-          >
-            <option value="">Tous</option>
-            {types.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
+            <label className="filter-field">
+              <span className="filter-label">Type</span>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+              >
+                <option value="">Tous</option>
+                {types.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </label>
 
-          <button className="nav-button" onClick={() => { setStartDate(''); setEndDate(''); setSelectedCompanyId(''); setSelectedType(''); fetchWorkStats(); fetchWorkTimelines(); }}>
-            RÃ©initialiser
-          </button>
+            <button className="analytics-reset" onClick={() => { setStartDate(''); setEndDate(''); setSelectedCompanyId(''); setSelectedType(''); fetchWorkStats(); fetchWorkTimelines(); }}>
+              Reinitialiser
+            </button>
+          </div>
         </div>
 
         {syncMessage && (
@@ -458,26 +468,26 @@ export default function AnalyticsPage() {
                   />
                 </div>
                 <div className="analytic-sub">
-                  Nouveau 0% Â· En cours 50% Â· TerminÃ© 100%
+                  Nouveau 0% · En cours 50% · Termine 100%
                 </div>
               </div>
 
               
 
               <div className="analytic-card">
-                <div className="analytic-label">RÃ©partition</div>
+                <div className="analytic-label">Repartition</div>
                 <div className="badge-row">
                   <span className="pill pill-new">Nouveau {analytics.counts.new}</span>
                   <span className="pill pill-progress">En cours {analytics.counts.in_progress}</span>
-                  <span className="pill pill-done">TerminÃ© {analytics.counts.completed}</span>
+                  <span className="pill pill-done">Termine {analytics.counts.completed}</span>
                 </div>
-                <div className="analytic-sub">Signalements synchronisÃ©s</div>
+                <div className="analytic-sub">Signalements synchronises</div>
               </div>
 
               <div className="analytic-card">
                 <div className="analytic-label">Cycle complet (moyenne)</div>
                 <div className="analytic-value">{formatDays(cycleAvgDays)}</div>
-                <div className="analytic-sub">DÃ©but â†’ fin</div>
+                <div className="analytic-sub">Debut -> fin</div>
               </div>
 
             </div>
@@ -486,7 +496,7 @@ export default function AnalyticsPage() {
               <>
                 <div className="timeline-table">
                   <div className="section-header">
-                    <h3>Timeline des travaux</h3>
+                    <h3>Chronologie des travaux</h3>
                   </div>
                   <div className="table-scroll">
                     <table>
