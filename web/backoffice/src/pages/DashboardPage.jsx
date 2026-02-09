@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback } from 'react'
+﻿import { useState, useEffect, useCallback } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import { useNavigate } from 'react-router-dom'
 import { iconByType } from '../mapIcons'
 import SignalementDetailModal from '../components/SignalementDetailModal'
 import NotificationToast from '../components/NotificationToast'
+import BackofficeSidebar from '../components/BackofficeSidebar'
 import { useNotifications } from '../hooks/useNotifications'
 
-// Mapping des types de problèmes vers les types d'icônes
+// Mapping des types de problÃ¨mes vers les types d'icÃ´nes
 const mapProblemTypeToIcon = (typeName) => {
   if (!typeName) return 'other'
 
@@ -16,13 +17,13 @@ const mapProblemTypeToIcon = (typeName) => {
   const directTypes = ['pothole', 'blocked_road', 'accident', 'construction', 'flooding', 'debris', 'poor_surface', 'other']
   if (directTypes.includes(lower)) return lower
 
-  // Fallback pour anciens types français
+  // Fallback pour anciens types franÃ§ais
   if (lower.includes('danger')) return 'danger'
   if (lower.includes('travaux') || lower.includes('work')) return 'construction'
   if (lower.includes('inondation') || lower.includes('eau') || lower.includes('water')) return 'flooding'
-  if (lower.includes('fermée') || lower.includes('closed') || lower.includes('barr')) return 'blocked_road'
+  if (lower.includes('fermÃ©e') || lower.includes('closed') || lower.includes('barr')) return 'blocked_road'
   if (lower.includes('risque') || lower.includes('warning')) return 'poor_surface'
-  if (lower.includes('résolu')) return 'ok'
+  if (lower.includes('rÃ©solu')) return 'ok'
 
   return 'other'
 }
@@ -33,8 +34,8 @@ export default function DashboardPage() {
   const username = localStorage.getItem('username')
   const token = localStorage.getItem('token')
   const [events, setEvents] = useState([])
-  const [unsyncedEvents, setUnsyncedEvents] = useState([]) // Signalements Firebase non synchronisés
-  const [totalUnsyncedCount, setTotalUnsyncedCount] = useState(0) // Total incluant ceux sans coordonnées
+  const [unsyncedEvents, setUnsyncedEvents] = useState([]) // Signalements Firebase non synchronisÃ©s
+  const [totalUnsyncedCount, setTotalUnsyncedCount] = useState(0) // Total incluant ceux sans coordonnÃ©es
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedEvent, setSelectedEvent] = useState(null)
@@ -43,8 +44,7 @@ export default function DashboardPage() {
   const [syncingStatus, setSyncingStatus] = useState(false)
   const [syncMessage, setSyncMessage] = useState('')
   const [showNotifDropdown, setShowNotifDropdown] = useState(false)
-  const [showUnsyncedLegend, setShowUnsyncedLegend] = useState(true) // Pour afficher/masquer la légende
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [showUnsyncedLegend, setShowUnsyncedLegend] = useState(true) // Pour afficher/masquer la lÃ©gende
 
   const fetchSignalements = useCallback(async () => {
     try {
@@ -63,7 +63,7 @@ export default function DashboardPage() {
 
       const data = await response.json()
 
-      // Transformer les données pour correspondre au format attendu
+      // Transformer les donnÃ©es pour correspondre au format attendu
       const transformedEvents = data.map(signalement => {
         const [lat, lon] = signalement.location.split(',').map(parseFloat)
         return {
@@ -76,7 +76,7 @@ export default function DashboardPage() {
           status: signalement.detail?.etat || 'nouveau',
           date: signalement.detail?.dateProblem,
           work: signalement.detail?.work,
-          isSynced: true, // Les signalements de la BDD sont synchronisés
+          isSynced: true, // Les signalements de la BDD sont synchronisÃ©s
         }
       })
 
@@ -90,11 +90,11 @@ export default function DashboardPage() {
     }
   }, [token])
 
-  // Fonction pour récupérer les signalements Firebase non synchronisés (seulement pour les managers)
+  // Fonction pour rÃ©cupÃ©rer les signalements Firebase non synchronisÃ©s (seulement pour les managers)
   const fetchUnsyncedFirebaseSignalements = useCallback(async () => {
     console.log('fetchUnsyncedFirebaseSignalements called, role:', role, 'token:', token ? 'present' : 'absent')
     
-    // Seul le manager peut voir les signalements non synchronisés
+    // Seul le manager peut voir les signalements non synchronisÃ©s
     if (role !== 'manager') {
       console.log('Non manager (role=' + role + '), skip fetch unsynced')
       return
@@ -115,13 +115,13 @@ export default function DashboardPage() {
       })
 
       if (!response.ok) {
-        console.warn('Impossible de récupérer les signalements Firebase non synchronisés')
+        console.warn('Impossible de rÃ©cupÃ©rer les signalements Firebase non synchronisÃ©s')
         return
       }
 
       const data = await response.json()
 
-      // Transformer les données Firebase - filtrer ceux avec coordonnées valides
+      // Transformer les donnÃ©es Firebase - filtrer ceux avec coordonnÃ©es valides
       const transformedUnsyncedEvents = data
         .filter(signalement => signalement.lat !== undefined && signalement.lng !== undefined)
         .map(signalement => ({
@@ -139,7 +139,7 @@ export default function DashboardPage() {
       setTotalUnsyncedCount(data.length)
       setUnsyncedEvents(transformedUnsyncedEvents)
     } catch (err) {
-      console.warn('Erreur lors du chargement des signalements Firebase non synchronisés:', err)
+      console.warn('Erreur lors du chargement des signalements Firebase non synchronisÃ©s:', err)
       setUnsyncedEvents([])
       setTotalUnsyncedCount(0)
     }
@@ -151,7 +151,7 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchSignalements()
     // Ne plus charger automatiquement les signalements Firebase
-    // Ils seront chargés uniquement lors de la synchronisation
+    // Ils seront chargÃ©s uniquement lors de la synchronisation
   }, [fetchSignalements])
 
   const handleLogout = () => {
@@ -182,7 +182,7 @@ export default function DashboardPage() {
       setSyncing(true)
       setSyncMessage('')
 
-      // D'abord, récupérer les signalements Firebase non synchronisés pour affichage
+      // D'abord, rÃ©cupÃ©rer les signalements Firebase non synchronisÃ©s pour affichage
       await fetchUnsyncedFirebaseSignalements()
 
       // Ensuite, faire la synchronisation
@@ -199,17 +199,17 @@ export default function DashboardPage() {
       }
 
       const data = await response.json()
-      setSyncMessage(`✓ ${data.imported} signalements importés depuis Firebase`)
+      setSyncMessage(`âœ“ ${data.imported} signalements importÃ©s depuis Firebase`)
 
-      // Rafraîchir la liste des signalements locaux
+      // RafraÃ®chir la liste des signalements locaux
       await fetchSignalements()
       
-      // Vider les signalements non synchronisés après la sync
+      // Vider les signalements non synchronisÃ©s aprÃ¨s la sync
       setUnsyncedEvents([])
       setTotalUnsyncedCount(0)
     } catch (err) {
       console.error('Erreur:', err)
-      setSyncMessage(`✗ Erreur: ${err.message}`)
+      setSyncMessage(`âœ— Erreur: ${err.message}`)
     } finally {
       setSyncing(false)
     }
@@ -234,19 +234,19 @@ export default function DashboardPage() {
       }
 
       const data = await response.json()
-      setSyncMessage(`✓ ${data.exported} signalements envoyés vers l'application mobile`)
+      setSyncMessage(`âœ“ ${data.exported} signalements envoyÃ©s vers l'application mobile`)
 
-      // Rafraîchir la liste
+      // RafraÃ®chir la liste
       await fetchSignalements()
     } catch (err) {
       console.error('Erreur:', err)
-      setSyncMessage(`✗ Erreur: ${err.message}`)
+      setSyncMessage(`âœ— Erreur: ${err.message}`)
     } finally {
       setExporting(false)
     }
   }
 
-  // Synchroniser tous les statuts modifiés vers Firebase (mobile)
+  // Synchroniser tous les statuts modifiÃ©s vers Firebase (mobile)
   const handleSyncStatusToMobile = async () => {
     try {
       setSyncingStatus(true)
@@ -265,41 +265,41 @@ export default function DashboardPage() {
       }
 
       const data = await response.json()
-      setSyncMessage(`✓ ${data.synced} statuts synchronisés vers l'application mobile`)
+      setSyncMessage(`âœ“ ${data.synced} statuts synchronisÃ©s vers l'application mobile`)
     } catch (err) {
       console.error('Erreur:', err)
-      setSyncMessage(`✗ Erreur: ${err.message}`)
+      setSyncMessage(`âœ— Erreur: ${err.message}`)
     } finally {
       setSyncingStatus(false)
     }
   }
 
   const actionsMenu = [
-    { label: 'Analyses', icon: '📊', onClick: () => navigate('/analytics') },
+    { label: 'Analyses', icon: 'ðŸ“Š', onClick: () => navigate('/analytics') },
     {
       label: 'Importer de Mobile',
-      icon: '📥',
+      icon: 'ðŸ“¥',
       onClick: handleSyncFirebase,
       disabled: syncing || exporting || syncingStatus,
       requiresManager: true,
     },
     {
       label: 'Envoyer vers mobile',
-      icon: '📤',
+      icon: 'ðŸ“¤',
       onClick: handleExportToMobile,
       disabled: syncing || exporting || syncingStatus,
       requiresManager: true,
     },
     {
       label: 'Synchroniser les statuts',
-      icon: '🔁',
+      icon: 'ðŸ”',
       onClick: handleSyncStatusToMobile,
       disabled: syncing || exporting || syncingStatus,
       requiresManager: true,
     },
     {
       label: 'Gestion des utilisateurs',
-      icon: '👥',
+      icon: 'ðŸ‘¥',
       onClick: () => navigate('/users'),
       requiresManager: true,
     },
@@ -315,7 +315,7 @@ export default function DashboardPage() {
               <span className="sidebar-subtitle">Actions rapides</span>
             </div>
             <button className="sidebar-toggle close" onClick={() => setSidebarOpen(false)}>
-              ✕
+              âœ•
             </button>
           </div>
           <div className="sidebar-actions">
@@ -339,25 +339,25 @@ export default function DashboardPage() {
         <div className="header-left">
           {!sidebarOpen && (
             <button className="sidebar-toggle open" onClick={() => setSidebarOpen(true)}>
-              ☰
+              â˜°
             </button>
           )}
           <div>
             <h1>Dashboard - Suivi des travaux routiers</h1>
             <p className="user-info">
-              Connecté en tant que: <strong>{username}</strong> ({role})
+              ConnectÃ© en tant que: <strong>{username}</strong> ({role})
             </p>
           </div>
         </div>
         <div className="header-actions">
-          {/* Icône de notification */}
+          {/* IcÃ´ne de notification */}
           <div className="notification-bell-container">
             <button
               className="notification-bell"
               onClick={() => setShowNotifDropdown(!showNotifDropdown)}
               title="Notifications"
             >
-              🔔
+              ðŸ””
               {notifications.length > 0 && (
                 <span className="notification-badge">{notifications.length}</span>
               )}
@@ -387,9 +387,9 @@ export default function DashboardPage() {
                         }}
                       >
                         <div className="notification-item-icon">
-                          {notif.type === 'NEW_SIGNALEMENT' ? '🆕' :
-                           notif.type === 'STATUS_UPDATED' ? '🔄' :
-                           notif.type === 'WORK_ADDED' ? '🔧' : '📢'}
+                          {notif.type === 'NEW_SIGNALEMENT' ? 'ðŸ†•' :
+                           notif.type === 'STATUS_UPDATED' ? 'ðŸ”„' :
+                           notif.type === 'WORK_ADDED' ? 'ðŸ”§' : 'ðŸ“¢'}
                         </div>
                         <div className="notification-item-content">
                           <div className="notification-item-message">{notif.message}</div>
@@ -406,7 +406,7 @@ export default function DashboardPage() {
           </div>
 
           <button onClick={handleLogout} className="logout-button">
-            🚪 Déconnexion
+            ðŸšª DÃ©connexion
           </button>
         </div>
           </header>
@@ -414,50 +414,50 @@ export default function DashboardPage() {
           <div className="map-container">
         {loading && <div className="loading">Chargement des signalements...</div>}
         {error && <div className="error">Erreur: {error}</div>}
-        {syncMessage && <div className={syncMessage.includes('✓') ? 'success' : 'error'}>{syncMessage}</div>}
+        {syncMessage && <div className={syncMessage.includes('âœ“') ? 'success' : 'error'}>{syncMessage}</div>}
         
         {!loading && (
           <>
             <div className="info-bar">
-              📍 {events.length} signalement{events.length > 1 ? 's' : ''} local{events.length > 1 ? 'aux' : ''}
+              ðŸ“ {events.length} signalement{events.length > 1 ? 's' : ''} local{events.length > 1 ? 'aux' : ''}
               {role === 'manager' && (
                 <span className="sync-hint">
-                  {' '}| 📥 Importer = récupérer de l app mobile | 📤 Envoyer = exporter vers l app mobile
+                  {' '}| ðŸ“¥ Importer = rÃ©cupÃ©rer de l app mobile | ðŸ“¤ Envoyer = exporter vers l app mobile
                 </span>
               )}
               {role === 'manager' && totalUnsyncedCount > 0 && (
                 <span className="unsynced-count">
-                  {' '}| 🔶 {totalUnsyncedCount} en attente de synchronisation
+                  {' '}| ðŸ”¶ {totalUnsyncedCount} en attente de synchronisation
                   {unsyncedEvents.length < totalUnsyncedCount && (
-                    <span className="coords-warning"> ({totalUnsyncedCount - unsyncedEvents.length} sans coordonnées)</span>
+                    <span className="coords-warning"> ({totalUnsyncedCount - unsyncedEvents.length} sans coordonnÃ©es)</span>
                   )}
                 </span>
               )}
             </div>
             
-            {/* Légende pour les managers */}
+            {/* LÃ©gende pour les managers */}
             {role === 'manager' && totalUnsyncedCount > 0 && showUnsyncedLegend && (
               <div className="map-legend">
                 <div className="legend-header">
-                  <span>📋 Légende</span>
-                  <button onClick={() => setShowUnsyncedLegend(false)} className="legend-close">×</button>
+                  <span>ðŸ“‹ LÃ©gende</span>
+                  <button onClick={() => setShowUnsyncedLegend(false)} className="legend-close">Ã—</button>
                 </div>
                 <div className="legend-item">
-                  <span className="legend-icon synced">●</span>
-                  <span>Signalements synchronisés</span>
+                  <span className="legend-icon synced">â—</span>
+                  <span>Signalements synchronisÃ©s</span>
                 </div>
                 <div className="legend-item">
-                  <span className="legend-icon unsynced">●</span>
-                  <span>Firebase non synchronisés (cliquez pour synchroniser)</span>
+                  <span className="legend-icon unsynced">â—</span>
+                  <span>Firebase non synchronisÃ©s (cliquez pour synchroniser)</span>
                 </div>
               </div>
             )}
             
             <div className="map-root">
               <MapContainer center={[-18.95, 47.52]} zoom={10} className="map-inner" scrollWheelZoom>
-                <TileLayer url="http://localhost:8089/styles/basic-preview/512/{z}/{x}/{y}.png" attribution="© OpenStreetMap contributors" />
+                <TileLayer url="http://localhost:8089/styles/basic-preview/512/{z}/{x}/{y}.png" attribution="Â© OpenStreetMap contributors" />
 
-                {/* Signalements synchronisés */}
+                {/* Signalements synchronisÃ©s */}
                 {events.map((event) => (
                   <Marker
                     key={event.id}
@@ -483,14 +483,14 @@ export default function DashboardPage() {
                             marginTop: '8px',
                           }}
                         >
-                          Voir détails
+                          Voir dÃ©tails
                         </button>
                       </div>
                     </Popup>
                   </Marker>
                 ))}
 
-                {/* Signalements Firebase non synchronisés (visibles pour tous) */}
+                {/* Signalements Firebase non synchronisÃ©s (visibles pour tous) */}
                 {unsyncedEvents.map((event) => (
                   <Marker
                     key={event.id}
@@ -507,7 +507,7 @@ export default function DashboardPage() {
                           marginBottom: '8px',
                           fontSize: '12px'
                         }}>
-                          🔶 Non synchronisé
+                          ðŸ”¶ Non synchronisÃ©
                         </div>
                         <strong>{event.title}</strong>
                         <p>{event.description}</p>
@@ -527,7 +527,7 @@ export default function DashboardPage() {
                             opacity: syncing ? 0.7 : 1,
                           }}
                         >
-                          {syncing ? '⏳ Synchronisation...' : '🔄 Synchroniser maintenant'}
+                          {syncing ? 'â³ Synchronisation...' : 'ðŸ”„ Synchroniser maintenant'}
                         </button>
                       </div>
                     </Popup>
@@ -551,7 +551,7 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* Notifications en temps réel */}
+      {/* Notifications en temps rÃ©el */}
       <NotificationToast
         notifications={notifications}
         onDismiss={clearNotification}
@@ -561,9 +561,10 @@ export default function DashboardPage() {
       {/* Indicateur de connexion WebSocket */}
       <div className="ws-status">
         <div className={`ws-status-dot ${connected ? 'connected' : 'disconnected'}`}></div>
-        <span>{connected ? 'Temps réel' : 'Déconnecté'}</span>
+        <span>{connected ? 'Temps rÃ©el' : 'DÃ©connectÃ©'}</span>
       </div>
     </div>
   )
 }
+
 
