@@ -332,22 +332,6 @@ export default function AnalyticsPage() {
     navigate('/login')
   }
 
-  const primaryMenu = [
-    { label: 'Tableau de bord', icon: 'Map', onClick: () => navigate('/dashboard'), path: '/dashboard' },
-    { label: 'Analyses', icon: 'Stats', onClick: () => navigate('/analytics'), path: '/analytics' },
-    { label: 'Utilisateurs', icon: 'Users', onClick: () => navigate('/users'), path: '/users', requiresManager: true },
-  ]
-
-  const secondaryMenu = [
-    {
-      label: syncing ? 'Synchronisation...' : 'Sync Firebase',
-      icon: 'Sync',
-      onClick: handleSyncFirebase,
-      disabled: syncing,
-      requiresManager: true,
-    },
-  ]
-
   const handleSyncFirebase = async () => {
     try {
       setSyncing(true)
@@ -374,6 +358,22 @@ export default function AnalyticsPage() {
       setSyncing(false)
     }
   }
+
+  const primaryMenu = [
+    { label: 'Tableau de bord', icon: 'Map', onClick: () => navigate('/dashboard'), path: '/dashboard' },
+    { label: 'Analyses', icon: 'Stats', onClick: () => navigate('/analytics'), path: '/analytics' },
+    { label: 'Utilisateurs', icon: 'Users', onClick: () => navigate('/users'), path: '/users', requiresManager: true },
+  ]
+
+  const secondaryMenu = [
+    {
+      label: syncing ? 'Synchronisation...' : 'Sync Firebase',
+      icon: 'Sync',
+      onClick: handleSyncFirebase,
+      disabled: syncing,
+      requiresManager: true,
+    },
+  ]
 
   return (
     <div className="dashboard-container analytics-page">
