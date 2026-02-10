@@ -1,0 +1,651 @@
+{
+	"info": {
+		"_postman_id": "roadworks-tracker-api",
+		"name": "Roadworks Tracker API",
+		"description": "Collection complète des API du projet Roadworks Tracker.\n\n**Base URL**: http://localhost:8080\n\n**Authentification**: Token Bearer via POST /api/auth/login\n\nProjet ITU - S5 - Groupe Mr Rojo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Auth",
+			"description": "Authentification et gestion des utilisateurs",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.collectionVariables.set('token', jsonData.token);",
+									"        console.log('Token sauvegardé automatiquement');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Connexion utilisateur. Le token est automatiquement sauvegardé dans la variable `token`.\n\nCompte admin par défaut: admin / admin"
+					}
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"newuser\",\n    \"password\": \"password123\",\n    \"role\": \"utilisateur\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "register"]
+						},
+						"description": "Inscription d'un nouvel utilisateur"
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "logout"]
+						},
+						"description": "Déconnexion - invalide le token de session"
+					}
+				},
+				{
+					"name": "Validate Token",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/validate",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "validate"]
+						},
+						"description": "Vérifie si le token de session est valide et non expiré"
+					}
+				},
+				{
+					"name": "Get Roles",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/auth/roles",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "roles"]
+						},
+						"description": "Liste tous les rôles disponibles"
+					}
+				},
+				{
+					"name": "Get Users (local)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/auth/users",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "users"]
+						},
+						"description": "Liste tous les utilisateurs de la base locale (PostgreSQL)"
+					}
+				},
+				{
+					"name": "Get Firebase Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/firebase-users",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "firebase-users"]
+						},
+						"description": "Liste les utilisateurs Firebase (application mobile)"
+					}
+				},
+				{
+					"name": "Import Firebase Users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/import-firebase",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "import-firebase"]
+						},
+						"description": "Importe tous les utilisateurs Firebase vers la base locale"
+					}
+				},
+				{
+					"name": "Sync Status to Firebase",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/sync-status-to-firebase",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "sync-status-to-firebase"]
+						},
+						"description": "Synchronise les statuts bloqué/débloqué vers Firebase/Firestore"
+					}
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": \"manager\",\n    \"password\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/users/:userId",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "users", ":userId"],
+							"variable": [
+								{ "key": "userId", "value": "1", "description": "ID utilisateur (local ou UID Firebase)" }
+							]
+						},
+						"description": "Met à jour un utilisateur (rôle, mot de passe). Laisser password vide pour ne pas modifier."
+					}
+				},
+				{
+					"name": "Unlock Local User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/users/:userId/unlock",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "users", ":userId", "unlock"],
+							"variable": [
+								{ "key": "userId", "value": "1", "description": "ID utilisateur local" }
+							]
+						},
+						"description": "Débloque un compte utilisateur local bloqué"
+					}
+				},
+				{
+					"name": "Unlock Firebase User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/firebase-users/:firebaseUid/unlock",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "firebase-users", ":firebaseUid", "unlock"],
+							"variable": [
+								{ "key": "firebaseUid", "value": "", "description": "UID Firebase de l'utilisateur" }
+							]
+						},
+						"description": "Débloque un utilisateur Firebase dans Firestore"
+					}
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/users/:userId",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "users", ":userId"],
+							"variable": [
+								{ "key": "userId", "value": "1", "description": "ID utilisateur" }
+							]
+						},
+						"description": "Supprime un utilisateur (⚠️ non implémenté, retourne 501)"
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Signalements",
+			"description": "CRUD et gestion des signalements d'incidents routiers",
+			"item": [
+				{
+					"name": "Get All Signalements",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" },
+							{ "key": "X-Username", "value": "admin" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/signalements",
+							"host": ["{{base_url}}"],
+							"path": ["api", "signalements"]
+						},
+						"description": "Liste tous les signalements avec détails (type problème, statut, entreprise, coûts)"
+					}
+				},
+				{
+					"name": "Get Signalement by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" },
+							{ "key": "X-Username", "value": "admin" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/signalements/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "signalements", ":id"],
+							"variable": [
+								{ "key": "id", "value": "1", "description": "ID du signalement" }
+							]
+						},
+						"description": "Récupère un signalement par ID"
+					}
+				},
+				{
+					"name": "Get Signalements by Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/signalements/status/:status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "signalements", "status", ":status"],
+							"variable": [
+								{ "key": "status", "value": "new", "description": "Statut: new, in_progress, completed, cancelled" }
+							]
+						},
+						"description": "Filtre les signalements par statut"
+					}
+				},
+				{
+					"name": "Get Signalement Photos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/signalements/:id/photos",
+							"host": ["{{base_url}}"],
+							"path": ["api", "signalements", ":id", "photos"],
+							"variable": [
+								{ "key": "id", "value": "1", "description": "ID du signalement" }
+							]
+						},
+						"description": "Récupère les photos associées à un signalement"
+					}
+				},
+				{
+					"name": "Update Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" },
+							{ "key": "X-Username", "value": "admin" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"in_progress\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/signalements/:id/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "signalements", ":id", "status"],
+							"variable": [
+								{ "key": "id", "value": "1", "description": "ID du signalement" }
+							]
+						},
+						"description": "Met à jour le statut d'un signalement (new, in_progress, completed, cancelled)"
+					}
+				},
+				{
+					"name": "Add Work (Réparation)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" },
+							{ "key": "X-Username", "value": "admin" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_company\": 1,\n    \"start_date\": \"2026-02-10\",\n    \"end_date_estimation\": \"2026-03-10\",\n    \"price\": 150000.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/signalements/:id/work",
+							"host": ["{{base_url}}"],
+							"path": ["api", "signalements", ":id", "work"],
+							"variable": [
+								{ "key": "id", "value": "1", "description": "ID du signalement" }
+							]
+						},
+						"description": "Ajoute une réparation à un signalement (entreprise, coûts, durées)"
+					}
+				},
+				{
+					"name": "Sync from Firebase",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" },
+							{ "key": "X-Username", "value": "admin" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/signalements/sync-firebase",
+							"host": ["{{base_url}}"],
+							"path": ["api", "signalements", "sync-firebase"]
+						},
+						"description": "Synchronise les signalements depuis Firebase vers la BD locale"
+					}
+				},
+				{
+					"name": "Export to Firebase",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" },
+							{ "key": "X-Username", "value": "admin" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/signalements/export-to-firebase",
+							"host": ["{{base_url}}"],
+							"path": ["api", "signalements", "export-to-firebase"]
+						},
+						"description": "Exporte les signalements locaux (sans firebase_id) vers Firebase"
+					}
+				},
+				{
+					"name": "Sync Status to Firebase",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" },
+							{ "key": "X-Username", "value": "admin" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/signalements/sync-status-to-firebase",
+							"host": ["{{base_url}}"],
+							"path": ["api", "signalements", "sync-status-to-firebase"]
+						},
+						"description": "Synchronise tous les statuts vers Firebase"
+					}
+				},
+				{
+					"name": "Sync Single to Firebase",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" },
+							{ "key": "X-Username", "value": "admin" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/signalements/:id/sync-to-firebase",
+							"host": ["{{base_url}}"],
+							"path": ["api", "signalements", ":id", "sync-to-firebase"],
+							"variable": [
+								{ "key": "id", "value": "1", "description": "ID du signalement" }
+							]
+						},
+						"description": "Synchronise un signalement spécifique vers Firebase"
+					}
+				},
+				{
+					"name": "Get Unsynced from Firebase",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" },
+							{ "key": "X-Username", "value": "admin" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/signalements/firebase-unsynced",
+							"host": ["{{base_url}}"],
+							"path": ["api", "signalements", "firebase-unsynced"]
+						},
+						"description": "Récupère les signalements Firebase non encore importés en local"
+					}
+				}
+			]
+		},
+		{
+			"name": "🏢 Companies",
+			"description": "Gestion des entreprises de réparation",
+			"item": [
+				{
+					"name": "Get All Companies",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/companies",
+							"host": ["{{base_url}}"],
+							"path": ["api", "companies"]
+						},
+						"description": "Liste toutes les entreprises"
+					}
+				},
+				{
+					"name": "Get Company by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/companies/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "companies", ":id"],
+							"variable": [
+								{ "key": "id", "value": "1", "description": "ID de l'entreprise" }
+							]
+						},
+						"description": "Récupère une entreprise par son ID"
+					}
+				},
+				{
+					"name": "Create Company",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"BTP Madagascar\",\n    \"siret\": \"12345678901234\",\n    \"address\": \"Lot IB 123, Antananarivo\",\n    \"phone\": \"+261 34 00 000 00\",\n    \"email\": \"contact@btp-mada.mg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/companies",
+							"host": ["{{base_url}}"],
+							"path": ["api", "companies"]
+						},
+						"description": "Crée une nouvelle entreprise"
+					}
+				},
+				{
+					"name": "Update Company",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"BTP Madagascar Updated\",\n    \"siret\": \"12345678901234\",\n    \"address\": \"Lot IB 456, Antananarivo\",\n    \"phone\": \"+261 34 00 000 00\",\n    \"email\": \"info@btp-mada.mg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/companies/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "companies", ":id"],
+							"variable": [
+								{ "key": "id", "value": "1", "description": "ID de l'entreprise" }
+							]
+						},
+						"description": "Met à jour une entreprise existante"
+					}
+				},
+				{
+					"name": "Delete Company",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/companies/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "companies", ":id"],
+							"variable": [
+								{ "key": "id", "value": "1", "description": "ID de l'entreprise" }
+							]
+						},
+						"description": "Supprime une entreprise"
+					}
+				}
+			]
+		},
+		{
+			"name": "📊 Stats & Timeline",
+			"description": "Statistiques et timeline des travaux",
+			"item": [
+				{
+					"name": "Get Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/stats?companyId=&startDate=&endDate=&status=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "stats"],
+							"query": [
+								{ "key": "companyId", "value": "", "description": "(Optionnel) ID entreprise" },
+								{ "key": "startDate", "value": "", "description": "(Optionnel) Date début YYYY-MM-DD" },
+								{ "key": "endDate", "value": "", "description": "(Optionnel) Date fin YYYY-MM-DD" },
+								{ "key": "status", "value": "", "description": "(Optionnel) Statut" }
+							]
+						},
+						"description": "Calcule les statistiques de travaux avec filtres optionnels"
+					}
+				},
+				{
+					"name": "Get Timeline",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/stats/timeline?companyId=&startDate=&endDate=&status=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "stats", "timeline"],
+							"query": [
+								{ "key": "companyId", "value": "", "description": "(Optionnel) ID entreprise" },
+								{ "key": "startDate", "value": "", "description": "(Optionnel) Date début YYYY-MM-DD" },
+								{ "key": "endDate", "value": "", "description": "(Optionnel) Date fin YYYY-MM-DD" },
+								{ "key": "status", "value": "", "description": "(Optionnel) Statut" }
+							]
+						},
+						"description": "Liste les timelines des travaux avec filtres optionnels"
+					}
+				}
+			]
+		},
+		{
+			"name": "📈 Advancement Rate",
+			"description": "Taux d'avancement par statut",
+			"item": [
+				{
+					"name": "Get All Rates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/advancement-rates",
+							"host": ["{{base_url}}"],
+							"path": ["api", "advancement-rates"]
+						},
+						"description": "Liste tous les taux d'avancement"
+					}
+				},
+				{
+					"name": "Update Rate",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/advancement-rates/:statusKey?percentage=50",
+							"host": ["{{base_url}}"],
+							"path": ["api", "advancement-rates", ":statusKey"],
+							"query": [
+								{ "key": "percentage", "value": "50", "description": "Pourcentage (0-100)" }
+							],
+							"variable": [
+								{ "key": "statusKey", "value": "in_progress", "description": "Clé du statut (new, in_progress, completed, cancelled)" }
+							]
+						},
+						"description": "Crée ou met à jour le taux d'avancement pour un statut"
+					}
+				}
+			]
+		}
+	]
+}
