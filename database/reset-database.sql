@@ -113,13 +113,20 @@ CREATE TABLE signalement_status (
 );
 
 CREATE TABLE signalement_work (
-    id BIGSERIAL PRIMARY KEY,
-    id_signalement BIGINT NOT NULL REFERENCES signalement(id) ON DELETE CASCADE,
-    id_company BIGINT NOT NULL REFERENCES company(id),
-    start_date DATE,
-    end_date_estimation DATE,
-    price NUMERIC(14,2),
-    real_end_date DATE
+  id BIGSERIAL PRIMARY KEY,
+  id_signalement BIGINT NOT NULL,
+  id_company BIGINT NOT NULL,
+  start_date DATE,
+  end_date_estimation DATE,
+  price NUMERIC(14,2),
+  real_end_date DATE,
+  id_reparation_type INT,
+  CONSTRAINT fk_work_signalement
+    FOREIGN KEY (id_signalement) REFERENCES signalement(id) ON DELETE CASCADE,
+  CONSTRAINT fk_work_company
+    FOREIGN KEY (id_company) REFERENCES company(id),
+  CONSTRAINT fk_work_reparation_type
+    FOREIGN KEY (id_reparation_type) REFERENCES reparation_type(id)
 );
 
 CREATE TABLE session (
@@ -204,7 +211,10 @@ INSERT INTO advancement_rate (status_key, percentage) VALUES
     ('in_progress', 50),
     ('terminé', 100),
     ('completed', 100);
-    
+
+-- Insérer les niveaux de réparation (1 à 10)
+INSERT INTO reparation_type (niveau) VALUES
+    (1), (2), (3), (4), (5), (6), (7), (8), (9), (10);
 
 -- Insérer l'utilisateur admin par défaut (rôle manager = id 2)
 -- Mot de passe: admin123 (hashé avec SHA-256 + Base64)
