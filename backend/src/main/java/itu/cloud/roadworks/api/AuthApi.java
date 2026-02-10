@@ -377,6 +377,28 @@ public class AuthApi {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Supprimer un utilisateur (placeholder)",
+            description = "Endpoint de suppression ajoute pour futur merge, sans logique active."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "501",
+                    description = "Suppression non implementee",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<AuthResponse> deleteUser(
+            @Parameter(description = "ID de l'utilisateur a supprimer", required = true)
+            @PathVariable String userId) {
+        return ResponseEntity.status(501).body(AuthResponse.builder()
+                .username(userId)
+                .message("Suppression utilisateur non implementee")
+                .build());
+    }
+
     // Schemas pour la documentation Swagger
     @Schema(description = "Réponse contenant les informations d'un rôle")
     private record RoleResponse(
