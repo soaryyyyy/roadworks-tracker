@@ -1,4 +1,4 @@
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
+import { MapContainer, Marker, Popup, Tooltip, TileLayer, useMap } from 'react-leaflet'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { iconByType } from '../mapIcons'
@@ -33,7 +33,20 @@ function MarkersLayer({ events }) {
         const tone = statusTone(status)
 
         return (
-          <Marker key={event.id} position={[event.lat, event.lon]} icon={icon}>
+          <Marker
+            key={event.id}
+            position={[event.lat, event.lon]}
+            icon={icon}
+          >
+            <Tooltip direction="top" offset={[0, -10]} opacity={0.95}>
+              <div style={{ textAlign: 'center' }}>
+                <strong>{event.illustration_problem} {event.type_problem.replace(/_/g, ' ')}</strong>
+                <br />
+                <span className={`rw-badge rw-badge--${tone}`}>{status}</span>
+                <br />
+                <small style={{ opacity: 0.7, fontStyle: 'italic' }}>Cliquer pour plus de détails</small>
+              </div>
+            </Tooltip>
             <Popup>
               <article className="rw-popup">
                 <header className="rw-popup__header">
