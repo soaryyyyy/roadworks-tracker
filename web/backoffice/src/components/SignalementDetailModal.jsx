@@ -341,7 +341,7 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
               </div>
               <div className="detail-row">
                 <label>Budget:</label>
-                <p>${signalement.work.price ? parseFloat(signalement.work.price).toFixed(2) : 'N/A'}</p>
+                <p>{signalement.work.price ? parseFloat(signalement.work.price).toFixed(2) : 'N/A'} MGA</p>
               </div>
             </>
           )}
