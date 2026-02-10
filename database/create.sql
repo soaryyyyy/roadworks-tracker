@@ -78,6 +78,10 @@ CREATE TABLE signalement (
   CONSTRAINT fk_signalement_type
     FOREIGN KEY (id_type_problem) REFERENCES type_problem(id)
 );
+create table reparation_type (
+  id BIGSERIAL PRIMARY KEY,
+  niveau INT NOT NULL
+);
 
 CREATE TABLE signalement_work (
   id BIGSERIAL PRIMARY KEY,
@@ -87,10 +91,13 @@ CREATE TABLE signalement_work (
   end_date_estimation DATE,
   price NUMERIC(14,2),
   real_end_date DATE,
+  id_reparation_type INT,
   CONSTRAINT fk_work_signalement
     FOREIGN KEY (id_signalement) REFERENCES signalement(id) ON DELETE CASCADE,
   CONSTRAINT fk_work_company
-    FOREIGN KEY (id_company) REFERENCES company(id)
+    FOREIGN KEY (id_company) REFERENCES company(id),
+  CONSTRAINT fk_work_reparation_type
+    FOREIGN KEY (id_reparation_type) REFERENCES reparation_type(id)
 );
 
 CREATE TABLE signalement_status (
@@ -115,6 +122,7 @@ CREATE TABLE session (
   CONSTRAINT fk_session_account
     FOREIGN KEY (id_account) REFERENCES account(id) ON DELETE CASCADE
 );
+
 
 CREATE VIEW signalement_problem_view AS
 SELECT

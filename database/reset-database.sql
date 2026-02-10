@@ -16,6 +16,7 @@ DROP TABLE IF EXISTS type_problem CASCADE;
 DROP TABLE IF EXISTS role CASCADE;
 DROP TABLE IF EXISTS config CASCADE;
 DROP TABLE IF EXISTS advancement_rate CASCADE;
+DROP TABLE IF EXISTS reparation_type CASCADE;
 
 -- Recréer les tables avec la structure originale
 CREATE TABLE role (
@@ -38,6 +39,11 @@ CREATE TABLE type_problem (
     libelle VARCHAR(100) NOT NULL UNIQUE,
     icone VARCHAR(50)
 );
+create table reparation_type (
+  id BIGSERIAL PRIMARY KEY,
+  niveau INT NOT NULL
+);
+
 
 CREATE TABLE account (
     id BIGSERIAL PRIMARY KEY,
