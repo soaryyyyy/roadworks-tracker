@@ -11,6 +11,8 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
   const [loadingCompanies, setLoadingCompanies] = useState(false)
   const [reparationTypes, setReparationTypes] = useState([])
   const [loadingReparationTypes, setLoadingReparationTypes] = useState(false)
+  const [defaultPrice, setDefaultPrice] = useState(null)
+  const [loadingDefaultPrice, setLoadingDefaultPrice] = useState(false)
   const [syncLoading, setSyncLoading] = useState(false)
   const [syncSuccess, setSyncSuccess] = useState('')
   
@@ -21,7 +23,6 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
     reparationTypeId: '',
     startDate: new Date().toISOString().split('T')[0],
     endDate: '',
-    price: '',
   })
 
   // Charger les companies au montage du composant
@@ -75,9 +76,35 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
       }
     }
 
+    const fetchDefaultPrice = async () => {
+      try {
+        setLoadingDefaultPrice(true)
+        const response = await fetch('/api/m2-forfaits/current', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        })
+
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok) {
+          setDefaultPrice(null)
+          return
+        }
+        setDefaultPrice(data?.price ?? null)
+      } catch (err) {
+        console.error('Erreur:', err)
+        setDefaultPrice(null)
+      } finally {
+        setLoadingDefaultPrice(false)
+      }
+    }
+
     if (showWorkForm) {
       fetchCompanies()
       fetchReparationTypes()
+      fetchDefaultPrice()
     }
   }, [showWorkForm, token])
 
@@ -140,8 +167,11 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
       setError('')
 
       // Validation
-      if (!formData.surface || !formData.companyId || !formData.price) {
+      if (!formData.surface || !formData.companyId) {
         throw new Error('Veuillez remplir tous les champs obligatoires')
+      }
+      if (!formData.reparationTypeId) {
+        throw new Error('Le niveau de réparation est obligatoire')
       }
 
       const response = await fetch(`/api/signalements/${signalement.id}/work`, {
@@ -156,7 +186,7 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
           reparationTypeId: formData.reparationTypeId ? Number(formData.reparationTypeId) : null,
           startDate: formData.startDate,
           endDate: formData.endDate,
-          price: parseFloat(formData.price),
+          price: null,
           status: 'en_cours', // Changer le statut à en_cours
         }),
       })
@@ -182,6 +212,24 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
       ...prev,
       [field]: value,
     }))
+  }
+
+  const selectedReparationLevel = () => {
+    const id = Number(formData.reparationTypeId)
+    if (!Number.isFinite(id) || id <= 0) return null
+    const match = reparationTypes.find((type) => Number(type.id) === id)
+    const niveau = match?.niveau != null ? Number(match.niveau) : null
+    return Number.isFinite(niveau) ? niveau : null
+  }
+
+  const estimateBudget = () => {
+    const surface = Number(formData.surface)
+    const priceM2 = Number(defaultPrice)
+    const level = selectedReparationLevel()
+    if (!Number.isFinite(surface) || surface <= 0) return null
+    if (!Number.isFinite(priceM2) || priceM2 <= 0) return null
+    if (!Number.isFinite(level) || level <= 0) return null
+    return Math.round(surface * priceM2 * level)
   }
 
   const handleSyncToFirebase = async () => {
@@ -381,16 +429,18 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="price">Budget (Ar):</label>
-                    <input
-                      id="price"
-                      type="number"
-                      step="0.01"
-                      value={formData.price}
-                      onChange={(e) => handleFormChange('price', e.target.value)}
-                      placeholder="Ex: 150000"
-                      className="form-input"
-                    />
+                    <label>Estimation (auto):</label>
+                    <p className="form-input" style={{ color: '#666', fontStyle: 'italic' }}>
+                      {loadingDefaultPrice ? (
+                        '⏳ Chargement du prix forfaitaire…'
+                      ) : estimateBudget() != null ? (
+                        `≈ ${estimateBudget().toLocaleString('fr-FR')} Ar (prix: ${Number(defaultPrice).toLocaleString('fr-FR')} Ar/m²)`
+                      ) : defaultPrice == null ? (
+                        '— (prix forfaitaire non défini)'
+                      ) : (
+                        '— (saisissez une surface et un niveau)'
+                      )}
+                    </p>
                   </div>
 
                   {error && <div className="error-message">{error}</div>}

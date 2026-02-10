@@ -44,6 +44,7 @@ public class SignalementService {
     private final SignalementPhotoRepository photoRepository;
     private final CompanyRepository companyRepository;
     private final ReparationTypeRepository reparationTypeRepository;
+    private final BudgetForfaitaireService budgetForfaitaireService;
     private final FirebaseService firebaseService;
     private final NotificationService notificationService;
     private final FcmService fcmService;
@@ -538,13 +539,30 @@ public class SignalementService {
                 }
             }
 
+            BigDecimal price;
+            if (workData.containsKey("price") && workData.get("price") != null) {
+                price = BigDecimal.valueOf(((Number) workData.get("price")).doubleValue());
+                if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                    price = null;
+                }
+            } else {
+                price = null;
+            }
+
+            if (price == null) {
+                if (reparationType == null || reparationType.getNiveau() == null) {
+                    throw new Exception("Type de réparation obligatoire pour calculer automatiquement le budget");
+                }
+                price = budgetForfaitaireService.calculerBudget(signalement.getSurface(), reparationType.getNiveau());
+            }
+
             SignalementWork work = SignalementWork.builder()
                     .signalement(signalement)
                     .company(company)
                     .reparationType(reparationType)
                     .startDate(startDate)
                     .endDateEstimation(endDate)
-                    .price(BigDecimal.valueOf(((Number) workData.get("price")).doubleValue()))
+                    .price(price)
                     .build();
 
             workRepository.save(work);

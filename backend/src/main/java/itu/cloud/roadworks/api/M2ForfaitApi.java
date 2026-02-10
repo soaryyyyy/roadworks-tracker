@@ -44,6 +44,22 @@ public class M2ForfaitApi {
         return repository.findAll();
     }
 
+    @Operation(summary = "Récupérer le prix forfaitaire courant (dernier)")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Prix courant récupéré",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultPrice.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "Aucun prix forfaitaire défini")
+    })
+    @GetMapping("/current")
+    public ResponseEntity<?> current() {
+        return repository.findTopByOrderByIdDesc()
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Aucun prix forfaitaire défini")));
+    }
+
     @Operation(summary = "Récupérer un forfait m² par id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Forfait récupéré"),
