@@ -9,6 +9,8 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
   const [showWorkForm, setShowWorkForm] = useState(false)
   const [companies, setCompanies] = useState([])
   const [loadingCompanies, setLoadingCompanies] = useState(false)
+  const [reparationTypes, setReparationTypes] = useState([])
+  const [loadingReparationTypes, setLoadingReparationTypes] = useState(false)
   const [syncLoading, setSyncLoading] = useState(false)
   const [syncSuccess, setSyncSuccess] = useState('')
   
@@ -16,6 +18,7 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
   const [formData, setFormData] = useState({
     surface: '',
     companyId: '',
+    reparationTypeId: '',
     startDate: new Date().toISOString().split('T')[0],
     endDate: '',
     price: '',
@@ -47,8 +50,34 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
       }
     }
 
+    const fetchReparationTypes = async () => {
+      try {
+        setLoadingReparationTypes(true)
+        const response = await fetch('/api/reparation-types', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Erreur lors du chargement des niveaux de réparation')
+        }
+
+        const data = await response.json()
+        setReparationTypes(Array.isArray(data) ? data : [])
+      } catch (err) {
+        console.error('Erreur:', err)
+        setReparationTypes([])
+      } finally {
+        setLoadingReparationTypes(false)
+      }
+    }
+
     if (showWorkForm) {
       fetchCompanies()
+      fetchReparationTypes()
     }
   }, [showWorkForm, token])
 
@@ -124,6 +153,7 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
         body: JSON.stringify({
           surface: parseFloat(formData.surface),
           companyId: formData.companyId,
+          reparationTypeId: formData.reparationTypeId ? Number(formData.reparationTypeId) : null,
           startDate: formData.startDate,
           endDate: formData.endDate,
           price: parseFloat(formData.price),
@@ -229,6 +259,10 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
                 <p>{signalement.work.surface || 'N/A'}</p>
               </div>
               <div className="detail-row">
+                <label>Niveau de réparation:</label>
+                <p>{signalement.work.reparationType?.niveau ?? 'N/A'}</p>
+              </div>
+              <div className="detail-row">
                 <label>Entreprise:</label>
                 <p>{signalement.work.company || 'N/A'}</p>
               </div>
@@ -295,6 +329,32 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
                       <p className="form-input" style={{ color: '#e74c3c', fontStyle: 'italic' }}>
                         ❌ Aucune entreprise disponible
                       </p>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="reparationType">Niveau de réparation:</label>
+                    {loadingReparationTypes ? (
+                      <p className="form-input" style={{ color: '#666', fontStyle: 'italic' }}>
+                        ⏳ Chargement des niveaux...
+                      </p>
+                    ) : (
+                      <select
+                        id="reparationType"
+                        value={formData.reparationTypeId}
+                        onChange={(e) => handleFormChange('reparationTypeId', e.target.value)}
+                        className="form-input"
+                      >
+                        <option value="">-- Sélectionner un niveau --</option>
+                        {(reparationTypes.length > 0
+                          ? reparationTypes
+                          : Array.from({ length: 10 }, (_, index) => ({ id: index + 1, niveau: index + 1 }))
+                        ).map((type) => (
+                          <option key={type.id} value={type.id}>
+                            Niveau {type.niveau}
+                          </option>
+                        ))}
+                      </select>
                     )}
                   </div>
 

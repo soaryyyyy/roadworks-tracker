@@ -89,5 +89,20 @@ public class SignalementProblemDto {
 
         @Schema(description = "Entreprise responsable")
         private CompanyDto company;
+
+        @Schema(description = "Type/niveau de réparation")
+        private ReparationTypeDto reparationType;
+    }
+
+    @Data
+    @Builder
+    @Schema(description = "Type de réparation (niveau)")
+    public static class ReparationTypeDto {
+
+        @Schema(description = "Identifiant du type de réparation", example = "1")
+        private Long id;
+
+        @Schema(description = "Niveau de réparation", example = "3")
+        private Integer niveau;
     }
 }

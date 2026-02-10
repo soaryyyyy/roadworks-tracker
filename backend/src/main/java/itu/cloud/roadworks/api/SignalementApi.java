@@ -240,6 +240,7 @@ public class SignalementApi {
                     - start_date: Date de début (YYYY-MM-DD)
                     - end_date_estimation: Date de fin estimée
                     - price: Coût estimé
+                    - reparationTypeId: ID du niveau de réparation (table reparation_type)
                     """)
             @RequestBody Map<String, Object> requestBody) {
         try {
