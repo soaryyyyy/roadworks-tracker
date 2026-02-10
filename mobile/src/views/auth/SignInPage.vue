@@ -57,10 +57,10 @@
         </ion-button>
 
         <!-- Sign up link -->
-        <div class="auth-link">
+        <!-- <div class="auth-link">
           <span>Pas encore de compte ?</span>
           <a @click="goToSignUp">S'inscrire</a>
-        </div>
+        </div> -->
       </div>
 
     </ion-content>

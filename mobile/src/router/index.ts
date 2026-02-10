@@ -21,6 +21,7 @@ const routes: Array<RouteRecordRaw> = [
   },
 
   { path: '/auth/signIn', component: () => import('@/views/auth/SignInPage.vue') },
+  { path: '/auth/signUp', component: () => import('@/views/auth/SignUpPage.vue') },
   { path: '/admin/blocked-accounts', component: () => import('@/views/admin/AdminBlockedAccountsPage.vue') },
 ]
 
