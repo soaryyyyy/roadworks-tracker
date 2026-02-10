@@ -31,6 +31,7 @@ function MarkersLayer({ events }) {
         const entreprise = event.detail_problem.entreprise_assign
         const status = event.detail_problem.etat
         const tone = statusTone(status)
+        const repairLevel = event.work?.reparationType?.niveau
 
         return (
           <Marker key={event.id} position={[event.lat, event.lon]} icon={icon}>
@@ -62,6 +63,10 @@ function MarkersLayer({ events }) {
                   <div>
                     <dt>Entreprise</dt>
                     <dd>{entreprise?.name ?? 'Non attribué'}</dd>
+                  </div>
+                  <div>
+                    <dt>Niveau réparation</dt>
+                    <dd>{repairLevel ?? '—'}</dd>
                   </div>
                 </dl>
 
@@ -116,6 +121,12 @@ MapView.propTypes = {
       lat: PropTypes.number.isRequired,
       lon: PropTypes.number.isRequired,
       icon_key: PropTypes.string.isRequired,
+      work: PropTypes.shape({
+        reparationType: PropTypes.shape({
+          id: PropTypes.number,
+          niveau: PropTypes.number,
+        }),
+      }),
       detail_problem: PropTypes.shape({
         etat: PropTypes.string.isRequired,
         date_problem: PropTypes.string.isRequired,
