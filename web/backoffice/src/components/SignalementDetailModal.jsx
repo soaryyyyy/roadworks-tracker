@@ -23,7 +23,6 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
     reparationTypeId: '',
     startDate: new Date().toISOString().split('T')[0],
     endDate: '',
-    price: '',
   })
 
   // Charger les companies au montage du composant
@@ -171,8 +170,8 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
       if (!formData.surface || !formData.companyId) {
         throw new Error('Veuillez remplir tous les champs obligatoires')
       }
-      if (!formData.price && !formData.reparationTypeId) {
-        throw new Error('Le niveau de réparation est obligatoire si vous laissez le budget en automatique')
+      if (!formData.reparationTypeId) {
+        throw new Error('Le niveau de réparation est obligatoire')
       }
 
       const response = await fetch(`/api/signalements/${signalement.id}/work`, {
@@ -187,7 +186,7 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
           reparationTypeId: formData.reparationTypeId ? Number(formData.reparationTypeId) : null,
           startDate: formData.startDate,
           endDate: formData.endDate,
-          price: formData.price ? parseFloat(formData.price) : null,
+          price: null,
           status: 'en_cours', // Changer le statut à en_cours
         }),
       })
@@ -425,19 +424,6 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
                       type="date"
                       value={formData.endDate}
                       onChange={(e) => handleFormChange('endDate', e.target.value)}
-                      className="form-input"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="price">Budget (Ar):</label>
-                    <input
-                      id="price"
-                      type="number"
-                      step="0.01"
-                      value={formData.price}
-                      onChange={(e) => handleFormChange('price', e.target.value)}
-                      placeholder="Optionnel (auto si vide)"
                       className="form-input"
                     />
                   </div>
