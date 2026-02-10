@@ -15,6 +15,7 @@ import java.time.Instant;
 public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final FcmService fcmService;
 
     public void notifyNewSignalement(Signalement signalement) {
         SignalementNotification notification = SignalementNotification.builder()
@@ -42,6 +43,13 @@ public class NotificationService {
                 .build();
 
         sendNotification(notification);
+
+        // Push notification FCM au propriétaire du signalement
+        fcmService.sendPushToReportOwner(
+                signalement.getFirebaseId(),
+                "Statut mis à jour",
+                signalement.getTypeProblem().getLibelle() + " → " + newStatus
+        );
     }
 
     public void notifyWorkAdded(Signalement signalement, String companyName) {
@@ -55,6 +63,13 @@ public class NotificationService {
                 .build();
 
         sendNotification(notification);
+
+        // Push notification FCM au propriétaire du signalement
+        fcmService.sendPushToReportOwner(
+                signalement.getFirebaseId(),
+                "Travaux assignés",
+                companyName + " - " + signalement.getTypeProblem().getLibelle()
+        );
     }
 
     public void notifySyncCompleted(int count) {

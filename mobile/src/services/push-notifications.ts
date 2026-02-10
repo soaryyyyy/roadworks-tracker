@@ -1,4 +1,5 @@
 import { PushNotifications } from '@capacitor/push-notifications';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -77,8 +78,21 @@ export const setupPushListeners = (): void => {
   });
 
   // Notification recue quand l'app est au premier plan
-  PushNotifications.addListener('pushNotificationReceived', (notification) => {
+  // Android n'affiche PAS les push FCM automatiquement en foreground,
+  // donc on affiche une notification locale
+  PushNotifications.addListener('pushNotificationReceived', async (notification) => {
     console.log('Push notification recue (foreground):', notification);
+
+    await LocalNotifications.schedule({
+      notifications: [{
+        id: Math.floor(Math.random() * 100000),
+        title: notification.title || 'Roadworks Tracker',
+        body: notification.body || '',
+        channelId: 'status-updates',
+        smallIcon: 'ic_stat_icon_config_sample',
+        largeIcon: 'ic_launcher',
+      }],
+    });
   });
 
   // L'utilisateur a clique sur la notification
