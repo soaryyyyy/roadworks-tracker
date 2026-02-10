@@ -297,7 +297,7 @@ export default function UsersPage() {
             className="import-button"
             disabled={syncing}
           >
-            {syncing ? '⏳ Synchronisation...' : '📥 Importer de Mobile'}
+            {syncing ? '⏳ Synchronisation...' : '📥 Synchroniser'}
           </button>
           <button 
             onClick={handleSyncStatusToMobile} 
