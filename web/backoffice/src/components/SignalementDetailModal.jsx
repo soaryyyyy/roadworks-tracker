@@ -16,6 +16,7 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
   const [formData, setFormData] = useState({
     surface: '',
     companyId: '',
+    reparationTypeId: '',
     startDate: new Date().toISOString().split('T')[0],
     endDate: '',
     price: '',
@@ -296,6 +297,23 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
                         ❌ Aucune entreprise disponible
                       </p>
                     )}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="reparationType">Niveau de réparation:</label>
+                    <select
+                      id="reparationType"
+                      value={formData.reparationTypeId}
+                      onChange={(e) => handleFormChange('reparationTypeId', e.target.value)}
+                      className="form-input"
+                    >
+                      <option value="">-- Sélectionner un niveau --</option>
+                      {Array.from({ length: 10 }, (_, index) => index + 1).map((level) => (
+                        <option key={level} value={level}>
+                          Niveau {level}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="form-group">
