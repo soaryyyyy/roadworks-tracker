@@ -24,6 +24,10 @@ public class SignalementWork {
     @JoinColumn(name = "id_company", nullable = false)
     private Company company;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_reparation_type")
+    private ReparationType reparationType;
+
     private LocalDate startDate;
 
     private LocalDate endDateEstimation;

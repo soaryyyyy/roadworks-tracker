@@ -15,6 +15,7 @@ import itu.cloud.roadworks.repository.SignalementStatusRepository;
 import itu.cloud.roadworks.repository.StatusSignalementRepository;
 import itu.cloud.roadworks.repository.TypeProblemRepository;
 import itu.cloud.roadworks.repository.AccountRepository;
+import itu.cloud.roadworks.repository.ReparationTypeRepository;
 import itu.cloud.roadworks.repository.SignalementWorkRepository;
 import itu.cloud.roadworks.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,8 @@ public class SignalementService {
     private final SignalementWorkRepository workRepository;
     private final SignalementPhotoRepository photoRepository;
     private final CompanyRepository companyRepository;
+    private final ReparationTypeRepository reparationTypeRepository;
+    private final BudgetForfaitaireService budgetForfaitaireService;
     private final FirebaseService firebaseService;
     private final NotificationService notificationService;
     private final FcmService fcmService;
@@ -71,6 +74,28 @@ public class SignalementService {
                 .description(signalement.getDescriptions())
                 .build();
 
+        SignalementProblemDto.WorkInfo workInfo = null;
+        if (latestWork != null) {
+            workInfo = SignalementProblemDto.WorkInfo.builder()
+                    .startDate(latestWork.getStartDate() != null ? latestWork.getStartDate().toString() : null)
+                    .endDateEstimation(latestWork.getEndDateEstimation() != null ? latestWork.getEndDateEstimation().toString() : null)
+                    .realEndDate(latestWork.getRealEndDate() != null ? latestWork.getRealEndDate().toString() : null)
+                    .price(latestWork.getPrice())
+                    .company(Optional.ofNullable(latestWork.getCompany())
+                            .map(company -> SignalementProblemDto.CompanyDto.builder()
+                                    .id(company.getId())
+                                    .name(company.getName())
+                                    .build())
+                            .orElse(null))
+                    .reparationType(Optional.ofNullable(latestWork.getReparationType())
+                            .map(rep -> SignalementProblemDto.ReparationTypeDto.builder()
+                                    .id(rep.getId())
+                                    .niveau(rep.getNiveau())
+                                    .build())
+                            .orElse(null))
+                    .build();
+        }
+
         // Récupérer les photos du signalement
         List<String> photosList = signalement.getPhotos().stream()
                 .map(SignalementPhoto::getPhotoData)
@@ -82,6 +107,7 @@ public class SignalementService {
                 .illustrationProblem(signalement.getTypeProblem().getIcone())
                 .location(signalement.getLocation())
                 .detail(detail)
+                .work(workInfo)
                 .photos(photosList.isEmpty() ? null : photosList)
                 .build();
     }
@@ -480,6 +506,21 @@ public class SignalementService {
             Company company = companyRepository.findById(companyId)
                     .orElseThrow(() -> new Exception("Entreprise non trouvée"));
 
+            Long reparationTypeId = null;
+            if (workData.containsKey("reparationTypeId")) {
+                Object repIdObj = workData.get("reparationTypeId");
+                if (repIdObj instanceof Number) {
+                    reparationTypeId = ((Number) repIdObj).longValue();
+                } else if (repIdObj instanceof String && !((String) repIdObj).trim().isEmpty()) {
+                    reparationTypeId = Long.parseLong((String) repIdObj);
+                }
+            }
+
+            var reparationType = reparationTypeId != null
+                    ? reparationTypeRepository.findById(reparationTypeId)
+                        .orElseThrow(() -> new Exception("Type de réparation non trouvé"))
+                    : null;
+
             // Créer le SignalementWork
             LocalDate startDate = null;
             LocalDate endDate = null;
@@ -498,12 +539,30 @@ public class SignalementService {
                 }
             }
 
+            BigDecimal price;
+            if (workData.containsKey("price") && workData.get("price") != null) {
+                price = BigDecimal.valueOf(((Number) workData.get("price")).doubleValue());
+                if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                    price = null;
+                }
+            } else {
+                price = null;
+            }
+
+            if (price == null) {
+                if (reparationType == null || reparationType.getNiveau() == null) {
+                    throw new Exception("Type de réparation obligatoire pour calculer automatiquement le budget");
+                }
+                price = budgetForfaitaireService.calculerBudget(signalement.getSurface(), reparationType.getNiveau());
+            }
+
             SignalementWork work = SignalementWork.builder()
                     .signalement(signalement)
                     .company(company)
+                    .reparationType(reparationType)
                     .startDate(startDate)
                     .endDateEstimation(endDate)
-                    .price(BigDecimal.valueOf(((Number) workData.get("price")).doubleValue()))
+                    .price(price)
                     .build();
 
             workRepository.save(work);

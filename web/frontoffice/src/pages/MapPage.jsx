@@ -131,6 +131,7 @@ const uniqueByNormalizedValue = (values) => {
 const adaptDtoToEvent = (dto) => {
   const detail = dto.detail ?? {}
   const coords = mapCoords(dto.location)
+  const work = dto.work ?? null
 
   return {
     id: dto.id,
@@ -147,6 +148,16 @@ const adaptDtoToEvent = (dto) => {
       entreprise_assign: detail.entrepriseAssign ?? { id: null, name: '—' },
       description: detail.description ?? 'Aucune description disponible.',
     },
+    work: work
+      ? {
+          startDate: work.startDate ?? null,
+          endDateEstimation: work.endDateEstimation ?? null,
+          realEndDate: work.realEndDate ?? null,
+          price: work.price ?? null,
+          company: work.company ?? null,
+          reparationType: work.reparationType ?? null,
+        }
+      : null,
   }
 }
 

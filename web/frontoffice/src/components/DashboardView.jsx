@@ -80,6 +80,7 @@ export function DashboardView({ events }) {
                 <li>Surface : {event.detail_problem.surface_m2} m²</li>
                 <li>Budget : {event.detail_problem.budget.toLocaleString()} Ar</li>
                 <li>Equipe : {event.detail_problem.entreprise_assign?.name ?? '—'}</li>
+                <li>Niveau réparation : {event.work?.reparationType?.niveau ?? '—'}</li>
               </ul>
               <p className="issue-description">{event.detail_problem.description}</p>
             </article>
@@ -96,6 +97,12 @@ DashboardView.propTypes = {
       id: PropTypes.number.isRequired,
       type_problem: PropTypes.string.isRequired,
       illustration_problem: PropTypes.string.isRequired,
+      work: PropTypes.shape({
+        reparationType: PropTypes.shape({
+          id: PropTypes.number,
+          niveau: PropTypes.number,
+        }),
+      }),
       detail_problem: PropTypes.shape({
         etat: PropTypes.string.isRequired,
         date_problem: PropTypes.string.isRequired,

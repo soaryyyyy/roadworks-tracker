@@ -65,6 +65,18 @@ export default function DashboardPage() {
       // Transformer les données pour correspondre au format attendu
       const transformedEvents = data.map(signalement => {
         const [lat, lon] = signalement.location.split(',').map(parseFloat)
+        const work = signalement.work
+          ? {
+              surface: signalement.detail?.surfaceM2 ?? null,
+              company: signalement.work.company?.name ?? 'N/A',
+              companyId: signalement.work.company?.id ?? null,
+              startDate: signalement.work.startDate ?? null,
+              endDateEstimation: signalement.work.endDateEstimation ?? null,
+              realEndDate: signalement.work.realEndDate ?? null,
+              price: signalement.work.price ?? null,
+              reparationType: signalement.work.reparationType ?? null,
+            }
+          : null
         return {
           id: signalement.id,
           type: mapProblemTypeToIcon(signalement.typeProblem),
@@ -74,7 +86,7 @@ export default function DashboardPage() {
           description: signalement.detail?.description || 'Aucune description',
           status: signalement.detail?.etat || 'nouveau',
           date: signalement.detail?.dateProblem,
-          work: signalement.detail?.work,
+          work,
           isSynced: true, // Les signalements de la BDD sont synchronisés
         }
       })
@@ -293,6 +305,9 @@ export default function DashboardPage() {
                 title="Importer les signalements depuis l'application mobile"
               >
                 {syncing ? '⏳ Import...' : '📥 Importer de Mobile'}
+              </button>
+              <button className="nav-button" onClick={() => navigate('/m2-forfait')}>
+                📐 Forfait m²
               </button>
               <button
                 onClick={handleExportToMobile}
