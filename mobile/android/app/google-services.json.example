@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "915681241557",
+    "project_id": "roadworks-tracker",
+    "storage_bucket": "roadworks-tracker.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915681241557:android:72eb61c45f97452b4ff55c",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApE5dhsT1NEFMKtJdgWvm7BFPPBwLpge4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
