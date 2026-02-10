@@ -94,8 +94,8 @@ import { useConfigStore } from '@/pinia/firebase/routeworks-tracker';
 import { useAuthSessionStore } from '@/pinia/auth/session';
 
 // Input
-const email = ref<string>('');
-const password = ref<string>('');
+const email = ref<string>('test@mail.com');
+const password = ref<string>('test123!');
 
 // Disable button or not
 const awaitSignIn = ref<boolean>(false);
