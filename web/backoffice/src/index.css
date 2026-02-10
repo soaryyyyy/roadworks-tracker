@@ -454,6 +454,124 @@ body {
   font-size: var(--font-size-xs);
 }
 
+/* Forfait m² (Manager) */
+.forfaits-content {
+  padding: var(--spacing-md);
+  background: var(--neutral-light);
+  flex: 1;
+}
+
+.forfaits-card {
+  background: var(--neutral-white);
+  border: 1px solid var(--neutral-gray-200);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.forfaits-card h2 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-md);
+  color: var(--neutral-dark);
+}
+
+.forfaits-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.forfaits-card-header h2 {
+  margin: 0;
+}
+
+.forfaits-form {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--spacing-md);
+  align-items: end;
+}
+
+.forfaits-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  grid-column: span 4;
+}
+
+.forfaits-field label {
+  font-size: var(--font-size-xs);
+  color: var(--neutral-gray-600);
+  font-weight: 600;
+}
+
+.forfaits-field input,
+.forfaits-field select {
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--neutral-gray-300);
+  background: var(--neutral-white);
+  font-size: var(--font-size-sm);
+}
+
+.forfaits-actions {
+  grid-column: span 4;
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.forfaits-empty {
+  margin: 0;
+  color: var(--neutral-gray-600);
+  font-size: var(--font-size-sm);
+}
+
+.forfaits-table-wrap {
+  overflow: auto;
+}
+
+.forfaits-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.forfaits-table th,
+.forfaits-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--neutral-gray-100);
+  font-size: var(--font-size-sm);
+  text-align: left;
+}
+
+.forfaits-table thead {
+  background: var(--neutral-gray-50);
+}
+
+.forfaits-row-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.forfaits-row-actions .logout-button {
+  padding: 8px 10px;
+}
+
+@media (max-width: 900px) {
+  .forfaits-field {
+    grid-column: span 6;
+  }
+  .forfaits-actions {
+    grid-column: span 12;
+    justify-content: flex-start;
+  }
+}
+
 /* Analytics */
 .analytics-grid {
   display: grid;

@@ -3,6 +3,8 @@ import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import UsersPage from './pages/UsersPage'
 import AnalyticsPage from './pages/AnalyticsPage'
+import M2ForfaitListPage from './pages/M2ForfaitListPage'
+import M2ForfaitFormPage from './pages/M2ForfaitFormPage'
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token')
@@ -38,6 +40,30 @@ export default function App() {
           element={
             <ProtectedRoute>
               <AnalyticsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/m2-forfait"
+          element={
+            <ProtectedRoute>
+              <M2ForfaitListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/m2-forfait/new"
+          element={
+            <ProtectedRoute>
+              <M2ForfaitFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/m2-forfait/:id/edit"
+          element={
+            <ProtectedRoute>
+              <M2ForfaitFormPage />
             </ProtectedRoute>
           }
         />
