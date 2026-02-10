@@ -306,6 +306,9 @@ export default function DashboardPage() {
               >
                 {syncing ? '⏳ Import...' : '📥 Importer de Mobile'}
               </button>
+              <button className="nav-button" onClick={() => navigate('/m2-forfait')}>
+                📐 Forfait m²
+              </button>
               <button
                 onClick={handleExportToMobile}
                 disabled={syncing || exporting || syncingStatus}
