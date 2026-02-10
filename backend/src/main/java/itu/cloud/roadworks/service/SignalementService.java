@@ -73,6 +73,28 @@ public class SignalementService {
                 .description(signalement.getDescriptions())
                 .build();
 
+        SignalementProblemDto.WorkInfo workInfo = null;
+        if (latestWork != null) {
+            workInfo = SignalementProblemDto.WorkInfo.builder()
+                    .startDate(latestWork.getStartDate() != null ? latestWork.getStartDate().toString() : null)
+                    .endDateEstimation(latestWork.getEndDateEstimation() != null ? latestWork.getEndDateEstimation().toString() : null)
+                    .realEndDate(latestWork.getRealEndDate() != null ? latestWork.getRealEndDate().toString() : null)
+                    .price(latestWork.getPrice())
+                    .company(Optional.ofNullable(latestWork.getCompany())
+                            .map(company -> SignalementProblemDto.CompanyDto.builder()
+                                    .id(company.getId())
+                                    .name(company.getName())
+                                    .build())
+                            .orElse(null))
+                    .reparationType(Optional.ofNullable(latestWork.getReparationType())
+                            .map(rep -> SignalementProblemDto.ReparationTypeDto.builder()
+                                    .id(rep.getId())
+                                    .niveau(rep.getNiveau())
+                                    .build())
+                            .orElse(null))
+                    .build();
+        }
+
         // Récupérer les photos du signalement
         List<String> photosList = signalement.getPhotos().stream()
                 .map(SignalementPhoto::getPhotoData)
@@ -84,6 +106,7 @@ public class SignalementService {
                 .illustrationProblem(signalement.getTypeProblem().getIcone())
                 .location(signalement.getLocation())
                 .detail(detail)
+                .work(workInfo)
                 .photos(photosList.isEmpty() ? null : photosList)
                 .build();
     }
