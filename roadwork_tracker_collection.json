@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "roadworks-tracker-api",
 		"name": "Roadworks Tracker API",
-		"description": "Collection complète des API du projet Roadworks Tracker.\n\n**Base URL**: http://localhost:8080\n\n**Authentification**: Token Bearer via POST /api/auth/login\n\nProjet ITU - S5 - Groupe Mr Rojo",
+		"description": "Collection complete des API du projet Roadworks Tracker.\n\nBase URL: http://localhost:8080\n\nAuthentification: Token Bearer via POST /api/auth/login\n\nProjet ITU - S5 - Groupe Mr Rojo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -19,7 +19,7 @@
 	],
 	"item": [
 		{
-			"name": "🔐 Auth",
+			"name": "Auth",
 			"description": "Authentification et gestion des utilisateurs",
 			"item": [
 				{
@@ -33,7 +33,7 @@
 									"    var jsonData = pm.response.json();",
 									"    if (jsonData.token) {",
 									"        pm.collectionVariables.set('token', jsonData.token);",
-									"        console.log('Token sauvegardé automatiquement');",
+									"        console.log('Token sauvegarde automatiquement');",
 									"    }",
 									"}"
 								],
@@ -48,14 +48,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin\"\n}"
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/auth/login",
 							"host": ["{{base_url}}"],
 							"path": ["api", "auth", "login"]
 						},
-						"description": "Connexion utilisateur. Le token est automatiquement sauvegardé dans la variable `token`.\n\nCompte admin par défaut: admin / admin"
+						"description": "Connexion utilisateur. Le token est automatiquement sauvegarde dans la variable token.\n\nCompte admin par defaut: admin / admin123"
 					}
 				},
 				{
@@ -89,7 +89,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "auth", "logout"]
 						},
-						"description": "Déconnexion - invalide le token de session"
+						"description": "Deconnexion - invalide le token de session"
 					}
 				},
 				{
@@ -104,7 +104,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "auth", "validate"]
 						},
-						"description": "Vérifie si le token de session est valide et non expiré"
+						"description": "Verifie si le token de session est valide et non expire"
 					}
 				},
 				{
@@ -116,13 +116,16 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "auth", "roles"]
 						},
-						"description": "Liste tous les rôles disponibles"
+						"description": "Liste tous les roles disponibles"
 					}
 				},
 				{
 					"name": "Get Users (local)",
 					"request": {
 						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
 						"url": {
 							"raw": "{{base_url}}/api/auth/users",
 							"host": ["{{base_url}}"],
@@ -162,7 +165,7 @@
 					}
 				},
 				{
-					"name": "Sync Status to Firebase",
+					"name": "Sync User Status to Firebase",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -173,7 +176,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "auth", "sync-status-to-firebase"]
 						},
-						"description": "Synchronise les statuts bloqué/débloqué vers Firebase/Firestore"
+						"description": "Synchronise les statuts bloque/debloque vers Firebase/Firestore"
 					}
 				},
 				{
@@ -196,7 +199,7 @@
 								{ "key": "userId", "value": "1", "description": "ID utilisateur (local ou UID Firebase)" }
 							]
 						},
-						"description": "Met à jour un utilisateur (rôle, mot de passe). Laisser password vide pour ne pas modifier."
+						"description": "Met a jour un utilisateur (role, mot de passe). Laisser password vide pour ne pas modifier."
 					}
 				},
 				{
@@ -214,7 +217,7 @@
 								{ "key": "userId", "value": "1", "description": "ID utilisateur local" }
 							]
 						},
-						"description": "Débloque un compte utilisateur local bloqué"
+						"description": "Debloque un compte utilisateur local bloque"
 					}
 				},
 				{
@@ -232,11 +235,11 @@
 								{ "key": "firebaseUid", "value": "", "description": "UID Firebase de l'utilisateur" }
 							]
 						},
-						"description": "Débloque un utilisateur Firebase dans Firestore"
+						"description": "Debloque un utilisateur Firebase dans Firestore"
 					}
 				},
 				{
-					"name": "Delete User",
+					"name": "Delete User (placeholder)",
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -250,13 +253,13 @@
 								{ "key": "userId", "value": "1", "description": "ID utilisateur" }
 							]
 						},
-						"description": "Supprime un utilisateur (⚠️ non implémenté, retourne 501)"
+						"description": "Supprime un utilisateur (non implemente, retourne 501)"
 					}
 				}
 			]
 		},
 		{
-			"name": "📋 Signalements",
+			"name": "Signalements",
 			"description": "CRUD et gestion des signalements d'incidents routiers",
 			"item": [
 				{
@@ -272,7 +275,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "signalements"]
 						},
-						"description": "Liste tous les signalements avec détails (type problème, statut, entreprise, coûts)"
+						"description": "Liste tous les signalements avec details (type probleme, statut, entreprise, couts)"
 					}
 				},
 				{
@@ -291,7 +294,7 @@
 								{ "key": "id", "value": "1", "description": "ID du signalement" }
 							]
 						},
-						"description": "Récupère un signalement par ID"
+						"description": "Recupere un signalement par ID"
 					}
 				},
 				{
@@ -306,10 +309,10 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "signalements", "status", ":status"],
 							"variable": [
-								{ "key": "status", "value": "new", "description": "Statut: new, in_progress, completed, cancelled" }
+								{ "key": "status", "value": "nouveau", "description": "Statut: nouveau, en_cours, termine, annule" }
 							]
 						},
-						"description": "Filtre les signalements par statut"
+						"description": "Filtre les signalements par statut. Valeurs: nouveau, en_cours, termine, annule"
 					}
 				},
 				{
@@ -327,7 +330,7 @@
 								{ "key": "id", "value": "1", "description": "ID du signalement" }
 							]
 						},
-						"description": "Récupère les photos associées à un signalement"
+						"description": "Recupere les photos associees a un signalement"
 					}
 				},
 				{
@@ -341,7 +344,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"status\": \"in_progress\"\n}"
+							"raw": "{\n    \"status\": \"en_cours\",\n    \"realEndDate\": null\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/signalements/:id/status",
@@ -351,11 +354,11 @@
 								{ "key": "id", "value": "1", "description": "ID du signalement" }
 							]
 						},
-						"description": "Met à jour le statut d'un signalement (new, in_progress, completed, cancelled)"
+						"description": "Met a jour le statut d'un signalement.\n\nStatuts: nouveau, en_cours, termine, annule\n\nREGLE: Le statut ne peut pas regresser (ex: en_cours ne peut pas redevenir nouveau).\nSi le statut est 'termine', le champ realEndDate (YYYY-MM-DD) est obligatoire."
 					}
 				},
 				{
-					"name": "Add Work (Réparation)",
+					"name": "Add Work (Reparation)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -365,7 +368,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id_company\": 1,\n    \"start_date\": \"2026-02-10\",\n    \"end_date_estimation\": \"2026-03-10\",\n    \"price\": 150000.00\n}"
+							"raw": "{\n    \"surface\": 25.50,\n    \"companyId\": 1,\n    \"startDate\": \"2026-02-10\",\n    \"endDate\": \"2026-03-10\",\n    \"price\": 150000.00,\n    \"reparationTypeId\": 3\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/signalements/:id/work",
@@ -375,7 +378,7 @@
 								{ "key": "id", "value": "1", "description": "ID du signalement" }
 							]
 						},
-						"description": "Ajoute une réparation à un signalement (entreprise, coûts, durées)"
+						"description": "Ajoute une reparation a un signalement.\n\nChamps:\n- surface (number, obligatoire): Surface en m2\n- companyId (Long, obligatoire): ID de l'entreprise\n- startDate (string, optionnel): Date debut YYYY-MM-DD\n- endDate (string, optionnel): Date fin estimee YYYY-MM-DD\n- price (number, obligatoire): Budget en Ariary\n- reparationTypeId (Long, optionnel): Niveau de reparation (1-10)\n\nLe statut passe automatiquement a en_cours."
 					}
 				},
 				{
@@ -387,11 +390,11 @@
 							{ "key": "X-Username", "value": "admin" }
 						],
 						"url": {
-							"raw": "{{base_url}}/api/signalements/sync-firebase",
+							"raw": "{{base_url}}/api/signalements/sync/firebase",
 							"host": ["{{base_url}}"],
-							"path": ["api", "signalements", "sync-firebase"]
+							"path": ["api", "signalements", "sync", "firebase"]
 						},
-						"description": "Synchronise les signalements depuis Firebase vers la BD locale"
+						"description": "Importe les signalements depuis Firebase vers la BD locale. Les doublons sont detectes par firebase_id."
 					}
 				},
 				{
@@ -403,15 +406,15 @@
 							{ "key": "X-Username", "value": "admin" }
 						],
 						"url": {
-							"raw": "{{base_url}}/api/signalements/export-to-firebase",
+							"raw": "{{base_url}}/api/signalements/sync/to-firebase",
 							"host": ["{{base_url}}"],
-							"path": ["api", "signalements", "export-to-firebase"]
+							"path": ["api", "signalements", "sync", "to-firebase"]
 						},
 						"description": "Exporte les signalements locaux (sans firebase_id) vers Firebase"
 					}
 				},
 				{
-					"name": "Sync Status to Firebase",
+					"name": "Sync All Status to Firebase",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -419,11 +422,11 @@
 							{ "key": "X-Username", "value": "admin" }
 						],
 						"url": {
-							"raw": "{{base_url}}/api/signalements/sync-status-to-firebase",
+							"raw": "{{base_url}}/api/signalements/sync/status-to-firebase",
 							"host": ["{{base_url}}"],
-							"path": ["api", "signalements", "sync-status-to-firebase"]
+							"path": ["api", "signalements", "sync", "status-to-firebase"]
 						},
-						"description": "Synchronise tous les statuts vers Firebase"
+						"description": "Synchronise tous les statuts vers Firebase pour l'application mobile"
 					}
 				},
 				{
@@ -435,14 +438,14 @@
 							{ "key": "X-Username", "value": "admin" }
 						],
 						"url": {
-							"raw": "{{base_url}}/api/signalements/:id/sync-to-firebase",
+							"raw": "{{base_url}}/api/signalements/:id/sync/firebase",
 							"host": ["{{base_url}}"],
-							"path": ["api", "signalements", ":id", "sync-to-firebase"],
+							"path": ["api", "signalements", ":id", "sync", "firebase"],
 							"variable": [
 								{ "key": "id", "value": "1", "description": "ID du signalement" }
 							]
 						},
-						"description": "Synchronise un signalement spécifique vers Firebase"
+						"description": "Synchronise un signalement specifique vers Firebase"
 					}
 				},
 				{
@@ -454,18 +457,18 @@
 							{ "key": "X-Username", "value": "admin" }
 						],
 						"url": {
-							"raw": "{{base_url}}/api/signalements/firebase-unsynced",
+							"raw": "{{base_url}}/api/signalements/firebase/unsynced",
 							"host": ["{{base_url}}"],
-							"path": ["api", "signalements", "firebase-unsynced"]
+							"path": ["api", "signalements", "firebase", "unsynced"]
 						},
-						"description": "Récupère les signalements Firebase non encore importés en local"
+						"description": "Recupere les signalements Firebase non encore importes en local (reserve aux managers)"
 					}
 				}
 			]
 		},
 		{
-			"name": "🏢 Companies",
-			"description": "Gestion des entreprises de réparation",
+			"name": "Companies",
+			"description": "Gestion des entreprises de reparation",
 			"item": [
 				{
 					"name": "Get All Companies",
@@ -491,7 +494,7 @@
 								{ "key": "id", "value": "1", "description": "ID de l'entreprise" }
 							]
 						},
-						"description": "Récupère une entreprise par son ID"
+						"description": "Recupere une entreprise par son ID"
 					}
 				},
 				{
@@ -511,7 +514,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "companies"]
 						},
-						"description": "Crée une nouvelle entreprise"
+						"description": "Cree une nouvelle entreprise. Le SIRET doit etre unique."
 					}
 				},
 				{
@@ -524,7 +527,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"BTP Madagascar Updated\",\n    \"siret\": \"12345678901234\",\n    \"address\": \"Lot IB 456, Antananarivo\",\n    \"phone\": \"+261 34 00 000 00\",\n    \"email\": \"info@btp-mada.mg\"\n}"
+							"raw": "{\n    \"name\": \"BTP Madagascar Updated\",\n    \"email\": \"info@btp-mada.mg\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/companies/:id",
@@ -534,7 +537,7 @@
 								{ "key": "id", "value": "1", "description": "ID de l'entreprise" }
 							]
 						},
-						"description": "Met à jour une entreprise existante"
+						"description": "Met a jour une entreprise. Seuls les champs fournis sont modifies."
 					}
 				},
 				{
@@ -552,61 +555,137 @@
 								{ "key": "id", "value": "1", "description": "ID de l'entreprise" }
 							]
 						},
-						"description": "Supprime une entreprise"
+						"description": "Supprime une entreprise (irreversible)"
 					}
 				}
 			]
 		},
 		{
-			"name": "📊 Stats & Timeline",
-			"description": "Statistiques et timeline des travaux",
+			"name": "Reparation Types",
+			"description": "Niveaux de reparation disponibles (1 a 10)",
 			"item": [
 				{
-					"name": "Get Stats",
+					"name": "Get All Reparation Types",
 					"request": {
 						"method": "GET",
-						"header": [
-							{ "key": "Authorization", "value": "Bearer {{token}}" }
-						],
 						"url": {
-							"raw": "{{base_url}}/api/stats?companyId=&startDate=&endDate=&status=",
+							"raw": "{{base_url}}/api/reparation-types",
 							"host": ["{{base_url}}"],
-							"path": ["api", "stats"],
-							"query": [
-								{ "key": "companyId", "value": "", "description": "(Optionnel) ID entreprise" },
-								{ "key": "startDate", "value": "", "description": "(Optionnel) Date début YYYY-MM-DD" },
-								{ "key": "endDate", "value": "", "description": "(Optionnel) Date fin YYYY-MM-DD" },
-								{ "key": "status", "value": "", "description": "(Optionnel) Statut" }
-							]
+							"path": ["api", "reparation-types"]
 						},
-						"description": "Calcule les statistiques de travaux avec filtres optionnels"
+						"description": "Liste tous les niveaux de reparation, tries par niveau croissant"
+					}
+				}
+			]
+		},
+		{
+			"name": "Forfaits M2",
+			"description": "CRUD du tarif forfaitaire au m2 (table default_price)",
+			"item": [
+				{
+					"name": "Get All Forfaits",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/m2-forfaits",
+							"host": ["{{base_url}}"],
+							"path": ["api", "m2-forfaits"]
+						},
+						"description": "Liste tous les forfaits de prix au m2"
 					}
 				},
 				{
-					"name": "Get Timeline",
+					"name": "Get Current Forfait",
 					"request": {
 						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/m2-forfaits/current",
+							"host": ["{{base_url}}"],
+							"path": ["api", "m2-forfaits", "current"]
+						},
+						"description": "Recupere le prix forfaitaire courant (le dernier enregistre)"
+					}
+				},
+				{
+					"name": "Get Forfait by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/m2-forfaits/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "m2-forfaits", ":id"],
+							"variable": [
+								{ "key": "id", "value": "1", "description": "ID du forfait" }
+							]
+						},
+						"description": "Recupere un forfait m2 par son ID"
+					}
+				},
+				{
+					"name": "Create Forfait",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prixM2\": 7500.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/m2-forfaits",
+							"host": ["{{base_url}}"],
+							"path": ["api", "m2-forfaits"]
+						},
+						"description": "Cree un nouveau forfait m2. Accepte prixM2 ou price (valeur > 0)."
+					}
+				},
+				{
+					"name": "Update Forfait",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prixM2\": 8000.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/m2-forfaits/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "m2-forfaits", ":id"],
+							"variable": [
+								{ "key": "id", "value": "1", "description": "ID du forfait" }
+							]
+						},
+						"description": "Met a jour un forfait m2 existant"
+					}
+				},
+				{
+					"name": "Delete Forfait",
+					"request": {
+						"method": "DELETE",
 						"header": [
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
 						"url": {
-							"raw": "{{base_url}}/api/stats/timeline?companyId=&startDate=&endDate=&status=",
+							"raw": "{{base_url}}/api/m2-forfaits/:id",
 							"host": ["{{base_url}}"],
-							"path": ["api", "stats", "timeline"],
-							"query": [
-								{ "key": "companyId", "value": "", "description": "(Optionnel) ID entreprise" },
-								{ "key": "startDate", "value": "", "description": "(Optionnel) Date début YYYY-MM-DD" },
-								{ "key": "endDate", "value": "", "description": "(Optionnel) Date fin YYYY-MM-DD" },
-								{ "key": "status", "value": "", "description": "(Optionnel) Statut" }
+							"path": ["api", "m2-forfaits", ":id"],
+							"variable": [
+								{ "key": "id", "value": "1", "description": "ID du forfait" }
 							]
 						},
-						"description": "Liste les timelines des travaux avec filtres optionnels"
+						"description": "Supprime un forfait m2"
 					}
 				}
 			]
 		},
 		{
-			"name": "📈 Advancement Rate",
+			"name": "Advancement Rates",
 			"description": "Taux d'avancement par statut",
 			"item": [
 				{
@@ -621,7 +700,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "advancement-rates"]
 						},
-						"description": "Liste tous les taux d'avancement"
+						"description": "Liste tous les taux d'avancement par statut"
 					}
 				},
 				{
@@ -639,10 +718,58 @@
 								{ "key": "percentage", "value": "50", "description": "Pourcentage (0-100)" }
 							],
 							"variable": [
-								{ "key": "statusKey", "value": "in_progress", "description": "Clé du statut (new, in_progress, completed, cancelled)" }
+								{ "key": "statusKey", "value": "en_cours", "description": "Cle du statut (nouveau, en_cours, termine)" }
 							]
 						},
-						"description": "Crée ou met à jour le taux d'avancement pour un statut"
+						"description": "Cree ou met a jour le taux d'avancement pour un statut donne"
+					}
+				}
+			]
+		},
+		{
+			"name": "Analytics",
+			"description": "Statistiques et timeline des travaux",
+			"item": [
+				{
+					"name": "Get Work Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/work-stats?companyId=&startDate=&endDate=&typeProblem=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "work-stats"],
+							"query": [
+								{ "key": "companyId", "value": "", "description": "(Optionnel) ID entreprise" },
+								{ "key": "startDate", "value": "", "description": "(Optionnel) Date debut YYYY-MM-DD" },
+								{ "key": "endDate", "value": "", "description": "(Optionnel) Date fin YYYY-MM-DD" },
+								{ "key": "typeProblem", "value": "", "description": "(Optionnel) Type de probleme" }
+							]
+						},
+						"description": "Calcule les statistiques agregees des travaux avec filtres optionnels"
+					}
+				},
+				{
+					"name": "Get Work Timelines",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/work-timelines?companyId=&startDate=&endDate=&typeProblem=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "analytics", "work-timelines"],
+							"query": [
+								{ "key": "companyId", "value": "", "description": "(Optionnel) ID entreprise" },
+								{ "key": "startDate", "value": "", "description": "(Optionnel) Date debut YYYY-MM-DD" },
+								{ "key": "endDate", "value": "", "description": "(Optionnel) Date fin YYYY-MM-DD" },
+								{ "key": "typeProblem", "value": "", "description": "(Optionnel) Type de probleme" }
+							]
+						},
+						"description": "Liste les timelines detaillees des travaux avec filtres optionnels"
 					}
 				}
 			]
