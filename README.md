@@ -1,6 +1,6 @@
 # Roadworks Tracker - Suivi des Travaux Routiers
 
-**Projet universitaire - ITU | Semestre 5 | Groupe Rojo**
+**Projet universitaire - ITU | Semestre 5 | Groupe Mr Rojo**
 
 Application multi-plateforme de signalement et de suivi des problemes d'infrastructure routiere dans la ville d'Antananarivo. Les citoyens peuvent signaler des degradations (nids de poule, inondations, effondrements, etc.) et les gestionnaires peuvent suivre, assigner et superviser les travaux de reparation.
 
