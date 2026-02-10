@@ -44,6 +44,7 @@ public class SignalementService {
     private final CompanyRepository companyRepository;
     private final FirebaseService firebaseService;
     private final NotificationService notificationService;
+    private final FcmService fcmService;
 
     public List<SignalementProblemDto> findAllProblems() {
         return repository.findAll()
@@ -113,17 +114,7 @@ public class SignalementService {
             }
         }
 
-        // Synchroniser automatiquement vers Firebase pour que le mobile soit a jour
-        try {
-            syncToFirebase(signalementId);
-        } catch (Exception e) {
-            System.err.println("Erreur sync Firebase apres updateStatus: " + e.getMessage());
-        }
-
-        // Recharger le signalement pour avoir le firebaseId a jour (mis a jour par syncToFirebase)
-        signalement = repository.findById(signalementId).orElse(signalement);
-
-        // Notification WebSocket + Push FCM
+        // Notification WebSocket uniquement (la sync Firebase + push FCM se fait via le bouton "Sync Statuts")
         notificationService.notifyStatusUpdated(signalement, statusName);
     }
 
@@ -530,17 +521,7 @@ public class SignalementService {
 
             statusRepository.save(signalStatus);
 
-            // Synchroniser automatiquement vers Firebase
-            try {
-                syncToFirebase(signalement.getId());
-            } catch (Exception syncErr) {
-                System.err.println("Erreur sync Firebase apres addWork: " + syncErr.getMessage());
-            }
-
-            // Recharger le signalement pour avoir le firebaseId a jour
-            signalement = repository.findById(signalement.getId()).orElse(signalement);
-
-            // Notification WebSocket + Push FCM
+            // Notification WebSocket uniquement (la sync Firebase + push FCM se fait via le bouton "Sync Statuts")
             notificationService.notifyWorkAdded(signalement, company.getName());
         } catch (Exception e) {
             System.err.println("Erreur dans addWork: " + e.getMessage());
@@ -702,8 +683,19 @@ public class SignalementService {
                 // Créer un nouveau document et sauvegarder son ID
                 var docRef = db.collection("roadworks_reports").add(data).get();
                 signalement.setFirebaseId(docRef.getId());
+                firebaseId = docRef.getId();
                 repository.save(signalement);
             }
+
+            // Envoyer push notification FCM au proprietaire du signalement
+            String desc = signalement.getDescriptions();
+            String shortDesc = (desc != null && desc.length() > 50)
+                    ? desc.substring(0, 50) + "..." : (desc != null ? desc : "Votre signalement");
+            fcmService.sendPushToReportOwner(
+                    firebaseId,
+                    "Statut mis à jour",
+                    shortDesc + " → " + reportStatus
+            );
 
         } catch (Exception e) {
             System.err.println("Erreur dans syncToFirebase: " + e.getMessage());
