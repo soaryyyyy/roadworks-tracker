@@ -115,6 +115,19 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
     { id: 4, label: 'Annulé', value: 'annulé' },
   ]
 
+  // Hiérarchie des statuts : on ne peut pas réduire le statut
+  const statusHierarchy = { 'nouveau': 1, 'en_cours': 2, 'terminé': 3, 'annulé': 4 }
+  const currentStatusLevel = statusHierarchy[signalement.status] || 0
+
+  // Filtrer les options : seuls les statuts >= au statut actuel sont autorisés
+  // "annulé" reste toujours accessible, mais un statut annulé ne peut plus changer
+  const availableStatusOptions = signalement.status === 'annulé'
+    ? statusOptions.filter(opt => opt.value === 'annulé')
+    : statusOptions.filter(opt => {
+        const level = statusHierarchy[opt.value] || 0
+        return level >= currentStatusLevel
+      })
+
   const statusColors = {
     nouveau: '#fdcb6e',
     en_cours: '#e17055',
@@ -490,7 +503,7 @@ export default function SignalementDetailModal({ signalement, onClose, onStatusC
                   onChange={(e) => setSelectedStatus(e.target.value)}
                   className="status-select"
                 >
-                  {statusOptions.map((option) => (
+                  {availableStatusOptions.map((option) => (
                     <option key={option.id} value={option.value}>
                       {option.label}
                     </option>

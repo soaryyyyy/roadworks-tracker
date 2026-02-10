@@ -112,9 +112,28 @@ public class SignalementService {
                 .build();
     }
 
+    // Hiérarchie des statuts : on ne peut pas réduire le statut
+    private static final java.util.Map<String, Integer> STATUS_HIERARCHY = java.util.Map.of(
+            "nouveau", 1,
+            "en_cours", 2,
+            "terminé", 3,
+            "annulé", 4
+    );
+
     public void updateStatus(Long signalementId, String statusName, String realEndDate) throws Exception {
         Signalement signalement = repository.findById(signalementId)
                 .orElseThrow(() -> new Exception("Signalement non trouvé"));
+
+        // Vérifier la non-régression du statut
+        SignalementStatus currentStatus = signalement.getStatuses().stream().findFirst().orElse(null);
+        if (currentStatus != null) {
+            String currentStatusName = currentStatus.getStatusSignalement().getLibelle();
+            int currentLevel = STATUS_HIERARCHY.getOrDefault(currentStatusName, 0);
+            int newLevel = STATUS_HIERARCHY.getOrDefault(statusName, 0);
+            if (newLevel < currentLevel) {
+                throw new Exception("Impossible de réduire le statut de '" + currentStatusName + "' vers '" + statusName + "'");
+            }
+        }
 
         var statusSignalement = statusSignalementRepository.findByLibelle(statusName)
                 .orElseThrow(() -> new Exception("Statut invalide: " + statusName));
