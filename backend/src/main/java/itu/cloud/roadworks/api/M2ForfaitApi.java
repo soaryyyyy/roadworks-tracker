@@ -52,7 +52,7 @@ public class M2ForfaitApi {
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable Long id) {
         return repository.findById(id)
-                .map(ResponseEntity::ok)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Forfait non trouvé")));
     }
 
@@ -121,4 +121,3 @@ public class M2ForfaitApi {
         return null;
     }
 }
-

@@ -1,28 +1,50 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { loadM2Forfaits, upsertM2Forfait } from './m2ForfaitStore'
-
-const DEFAULT_FORM = { niveau: '', prixM2: '' }
+const DEFAULT_FORM = { price: '' }
 
 export default function M2ForfaitFormPage() {
   const navigate = useNavigate()
   const params = useParams()
   const role = localStorage.getItem('role')
   const username = localStorage.getItem('username')
-
-  const levels = useMemo(() => Array.from({ length: 10 }, (_, index) => index + 1), [])
+  const token = localStorage.getItem('token')
 
   const editingId = params.id ? Number(params.id) : null
-  const existing = useMemo(() => {
-    if (!editingId) return null
-    return loadM2Forfaits().find((item) => item.id === editingId) ?? null
-  }, [editingId])
-
-  const [form, setForm] = useState(() => {
-    if (!existing) return DEFAULT_FORM
-    return { niveau: String(existing.niveau), prixM2: String(existing.prixM2) }
-  })
+  const isEditing = Boolean(editingId)
+  const [form, setForm] = useState(DEFAULT_FORM)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const fetchItem = async () => {
+      if (!isEditing) return
+
+      try {
+        setLoading(true)
+        setError('')
+        const response = await fetch(`/api/m2-forfaits/${editingId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        })
+
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok) {
+          throw new Error(data.error || 'Erreur lors du chargement du forfait')
+        }
+
+        setForm({ price: data.price != null ? String(data.price) : '' })
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchItem()
+  }, [editingId, isEditing, token])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -37,34 +59,44 @@ export default function M2ForfaitFormPage() {
 
   const validate = () => {
     setError('')
-    const niveau = Number(form.niveau)
-    const prixM2 = Number(form.prixM2)
-
-    if (!Number.isFinite(niveau) || niveau < 1 || niveau > 10) {
-      setError('Veuillez sélectionner un niveau (1 à 10).')
-      return null
-    }
-    if (!Number.isFinite(prixM2) || prixM2 <= 0) {
+    const price = Number(form.price)
+    if (!Number.isFinite(price) || price <= 0) {
       setError('Veuillez saisir un tarif au m² valide.')
       return null
     }
-
-    const items = loadM2Forfaits()
-    const isDuplicate = items.some((item) => item.niveau === niveau && item.id !== editingId)
-    if (isDuplicate) {
-      setError('Ce niveau existe déjà.')
-      return null
-    }
-
-    return { niveau, prixM2 }
+    return { price }
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const validated = validate()
     if (!validated) return
 
-    upsertM2Forfait({ id: editingId, ...validated })
-    navigate('/m2-forfait')
+    try {
+      setLoading(true)
+      setError('')
+
+      const response = await fetch(isEditing ? `/api/m2-forfaits/${editingId}` : '/api/m2-forfaits', {
+        method: isEditing ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          price: validated.price,
+        }),
+      })
+
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de l’enregistrement')
+      }
+
+      navigate('/m2-forfait')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (role !== 'manager') {
@@ -103,18 +135,8 @@ export default function M2ForfaitFormPage() {
 
       <div className="forfaits-content">
         <section className="forfaits-card">
-          <h2>{editingId ? 'Modifier un forfait' : 'Ajouter un forfait'}</h2>
+          <h2>{isEditing ? 'Modifier un forfait' : 'Ajouter un forfait'}</h2>
           <div className="forfaits-form">
-            <div className="forfaits-field">
-              <label htmlFor="niveau">Niveau</label>
-              <select id="niveau" value={form.niveau} onChange={handleChange('niveau')}>
-                <option value="">--</option>
-                {levels.map((level) => (
-                  <option key={level} value={level}>{level}</option>
-                ))}
-              </select>
-            </div>
-
             <div className="forfaits-field">
               <label htmlFor="prixM2">Tarif (Ar/m²)</label>
               <input
@@ -122,17 +144,18 @@ export default function M2ForfaitFormPage() {
                 type="number"
                 min="0"
                 step="1"
-                value={form.prixM2}
-                onChange={handleChange('prixM2')}
+                value={form.price}
+                onChange={handleChange('price')}
                 placeholder="Ex: 15000"
+                disabled={loading}
               />
             </div>
 
             <div className="forfaits-actions">
-              <button className="action-button" type="button" onClick={handleSubmit}>
-                {editingId ? '💾 Enregistrer' : '➕ Ajouter'}
+              <button className="action-button" type="button" onClick={handleSubmit} disabled={loading}>
+                {loading ? '⏳ Enregistrement...' : isEditing ? '💾 Enregistrer' : '➕ Ajouter'}
               </button>
-              <button className="nav-button" type="button" onClick={() => navigate('/m2-forfait')}>
+              <button className="nav-button" type="button" onClick={() => navigate('/m2-forfait')} disabled={loading}>
                 Annuler
               </button>
             </div>
@@ -144,4 +167,3 @@ export default function M2ForfaitFormPage() {
     </div>
   )
 }
-

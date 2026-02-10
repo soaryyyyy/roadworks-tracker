@@ -1,16 +1,44 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { deleteM2Forfait, loadM2Forfaits } from './m2ForfaitStore'
 
 export default function M2ForfaitListPage() {
   const navigate = useNavigate()
   const role = localStorage.getItem('role')
   const username = localStorage.getItem('username')
+  const token = localStorage.getItem('token')
   const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    setItems(loadM2Forfaits())
-  }, [])
+    const fetchItems = async () => {
+      try {
+        setLoading(true)
+        setError('')
+        const response = await fetch('/api/m2-forfaits', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('Erreur lors du chargement des forfaits')
+        }
+
+        const data = await response.json()
+        setItems(Array.isArray(data) ? data : [])
+      } catch (err) {
+        setError(err.message)
+        setItems([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchItems()
+  }, [token])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -19,8 +47,29 @@ export default function M2ForfaitListPage() {
     navigate('/login')
   }
 
-  const handleDelete = (id) => {
-    setItems(deleteM2Forfait(id))
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm('Supprimer ce forfait ?')
+    if (!confirmed) return
+
+    try {
+      setError('')
+      const response = await fetch(`/api/m2-forfaits/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de la suppression')
+      }
+
+      setItems((prev) => prev.filter((item) => item.id !== id))
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
   if (role !== 'manager') {
@@ -67,14 +116,17 @@ export default function M2ForfaitListPage() {
             </button>
           </div>
 
-          {items.length === 0 ? (
+          {error && <div className="error" style={{ marginBottom: '10px' }}>Erreur: {error}</div>}
+
+          {loading ? (
+            <p className="forfaits-empty">Chargement…</p>
+          ) : items.length === 0 ? (
             <p className="forfaits-empty">Aucun forfait défini pour le moment.</p>
           ) : (
             <div className="forfaits-table-wrap">
               <table className="forfaits-table">
                 <thead>
                   <tr>
-                    <th>Niveau</th>
                     <th>Tarif (Ar/m²)</th>
                     <th style={{ width: 160 }}>Actions</th>
                   </tr>
@@ -82,8 +134,7 @@ export default function M2ForfaitListPage() {
                 <tbody>
                   {items.map((item) => (
                     <tr key={item.id}>
-                      <td>{item.niveau}</td>
-                      <td>{Number(item.prixM2).toLocaleString('fr-FR')}</td>
+                      <td>{Number(item.price).toLocaleString('fr-FR')}</td>
                       <td>
                         <div className="forfaits-row-actions">
                           <button className="nav-button" type="button" onClick={() => navigate(`/m2-forfait/${item.id}/edit`)}>
@@ -105,4 +156,3 @@ export default function M2ForfaitListPage() {
     </div>
   )
 }
-
