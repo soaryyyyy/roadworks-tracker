@@ -26,7 +26,7 @@ const useGeoLocationPermissionStore = defineStore('geo-location-permission', {
         const status = await Geolocation.checkPermissions();
         this.status = status.location;
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
 
@@ -36,7 +36,7 @@ const useGeoLocationPermissionStore = defineStore('geo-location-permission', {
           const status = await Geolocation.requestPermissions();
           this.status = status.location;
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
       }
     }

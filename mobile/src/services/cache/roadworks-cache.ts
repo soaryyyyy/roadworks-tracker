@@ -2,7 +2,6 @@ import { Preferences } from '@capacitor/preferences';
 import { RoadworksReportWithId } from '../firebase/roadworks-reports';
 
 const CACHE_KEY = 'roadworks_reports_cache_v1';
-const CACHE_MAX_AGE_MS = 1000 * 60 * 30; // 30 minutes
 
 interface RoadworksCachePayload {
   reports: RoadworksReportWithId[];
@@ -33,9 +32,3 @@ export const readRoadworksCache = async (): Promise<RoadworksCachePayload | null
     return null;
   }
 };
-
-export const isCacheFresh = (cachedAt: number): boolean => {
-  return Date.now() - cachedAt <= CACHE_MAX_AGE_MS;
-};
-
-export const ROADWORKS_CACHE_KEY = CACHE_KEY;

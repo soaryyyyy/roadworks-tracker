@@ -44,6 +44,7 @@ public class SignalementService {
     private final CompanyRepository companyRepository;
     private final FirebaseService firebaseService;
     private final NotificationService notificationService;
+    private final FcmService fcmService;
 
     public List<SignalementProblemDto> findAllProblems() {
         return repository.findAll()
@@ -113,11 +114,8 @@ public class SignalementService {
             }
         }
 
-        // Notification WebSocket
+        // Notification WebSocket uniquement (la sync Firebase + push FCM se fait via le bouton "Sync Statuts")
         notificationService.notifyStatusUpdated(signalement, statusName);
-
-        // Note: La synchronisation vers Firebase se fait manuellement via le bouton "Sync Statuts"
-        // pour éviter d'envoyer les statuts avant que l'utilisateur ne le souhaite
     }
 
     // Méthode surchargée pour la rétro-compatibilité
@@ -523,7 +521,7 @@ public class SignalementService {
 
             statusRepository.save(signalStatus);
 
-            // Notification WebSocket
+            // Notification WebSocket uniquement (la sync Firebase + push FCM se fait via le bouton "Sync Statuts")
             notificationService.notifyWorkAdded(signalement, company.getName());
         } catch (Exception e) {
             System.err.println("Erreur dans addWork: " + e.getMessage());
@@ -685,8 +683,19 @@ public class SignalementService {
                 // Créer un nouveau document et sauvegarder son ID
                 var docRef = db.collection("roadworks_reports").add(data).get();
                 signalement.setFirebaseId(docRef.getId());
+                firebaseId = docRef.getId();
                 repository.save(signalement);
             }
+
+            // Envoyer push notification FCM au proprietaire du signalement
+            String desc = signalement.getDescriptions();
+            String shortDesc = (desc != null && desc.length() > 50)
+                    ? desc.substring(0, 50) + "..." : (desc != null ? desc : "Votre signalement");
+            fcmService.sendPushToReportOwner(
+                    firebaseId,
+                    "Statut mis à jour",
+                    shortDesc + " → " + reportStatus
+            );
 
         } catch (Exception e) {
             System.err.println("Erreur dans syncToFirebase: " + e.getMessage());

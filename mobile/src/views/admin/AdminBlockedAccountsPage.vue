@@ -48,8 +48,7 @@
       <ion-item class="ion-margin-top" lines="none">
         <ion-input 
           placeholder="Chercher un email..."
-          v-model="searchEmail"
-          @input="filterAccounts">
+          v-model="searchEmail">
         </ion-input>
       </ion-item>
 
@@ -126,9 +125,8 @@ import {
   alertController
 } from '@ionic/vue';
 
-import { lockClosed } from 'ionicons/icons';
 import { firestore } from '@/services/firebase/routeworks-tracker';
-import { collection, query, where, getDocs, updateDoc, doc, deleteDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { unlockAccount } from '@/services/firebase/auth-attempts';
 import { lockClosedOutline, lockOpenOutline, refreshOutline, statsChartOutline } from 'ionicons/icons';
 
@@ -174,8 +172,6 @@ const refreshBlockedAccounts = async () => {
     // Mettre à jour l'heure
     const now = new Date();
     lastRefreshTime.value = now.toLocaleTimeString('fr-FR');
-
-    console.log(`📊 ${blockedAccounts.value.length} compte(s) bloqué(s) trouvé(s)`);
   } catch (error) {
     console.error('Erreur lors de la récupération des comptes bloqués:', error);
   } finally {
@@ -243,10 +239,6 @@ const resetAccountAction = async (email: string) => {
     ]
   });
   await alert.present();
-};
-
-const filterAccounts = () => {
-  // Le filtre est géré par le computed
 };
 
 onMounted(() => {

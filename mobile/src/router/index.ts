@@ -15,13 +15,12 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       { path: '', redirect: '/tabs/map' },
       { path: 'map', component: () => import('@/views/geo-location/MapPage.vue') },
-      { path: 'tab2', component: () => import('@/views/recap/RecapPage.vue') },
-      { path: 'tab3', component: () => import('@/views/Tab3Page.vue') },
+      { path: 'recap', component: () => import('@/views/recap/RecapPage.vue') },
+      { path: 'profile', component: () => import('@/views/Tab3Page.vue') },
     ]
   },
 
   { path: '/auth/signIn', component: () => import('@/views/auth/SignInPage.vue') },
-  { path: '/test/blocking', component: () => import('@/views/TestBlockingPage.vue') },
   { path: '/admin/blocked-accounts', component: () => import('@/views/admin/AdminBlockedAccountsPage.vue') },
 ]
 

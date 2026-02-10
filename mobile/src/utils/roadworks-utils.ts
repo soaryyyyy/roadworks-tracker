@@ -35,7 +35,7 @@ export const getStatusLabel = (status: string): string => {
 /**
  * Retourne une icone emoji pour un type de signalement (pour les markers)
  */
-export const getStatusIcon = (status: string, color: string): string => {
+export const getStatusIcon = (status: string): string => {
   const emoji = getStatusEmoji(status);
   return `
     <div style="
@@ -49,7 +49,7 @@ export const getStatusIcon = (status: string, color: string): string => {
 };
 
 /**
- * Retourne uniquement l'emoji pour un type de signalement (legacy, déprécié)
+ * Retourne l'emoji pour un type de signalement
  */
 export const getStatusEmoji = (status: string): string => {
   switch (status) {
@@ -74,23 +74,6 @@ export const getReportStatusLabel = (status: string): string => {
     case 'in_progress': return 'En cours';
     case 'completed': return 'Terminé';
     default: return status;
-  }
-};
-
-/**
- * Retourne la couleur hex pour un type de signalement (pour les markers)
- */
-export const getStatusHexColor = (status: string): string => {
-  switch (status) {
-    case 'pothole': return '#FF6B6B';
-    case 'blocked_road': return '#FF8C00';
-    case 'accident': return '#DC143C';
-    case 'construction': return '#FFD700';
-    case 'flooding': return '#1E90FF';
-    case 'debris': return '#A9A9A9';
-    case 'poor_surface': return '#FFA500';
-    case 'other': return '#808080';
-    default: return '#808080';
   }
 };
 

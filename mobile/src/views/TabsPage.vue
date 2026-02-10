@@ -8,12 +8,12 @@
           <ion-label>Explorer</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="tab2" href="/tabs/tab2">
+        <ion-tab-button tab="recap" href="/tabs/recap">
           <ion-icon aria-hidden="true" :icon="statsChartOutline" />
           <ion-label>Recap</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="tab3" href="/tabs/tab3">
+        <ion-tab-button tab="profile" href="/tabs/profile">
           <ion-icon aria-hidden="true" :icon="personOutline" />
           <ion-label>Profil</ion-label>
         </ion-tab-button>

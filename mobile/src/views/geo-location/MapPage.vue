@@ -64,12 +64,10 @@ import RoadworksReportDetailsModal from '@/components/geo-location/RoadworksRepo
 import {
   getStatusLabel,
   getStatusIcon,
-  getStatusHexColor,
   getReportStatusLabel,
   formatDateShort,
 } from '@/utils/roadworks-utils';
 
-const isGeoLocationModalOpen = ref<boolean>(false);
 let map: L.Map | null = null;
 let userLocation: L.Marker | null = null;
 
@@ -83,6 +81,7 @@ const showOnlyMyReports = ref<boolean>(false);
 
 const isDetailsModalOpen = ref<boolean>(false);
 const selectedReport = ref<any>(null);
+let markerClicked = false;
 
 const mountMap = async () => {
   const mapLoading = await loadingController.create({
@@ -108,7 +107,9 @@ const mountMap = async () => {
     }).addTo(map);
 
     map.on('click', function(e: L.LeafletMouseEvent) {
-      if ((e.target as any).options && (e.target as any).options.icon) {
+      // Ignorer si un marker vient d'etre clique (le click bubble vers la map)
+      if (markerClicked) {
+        markerClicked = false;
         return;
       }
 
@@ -164,8 +165,7 @@ const displayReportsOnMap = () => {
   }
 
   reportsToDisplay.forEach((report) => {
-    const statusColor = getStatusHexColor(report.status);
-    const markerHtml = getStatusIcon(report.status, statusColor);
+    const markerHtml = getStatusIcon(report.status);
 
     const svgMarkerIcon = L.divIcon({
       html: markerHtml,
@@ -199,6 +199,7 @@ const displayReportsOnMap = () => {
     marker.bindPopup(popupContent);
 
     marker.on('click', () => {
+      markerClicked = true;
       map?.setView([report.lat, report.lng], 17);
       selectedReport.value = report;
       isDetailsModalOpen.value = true;

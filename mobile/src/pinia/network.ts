@@ -32,12 +32,6 @@ export const useNetworkStore = defineStore('network', {
     updateStatus(status: NetworkStatus) {
       this.isConnected = status.connected;
       this.connectionType = status.connectionType;
-
-      if (!status.connected) {
-        console.warn('⚠️ Pas de connexion réseau');
-      } else {
-        console.log(`✅ Connexion établie (${status.connectionType})`);
-      }
     },
 
     setConnected(connected: boolean) {

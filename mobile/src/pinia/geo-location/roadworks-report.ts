@@ -8,7 +8,7 @@ import {
   RoadworksReportData,
   RoadworksReportWithId,
 } from '@/services/firebase/roadworks-reports';
-import { readRoadworksCache, saveRoadworksCache, isCacheFresh } from '@/services/cache/roadworks-cache';
+import { readRoadworksCache, saveRoadworksCache } from '@/services/cache/roadworks-cache';
 import { showToast } from '@/utils/ui';
 import { notifyStatusChange as sendNativeNotification } from '@/services/notifications';
 import { alertCircleOutline, checkmarkCircleOutline, refreshCircleOutline, notificationsOutline } from 'ionicons/icons';
@@ -70,7 +70,6 @@ export const useRoadworksReportStore = defineStore('roadworks-report', {
         if (cached?.reports?.length) {
           this.reports = cached.reports;
           onCacheApplied?.();
-          console.log(`📦 ${cached.reports.length} signalements chargés depuis le cache local (${isCacheFresh(cached.cachedAt) ? 'frais' : 'stale'})`);
         }
 
         // Récupérer l'ID utilisateur actuel
@@ -81,8 +80,6 @@ export const useRoadworksReportStore = defineStore('roadworks-report', {
 
         this.reports = await getAllRoadworksReports();
         await saveRoadworksCache(this.reports);
-        console.log(`📍 ${this.reports.length} signalements chargés depuis Firebase`);
-        console.log(`👤 User ID: ${this.currentUserId}`);
 
         onCacheApplied?.();
       } catch (error: any) {
@@ -115,7 +112,6 @@ export const useRoadworksReportStore = defineStore('roadworks-report', {
       // S'abonner à tous les signalements
       this.unsubscribeAll = subscribeToAllReports((reports) => {
         this.reports = reports;
-        console.log(`📍 ${reports.length} signalements mis à jour en temps réel`);
       });
 
       // S'abonner aux signalements de l'utilisateur pour les notifications de statut
@@ -129,7 +125,6 @@ export const useRoadworksReportStore = defineStore('roadworks-report', {
         );
       }
 
-      console.log('🔔 Abonnement aux notifications activé');
     },
 
     /**
@@ -181,11 +176,6 @@ export const useRoadworksReportStore = defineStore('roadworks-report', {
         'top'
       );
 
-      console.log(`🔔 Notification native envoyée: Signalement ${report.id} - Statut changé de "${oldStatusLabel}" à "${newStatusLabel}"`);
-    },
-
-    getReports() {
-      return this.reports;
     },
 
     clearError() {

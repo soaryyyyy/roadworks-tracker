@@ -16,7 +16,6 @@ export const initNotifications = async (): Promise<boolean> => {
     const permission = await LocalNotifications.checkPermissions();
 
     if (permission.display === 'granted') {
-      console.log('Notifications déjà autorisées');
       return true;
     }
 
@@ -24,11 +23,8 @@ export const initNotifications = async (): Promise<boolean> => {
     const request = await LocalNotifications.requestPermissions();
 
     if (request.display === 'granted') {
-      console.log('Notifications autorisées');
       return true;
     }
-
-    console.warn('Notifications refusées par l\'utilisateur');
     return false;
   } catch (error) {
     console.error('Erreur lors de l\'initialisation des notifications:', error);
@@ -74,7 +70,6 @@ export const notifyStatusChange = async (
     };
 
     await LocalNotifications.schedule(notification);
-    console.log(`Notification envoyée pour le signalement ${reportId}`);
   } catch (error) {
     console.error('Erreur lors de l\'envoi de la notification:', error);
   }
@@ -95,7 +90,6 @@ export const createNotificationChannel = async (): Promise<void> => {
       vibration: true,
       lights: true,
     });
-    console.log('Canal de notification créé');
   } catch (error) {
     console.error('Erreur lors de la création du canal:', error);
   }
@@ -105,18 +99,9 @@ export const createNotificationChannel = async (): Promise<void> => {
  * Configurer les listeners pour les notifications
  */
 export const setupNotificationListeners = (): void => {
-  // Quand l'utilisateur clique sur une notification
-  LocalNotifications.addListener('localNotificationActionPerformed', (notification) => {
-    console.log('Notification cliquée:', notification);
-    const reportId = notification.notification.extra?.reportId;
-    if (reportId) {
-
-      console.log('Naviguer vers le signalement:', reportId);
-    }
+  LocalNotifications.addListener('localNotificationActionPerformed', (_notification) => {
   });
 
-  // Quand une notification est reçue (app au premier plan)
-  LocalNotifications.addListener('localNotificationReceived', (notification) => {
-    console.log('Notification reçue:', notification);
+  LocalNotifications.addListener('localNotificationReceived', (_notification) => {
   });
 };

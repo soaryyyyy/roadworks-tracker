@@ -191,7 +191,7 @@ const handleSignIn = async () => {
           break;
       }
     } else {
-      console.log(error);
+      console.error(error);
       showToast('Une erreur inattendue est survenue', 5000, alertCircleOutline, 'danger', 'bottom')
     }
   } finally {
