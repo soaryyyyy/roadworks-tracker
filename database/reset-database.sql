@@ -28,7 +28,11 @@ CREATE TABLE status_signalement (
     id BIGSERIAL PRIMARY KEY,
     libelle VARCHAR(100) NOT NULL UNIQUE
 );
+create table default_price(
+  id BIGSERIAL PRIMARY KEY,
+  price NUMERIC(14,2) NOT NULL
 
+);
 CREATE TABLE status_account (
     id BIGSERIAL PRIMARY KEY,
     libelle VARCHAR(50) NOT NULL UNIQUE

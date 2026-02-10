@@ -20,6 +20,11 @@ CREATE TABLE config (
   max_attempts INT NOT NULL,
   session_duration INT NOT NULL
 );
+create table default_price(
+  id BIGSERIAL PRIMARY KEY,
+  price NUMERIC(14,2) NOT NULL
+
+);
 
 CREATE TABLE account (
   id BIGSERIAL PRIMARY KEY,
@@ -78,6 +83,20 @@ CREATE TABLE signalement (
   CONSTRAINT fk_signalement_type
     FOREIGN KEY (id_type_problem) REFERENCES type_problem(id)
 );
+
+CREATE TABLE signalement_photo (
+  id BIGSERIAL PRIMARY KEY,
+  id_signalement BIGINT NOT NULL,
+  photo_data TEXT NOT NULL,
+  photo_order INTEGER,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_signalement_photo_signalement
+    FOREIGN KEY (id_signalement) REFERENCES signalement(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_signalement_photo_signalement_id
+  ON signalement_photo(id_signalement);
+
 create table reparation_type (
   id BIGSERIAL PRIMARY KEY,
   niveau INT NOT NULL
