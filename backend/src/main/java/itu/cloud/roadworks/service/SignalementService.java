@@ -550,7 +550,10 @@ public class SignalementService {
             }
 
             if (price == null) {
-                price = budgetForfaitaireService.calculerBudget(signalement.getSurface());
+                if (reparationType == null || reparationType.getNiveau() == null) {
+                    throw new Exception("Type de réparation obligatoire pour calculer automatiquement le budget");
+                }
+                price = budgetForfaitaireService.calculerBudget(signalement.getSurface(), reparationType.getNiveau());
             }
 
             SignalementWork work = SignalementWork.builder()

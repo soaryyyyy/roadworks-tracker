@@ -13,12 +13,15 @@ public class BudgetForfaitaireService {
 
     private final DefaultPriceRepository defaultPriceRepository;
 
-    public BigDecimal calculerBudget(BigDecimal surfaceM2) {
+    public BigDecimal calculerBudget(BigDecimal surfaceM2, int niveau) {
         if (surfaceM2 == null) {
             throw new IllegalArgumentException("Surface obligatoire pour calculer le budget");
         }
         if (surfaceM2.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Surface invalide (>0)");
+        }
+        if (niveau <= 0) {
+            throw new IllegalArgumentException("Niveau invalide (>0)");
         }
 
         BigDecimal prixM2 = defaultPriceRepository.findTopByOrderByIdDesc()
@@ -29,7 +32,9 @@ public class BudgetForfaitaireService {
             throw new IllegalStateException("Prix forfaitaire m² invalide");
         }
 
-        return prixM2.multiply(surfaceM2).setScale(2, RoundingMode.HALF_UP);
+        return prixM2
+                .multiply(BigDecimal.valueOf(niveau))
+                .multiply(surfaceM2)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 }
-
