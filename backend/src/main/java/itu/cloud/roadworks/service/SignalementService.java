@@ -15,6 +15,7 @@ import itu.cloud.roadworks.repository.SignalementStatusRepository;
 import itu.cloud.roadworks.repository.StatusSignalementRepository;
 import itu.cloud.roadworks.repository.TypeProblemRepository;
 import itu.cloud.roadworks.repository.AccountRepository;
+import itu.cloud.roadworks.repository.ReparationTypeRepository;
 import itu.cloud.roadworks.repository.SignalementWorkRepository;
 import itu.cloud.roadworks.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class SignalementService {
     private final SignalementWorkRepository workRepository;
     private final SignalementPhotoRepository photoRepository;
     private final CompanyRepository companyRepository;
+    private final ReparationTypeRepository reparationTypeRepository;
     private final FirebaseService firebaseService;
     private final NotificationService notificationService;
     private final FcmService fcmService;
@@ -480,6 +482,21 @@ public class SignalementService {
             Company company = companyRepository.findById(companyId)
                     .orElseThrow(() -> new Exception("Entreprise non trouvée"));
 
+            Long reparationTypeId = null;
+            if (workData.containsKey("reparationTypeId")) {
+                Object repIdObj = workData.get("reparationTypeId");
+                if (repIdObj instanceof Number) {
+                    reparationTypeId = ((Number) repIdObj).longValue();
+                } else if (repIdObj instanceof String && !((String) repIdObj).trim().isEmpty()) {
+                    reparationTypeId = Long.parseLong((String) repIdObj);
+                }
+            }
+
+            var reparationType = reparationTypeId != null
+                    ? reparationTypeRepository.findById(reparationTypeId)
+                        .orElseThrow(() -> new Exception("Type de réparation non trouvé"))
+                    : null;
+
             // Créer le SignalementWork
             LocalDate startDate = null;
             LocalDate endDate = null;
@@ -501,6 +518,7 @@ public class SignalementService {
             SignalementWork work = SignalementWork.builder()
                     .signalement(signalement)
                     .company(company)
+                    .reparationType(reparationType)
                     .startDate(startDate)
                     .endDateEstimation(endDate)
                     .price(BigDecimal.valueOf(((Number) workData.get("price")).doubleValue()))
