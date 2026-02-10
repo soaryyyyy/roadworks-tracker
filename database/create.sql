@@ -20,6 +20,11 @@ CREATE TABLE config (
   max_attempts INT NOT NULL,
   session_duration INT NOT NULL
 );
+create table default_price(
+  id BIGSERIAL PRIMARY KEY,
+  price NUMERIC(14,2) NOT NULL
+
+);
 
 CREATE TABLE account (
   id BIGSERIAL PRIMARY KEY,
@@ -79,6 +84,24 @@ CREATE TABLE signalement (
     FOREIGN KEY (id_type_problem) REFERENCES type_problem(id)
 );
 
+CREATE TABLE signalement_photo (
+  id BIGSERIAL PRIMARY KEY,
+  id_signalement BIGINT NOT NULL,
+  photo_data TEXT NOT NULL,
+  photo_order INTEGER,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_signalement_photo_signalement
+    FOREIGN KEY (id_signalement) REFERENCES signalement(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_signalement_photo_signalement_id
+  ON signalement_photo(id_signalement);
+
+create table reparation_type (
+  id BIGSERIAL PRIMARY KEY,
+  niveau INT NOT NULL
+);
+
 CREATE TABLE signalement_work (
   id BIGSERIAL PRIMARY KEY,
   id_signalement BIGINT NOT NULL,
@@ -87,10 +110,13 @@ CREATE TABLE signalement_work (
   end_date_estimation DATE,
   price NUMERIC(14,2),
   real_end_date DATE,
+  id_reparation_type INT,
   CONSTRAINT fk_work_signalement
     FOREIGN KEY (id_signalement) REFERENCES signalement(id) ON DELETE CASCADE,
   CONSTRAINT fk_work_company
-    FOREIGN KEY (id_company) REFERENCES company(id)
+    FOREIGN KEY (id_company) REFERENCES company(id),
+  CONSTRAINT fk_work_reparation_type
+    FOREIGN KEY (id_reparation_type) REFERENCES reparation_type(id)
 );
 
 CREATE TABLE signalement_status (
@@ -115,6 +141,7 @@ CREATE TABLE session (
   CONSTRAINT fk_session_account
     FOREIGN KEY (id_account) REFERENCES account(id) ON DELETE CASCADE
 );
+
 
 CREATE VIEW signalement_problem_view AS
 SELECT
